@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Allow access to storage directly
+RewriteCond %{REQUEST_URI} !^/storage/app/public
+RewriteRule ^(.*)$ public/$1 [L]
