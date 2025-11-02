@@ -23,6 +23,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
      */
     protected $fillable = [
         'name',
+        'surname',
+        'username',
+        'business_name',
         'email',
         'password',
         'avatar_url',
@@ -67,8 +70,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         $types = [
             1 => 'Admin',
-            2 => 'Buyer',
-            3 => 'Seller',
+            2 => 'Professional',
+            3 => 'Customer',
         ];
 
         return $types[$this->user_type] ?? 'Unknown';
@@ -76,6 +79,18 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function gigs()
     {
         return $this->hasMany(Gig::class);
+    }
+
+    public function userSubcategories()
+    {
+        return $this->hasMany(UserSubcategory::class);
+    }
+
+    public function subcategories()
+    {
+        return $this->belongsToMany(Subcategory::class, 'user_subcategories')
+                    ->withPivot('priority')
+                    ->withTimestamps();
     }
 
     public function getFilamentAvatarUrl(): ?string

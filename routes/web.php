@@ -38,6 +38,18 @@ Route::get('/api/subcategories/{categoryId}', function ($categoryId) {
     return response()->json($subcategories);
 });
 
+// API route for creating setup intent during registration (before user exists)
+Route::post('/api/create-setup-intent-for-registration', function (Request $request) {
+    Stripe::setApiKey(config('services.stripe.secret'));
+    
+    // Create a temporary setup intent without customer (we'll attach it later)
+    $setupIntent = \Stripe\SetupIntent::create([
+        'payment_method_types' => ['card'],
+    ]);
+    
+    return response()->json(['clientSecret' => $setupIntent->client_secret]);
+});
+
 Route::post('/store-payment-method', function (Request $request) {
     $user = User::find(Auth::id());
 

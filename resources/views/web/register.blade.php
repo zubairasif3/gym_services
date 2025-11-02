@@ -354,9 +354,9 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Address<span class="required">*</span>
+                            Cap<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="address" placeholder="Address" required>
+                        <input type="text" class="form-input-register" name="cap" placeholder="CAP" required>
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
@@ -415,6 +415,12 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
+                            Business Name<span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input-register" name="business_name" placeholder="Business Name" required>
+                    </div>
+                    <div class="form-group-register">
+                        <label class="form-label-register">
                             Username<span class="required">*</span>
                         </label>
                         <input type="text" class="form-input-register" name="username" placeholder="Username" required>
@@ -439,9 +445,9 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Address<span class="required">*</span>
+                            Address
                         </label>
-                        <input type="text" class="form-input-register" name="address" placeholder="Address" required>
+                        <input type="text" class="form-input-register" name="address" placeholder="Address">
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
@@ -508,6 +514,21 @@
                     </div>
                 </div>
 
+                <!-- Credit Card Section for Professionals -->
+                <div class="credit-card-section" style="margin: 30px 0; padding: 25px; background: rgba(0, 179, 241, 0.05); border: 1px solid #00b3f1; border-radius: 12px;">
+                    <h3 style="color: white; font-size: 18px; margin-bottom: 15px; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
+                        Payment Information <span class="required">*</span>
+                    </h3>
+                    <p style="color: #00b3f1; font-size: 13px; margin-bottom: 20px; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
+                        First year free, €99/year renewal
+                    </p>
+                    <div id="professional-card-element" style="padding: 12px; background: transparent; border: 1px solid #00b3f1; border-radius: 12px; margin-bottom: 10px;">
+                        <!-- Stripe Elements will create form elements here -->
+                    </div>
+                    <div id="professional-card-errors" role="alert" style="color: #ff4444; font-size: 13px; margin-top: 10px; min-height: 20px;"></div>
+                    <input type="hidden" name="payment_method_id" id="professional_payment_method_id">
+                </div>
+
                 <p class="required-fields-note">* Required fields</p>
 
                 <div class="privacy-checkbox-wrapper">
@@ -517,7 +538,7 @@
                     </label>
                 </div>
 
-                <button type="submit" class="register-submit-btn">Create Account</button>
+                <button type="submit" class="register-submit-btn" id="professional-submit-btn">Create Account</button>
             </div>
         </form>
     </div>
@@ -525,6 +546,116 @@
 @endsection
 
 @push('scripts')
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Initialize Stripe for Professional form
+    let professionalStripe;
+    let professionalCardElement;
+    let professionalCardErrors;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only initialize Stripe if we're on the professional tab
+        const professionalForm = document.getElementById('professionalForm');
+        if (professionalForm) {
+            professionalStripe = Stripe("{{ config('services.stripe.key') }}");
+            const professionalElements = professionalStripe.elements();
+            
+            professionalCardElement = professionalElements.create('card', {
+                style: {
+                    base: {
+                        color: '#ffffff',
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '14px',
+                        '::placeholder': {
+                            color: '#999999',
+                        },
+                    },
+                    invalid: {
+                        color: '#ff4444',
+                    },
+                },
+            });
+            
+            professionalCardElement.mount('#professional-card-element');
+            
+            professionalCardErrors = document.getElementById('professional-card-errors');
+            
+            professionalCardElement.on('change', function(event) {
+                if (event.error) {
+                    professionalCardErrors.textContent = event.error.message;
+                } else {
+                    professionalCardErrors.textContent = '';
+                }
+            });
+        }
+    });
+
+    // Handle professional form submission with Stripe
+    const professionalForm = document.getElementById('professionalForm');
+    if (professionalForm) {
+        professionalForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('professional-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            
+            try {
+                // Create setup intent first (we'll handle this server-side after user creation)
+                // For now, we'll just validate the card and continue with form submission
+                const {setupIntent, error} = await professionalStripe.confirmCardSetup(
+                    await getSetupIntentClientSecret(), {
+                        payment_method: {
+                            card: professionalCardElement,
+                            billing_details: {
+                                name: document.querySelector('#professionalForm input[name="name"]').value + ' ' + document.querySelector('#professionalForm input[name="surname"]').value,
+                                email: document.querySelector('#professionalForm input[name="email"]').value,
+                            },
+                        },
+                    }
+                );
+                
+                if (error) {
+                    professionalCardErrors.textContent = error.message;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Account';
+                    return;
+                }
+                
+                // Set the payment method ID in hidden field
+                document.getElementById('professional_payment_method_id').value = setupIntent.payment_method;
+                
+                // Now submit the form
+                professionalForm.submit();
+                
+            } catch (err) {
+                professionalCardErrors.textContent = 'An error occurred. Please try again.';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        });
+    }
+    
+    // Function to get setup intent client secret
+    async function getSetupIntentClientSecret() {
+        // We'll create the setup intent on the server side
+        // For now, we'll use a temporary approach - create customer during registration
+        const response = await fetch('/api/create-setup-intent-for-registration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                email: document.querySelector('#professionalForm input[name="email"]').value,
+                name: document.querySelector('#professionalForm input[name="name"]').value
+            })
+        });
+        
+        const data = await response.json();
+        return data.clientSecret;
+    }
+</script>
 <script>
     // Tab switching
     document.querySelectorAll('.register-tab').forEach(tab => {
@@ -544,6 +675,33 @@
                 document.getElementById('customerForm').classList.add('active');
             } else {
                 document.getElementById('professionalForm').classList.add('active');
+                // Re-initialize Stripe card element when switching to professional tab
+                if (professionalStripe && !professionalCardElement) {
+                    const professionalElements = professionalStripe.elements();
+                    professionalCardElement = professionalElements.create('card', {
+                        style: {
+                            base: {
+                                color: '#ffffff',
+                                fontFamily: "'DM Sans', sans-serif",
+                                fontSize: '14px',
+                                '::placeholder': {
+                                    color: '#999999',
+                                },
+                            },
+                            invalid: {
+                                color: '#ff4444',
+                            },
+                        },
+                    });
+                    professionalCardElement.mount('#professional-card-element');
+                    professionalCardElement.on('change', function(event) {
+                        if (event.error) {
+                            professionalCardErrors.textContent = event.error.message;
+                        } else {
+                            professionalCardErrors.textContent = '';
+                        }
+                    });
+                }
             }
         });
     });
