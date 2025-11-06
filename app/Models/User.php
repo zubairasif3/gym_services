@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +11,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Filament\Models\Contracts\HasAvatar;
 
-class User extends Authenticatable implements FilamentUser, HasAvatar
+class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -91,6 +91,21 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->belongsToMany(Subcategory::class, 'user_subcategories')
                     ->withPivot('priority')
                     ->withTimestamps();
+    }
+
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        // Send different notifications based on user type
+        if ($this->user_type == 3) {
+            // Professional/Seller
+            $this->notify(new \App\Notifications\VerifyEmailProfessional());
+        } else {
+            // Customer (user_type == 2)
+            $this->notify(new \App\Notifications\VerifyEmailCustomer());
+        }
     }
 
     public function getFilamentAvatarUrl(): ?string

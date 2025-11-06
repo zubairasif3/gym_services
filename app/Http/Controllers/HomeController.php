@@ -11,6 +11,8 @@ use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\PaymentMethod;
@@ -161,145 +163,183 @@ class HomeController extends Controller
 
     public function registerProcess(Request $request)
     {
-        // Get user type from hidden field (2 = Customer, 3 = Professional/Seller)
-        $userType = $request->input('user_type', 2);
+        try {
+            // Get user type from hidden field (2 = Customer, 3 = Professional/Seller)
+            $userType = $request->input('user_type', 2);
 
-        // Base validation rules for all users
-        $rules = [
-            'name' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'country' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'privacy_consent' => 'required|accepted',
-        ];
-
-        // Add conditional validation based on user type
-        if ($userType == 2) {
-            // Customer specific fields
-            $rules['date_of_birth'] = 'required|date|before:today';
-            $rules['cap'] = 'required|string|max:10';
-        } elseif ($userType == 3) {
-            // Professional/Seller specific fields
-            $rules['business_name'] = 'required|string|max:255';
-            $rules['address'] = 'nullable|string|max:500';
-            $rules['cap'] = 'required|string|max:10';
-            $rules['category_id'] = 'required|exists:categories,id';
-            $rules['subcategory_1'] = 'required|exists:subcategories,id';
-            $rules['subcategory_2'] = 'nullable|exists:subcategories,id';
-            $rules['subcategory_3'] = 'nullable|exists:subcategories,id';
-        }
-
-        // Validate the input
-        $validated = $request->validate($rules);
-
-        // Prepare user data
-        $userData = [
-            'name' => $validated['name'],
-            'surname' => $validated['surname'],
-            'username' => $validated['username'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'user_type' => $userType,
-        ];
-
-        // Add business_name for professionals
-        if ($userType == 3 && isset($validated['business_name'])) {
-            $userData['business_name'] = $validated['business_name'];
-        }
-
-        // Create user
-        $user = User::create($userData);
-
-        // Prepare profile data
-        $profileData = [
-            'user_id' => $user->id,
-            'country' => $validated['country'],
-            'city' => $validated['city'],
-        ];
-
-        // Add conditional profile fields
-        if ($userType == 2) {
-            // Customer
-            $profileData['date_of_birth'] = $validated['date_of_birth'];
-            $profileData['cap'] = $validated['cap'];
-            $profileData['is_provider'] = false;
-        } elseif ($userType == 3) {
-            // Professional/Seller
-            $profileData['cap'] = $validated['cap'];
-            $profileData['is_provider'] = true;
-            // Address is optional for professionals
-            if (isset($validated['address'])) {
-                $profileData['address'] = $validated['address'];
-            }
-        }
-
-        // Create user profile
-        $userProfile = UserProfile::create($profileData);
-
-        // For professionals, attach subcategories and handle payment method
-        if ($userType == 3) {
-            $subcategories = [
-                ['subcategory_id' => $validated['subcategory_1'], 'priority' => 1],
+            // Base validation rules for all users
+            $rules = [
+                'name' => 'required|string|max:255',
+                'surname' => 'required|string|max:255',
+                'username' => 'required|string|max:255|unique:users,username',
+                'email' => 'required|email|max:255|unique:users,email',
+                'password' => 'required|string|min:6|confirmed',
+                'country' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'privacy_consent' => 'required|accepted',
             ];
 
-            if (!empty($validated['subcategory_2'])) {
-                $subcategories[] = ['subcategory_id' => $validated['subcategory_2'], 'priority' => 2];
+            // Add conditional validation based on user type
+            if ($userType == 2) {
+                // Customer specific fields
+                $rules['date_of_birth'] = 'required|date|before:today';
+                $rules['cap'] = 'required|string|max:10';
+            } elseif ($userType == 3) {
+                // Professional/Seller specific fields
+                $rules['business_name'] = 'required|string|max:255';
+                $rules['address'] = 'nullable|string|max:500';
+                $rules['cap'] = 'required|string|max:10';
+                $rules['category_id'] = 'required|exists:categories,id';
+                $rules['subcategory_1'] = 'required|exists:subcategories,id';
+                $rules['subcategory_2'] = 'nullable|exists:subcategories,id';
+                $rules['subcategory_3'] = 'nullable|exists:subcategories,id';
             }
 
-            if (!empty($validated['subcategory_3'])) {
-                $subcategories[] = ['subcategory_id' => $validated['subcategory_3'], 'priority' => 3];
-            }
+            // Validate the input
+            $validated = $request->validate($rules);
 
-            foreach ($subcategories as $subcategory) {
-                \App\Models\UserSubcategory::create([
+            // Use database transaction to ensure data consistency
+            DB::beginTransaction();
+
+            try {
+                // Prepare user data
+                $userData = [
+                    'name' => $validated['name'],
+                    'surname' => $validated['surname'],
+                    'username' => $validated['username'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'user_type' => $userType,
+                ];
+
+                // Add business_name for professionals
+                if ($userType == 3 && isset($validated['business_name'])) {
+                    $userData['business_name'] = $validated['business_name'];
+                }
+
+                // Create user
+                $user = User::create($userData);
+
+                // Prepare profile data
+                $profileData = [
                     'user_id' => $user->id,
-                    'subcategory_id' => $subcategory['subcategory_id'],
-                    'priority' => $subcategory['priority'],
-                ]);
+                    'country' => $validated['country'],
+                    'city' => $validated['city'],
+                ];
+
+                // Add conditional profile fields
+                if ($userType == 2) {
+                    // Customer
+                    $profileData['date_of_birth'] = $validated['date_of_birth'];
+                    $profileData['cap'] = $validated['cap'];
+                    $profileData['is_provider'] = false;
+                } elseif ($userType == 3) {
+                    // Professional/Seller
+                    $profileData['cap'] = $validated['cap'];
+                    $profileData['is_provider'] = true;
+                    // Address is optional for professionals
+                    if (isset($validated['address']) && !empty($validated['address'])) {
+                        $profileData['address'] = $validated['address'];
+                    }
+                }
+
+                // Create user profile
+                $userProfile = UserProfile::create($profileData);
+
+                // For professionals, attach subcategories and handle payment method
+                if ($userType == 3) {
+                    $subcategories = [
+                        ['subcategory_id' => $validated['subcategory_1'], 'priority' => 1],
+                    ];
+
+                    if (!empty($validated['subcategory_2'])) {
+                        $subcategories[] = ['subcategory_id' => $validated['subcategory_2'], 'priority' => 2];
+                    }
+
+                    if (!empty($validated['subcategory_3'])) {
+                        $subcategories[] = ['subcategory_id' => $validated['subcategory_3'], 'priority' => 3];
+                    }
+
+                    foreach ($subcategories as $subcategory) {
+                        \App\Models\UserSubcategory::create([
+                            'user_id' => $user->id,
+                            'subcategory_id' => $subcategory['subcategory_id'],
+                            'priority' => $subcategory['priority'],
+                        ]);
+                    }
+
+                    // Handle Stripe payment method for professionals
+                    if ($request->has('payment_method_id') && !empty($request->input('payment_method_id'))) {
+                        try {
+                            Stripe::setApiKey(config('services.stripe.secret'));
+                            
+                            // Check if we're in local/test environment and using test keys
+                            $stripeSecret = config('services.stripe.secret');
+                            $isTestMode = strpos($stripeSecret, 'sk_test_') === 0;
+                            
+                            // Create Stripe customer
+                            $customer = Customer::create([
+                                'email' => $user->email,
+                                'name' => $user->name . ' ' . $user->surname,
+                            ]);
+                            
+                            // Attach payment method to customer
+                            PaymentMethod::retrieve($request->input('payment_method_id'))
+                                ->attach(['customer' => $customer->id]);
+                            
+                            // Set as default payment method
+                            Customer::update($customer->id, [
+                                'invoice_settings' => [
+                                    'default_payment_method' => $request->input('payment_method_id'),
+                                ],
+                            ]);
+                            
+                            // Update user with Stripe customer ID and payment method
+                            $user->update([
+                                'stripe_customer_id' => $customer->id,
+                                'default_payment_method' => $request->input('payment_method_id'),
+                            ]);
+                        } catch (\Stripe\Exception\CardException $e) {
+                            // Card-specific errors
+                            Log::error('Stripe card error during registration: ' . $e->getMessage());
+                            // In local, provide more context
+                            if (config('app.env') === 'local') {
+                                Log::info('Make sure you are using TEST Stripe keys: pk_test_... and sk_test_...');
+                            }
+                            // Continue with registration even if Stripe fails
+                        } catch (\Exception $e) {
+                            // Log Stripe error but don't fail registration
+                            Log::error('Stripe error during registration: ' . $e->getMessage());
+                            // Continue with registration even if Stripe fails
+                        }
+                    }
+                }
+
+                // Commit transaction
+                DB::commit();
+
+                // Send email verification notification
+                $user->sendEmailVerificationNotification();
+
+                // Redirect to email verification notice page
+                return redirect()->route('verification.notice')
+                    ->with('registered', true)
+                    ->with('email', $user->email);
+
+            } catch (\Exception $e) {
+                // Rollback transaction on error
+                DB::rollBack();
+                throw $e;
             }
 
-            // Handle Stripe payment method for professionals
-            if ($request->has('payment_method_id') && !empty($request->input('payment_method_id'))) {
-                Stripe::setApiKey(config('services.stripe.secret'));
-                
-                // Create Stripe customer
-                $customer = Customer::create([
-                    'email' => $user->email,
-                    'name' => $user->name . ' ' . $user->surname,
-                ]);
-                
-                // Attach payment method to customer
-                PaymentMethod::retrieve($request->input('payment_method_id'))
-                    ->attach(['customer' => $customer->id]);
-                
-                // Set as default payment method
-                Customer::update($customer->id, [
-                    'invoice_settings' => [
-                        'default_payment_method' => $request->input('payment_method_id'),
-                    ],
-                ]);
-                
-                // Update user with Stripe customer ID and payment method
-                $user->update([
-                    'stripe_customer_id' => $customer->id,
-                    'default_payment_method' => $request->input('payment_method_id'),
-                ]);
-            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            Log::error('Registration error: ' . $e->getMessage());
+            return back()
+                ->withErrors(['error' => 'An error occurred during registration. Please try again later.'])
+                ->withInput();
         }
-
-        // Auto-login the user after registration
-        Auth::login($user);
-
-        // Redirect based on user type
-        if ($userType == 3) {
-            // Professional/Seller goes to admin panel
-            return redirect('/admin')->with('success', 'Professional account created successfully!');
-        }
-
-        return redirect()->route('web.index')->with('success', 'Account created successfully!');
     }
     public function loginProcess(Request $request)
     {
@@ -317,6 +357,13 @@ class HomeController extends Controller
             return back()->withErrors(['email' => 'Invalid credentials.']);
         }
 
+        // Check if email is verified
+        if (!$user->hasVerifiedEmail()) {
+            Auth::login($user);
+            return redirect()->route('verification.notice')
+                ->withErrors(['email' => 'You must verify your email address before you can access. Check your email for the verification link.']);
+        }
+
         // All good - log in user
         Auth::login($user);
 
@@ -326,7 +373,65 @@ class HomeController extends Controller
         }
 
         // Redirect to dashboard or home
-        return redirect()->route('web.index')->with('success', 'Logged in successfully!');
+        return redirect()->route('web.index')->with('success', 'Login successful!');
+    }
+
+    /**
+     * Show the email verification notice page.
+     */
+    public function showVerificationNotice()
+    {
+        // Allow both authenticated and unauthenticated users to see this page
+        // If authenticated but not verified, show resend option
+        // If just registered, show success message
+        return view('web.verify-email');
+    }
+
+    /**
+     * Mark the user's email as verified.
+     */
+    public function verifyEmail(Request $request, $id, $hash)
+    {
+        $user = User::findOrFail($id);
+
+        // Verify the hash matches
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            abort(403, 'Invalid verification link.');
+        }
+
+        // Check if already verified
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('web.login')->with('success', 'Email already verified!');
+        }
+
+        // Mark email as verified
+        if ($user->markEmailAsVerified()) {
+            event(new \Illuminate\Auth\Events\Verified($user));
+        }
+
+        // Auto-login after verification
+        Auth::login($user);
+
+        // Redirect based on user type
+        if ($user->user_type == 3) {
+            return redirect('/admin')->with('success', 'Email verified successfully! You can now access the dashboard.');
+        }
+
+        return redirect()->route('web.index')->with('success', 'Email verified successfully! You can now access your account.');
+    }
+
+    /**
+     * Resend the email verification notification.
+     */
+    public function resendVerificationEmail(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('web.index');
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('status', 'Verification link sent!');
     }
 
 

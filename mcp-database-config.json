@@ -1,0 +1,12 @@
+{
+  "mcp_tools": {
+    "database": {
+      "connection": "mysql",
+      "host": "127.0.0.1",
+      "port": 3306,
+      "database": "gym_services",
+      "username": "root",
+      "password": ""
+    }
+  }
+}

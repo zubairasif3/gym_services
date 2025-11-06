@@ -3,6 +3,7 @@
 use Stripe\Stripe;
 use App\Models\User;
 use Stripe\Customer;
+use Stripe\Exception\CardException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,11 @@ Route::get('/login', [HomeController::class, 'login'])->name('web.login');
 Route::post('/login', [HomeController::class, 'loginProcess'])->name('web.login.post');
 Route::get('/register', [HomeController::class, 'register'])->name('web.register');
 Route::post('/register', [HomeController::class, 'registerProcess'])->name('web.register.process');
+
+// Email verification routes
+Route::get('/email/verify', [HomeController::class, 'showVerificationNotice'])->name('verification.notice');
+Route::get('/email/verify/{id}/{hash}', [HomeController::class, 'verifyEmail'])->middleware('signed')->name('verification.verify');
+Route::post('/email/verification-notification', [HomeController::class, 'resendVerificationEmail'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 Route::get('/gigs-show/{slug}', [HomeController::class, 'gigShow'])->name('gigs.show');
 Route::get('/services-search', [HomeController::class, 'search'])->name('services.search');
 Route::get('/gig-content/{id}', [HomeController::class, 'gigContact'])->name('gig.contact');
@@ -38,16 +44,72 @@ Route::get('/api/subcategories/{categoryId}', function ($categoryId) {
     return response()->json($subcategories);
 });
 
+// API route to check Stripe configuration
+Route::get('/api/check-stripe-config', function () {
+    if (config('app.env') !== 'local') {
+        return response()->json(['isLocal' => false]);
+    }
+    
+    $stripeKey = config('services.stripe.key');
+    $stripeSecret = config('services.stripe.secret');
+    
+    $isTestKey = strpos($stripeKey, 'pk_test_') === 0;
+    $isTestSecret = strpos($stripeSecret, 'sk_test_') === 0;
+    
+    return response()->json([
+        'isLocal' => true,
+        'isTestKey' => $isTestKey,
+        'isTestSecret' => $isTestSecret,
+        'hasKeys' => !empty($stripeKey) && !empty($stripeSecret),
+        'keyPreview' => $stripeKey ? substr($stripeKey, 0, 8) . '...' : 'Not set',
+    ]);
+});
+
 // API route for creating setup intent during registration (before user exists)
 Route::post('/api/create-setup-intent-for-registration', function (Request $request) {
-    Stripe::setApiKey(config('services.stripe.secret'));
-    
-    // Create a temporary setup intent without customer (we'll attach it later)
-    $setupIntent = \Stripe\SetupIntent::create([
-        'payment_method_types' => ['card'],
-    ]);
-    
-    return response()->json(['clientSecret' => $setupIntent->client_secret]);
+    try {
+        // Validate Stripe keys in local environment
+        if (config('app.env') === 'local') {
+            $stripeSecret = config('services.stripe.secret');
+            $isTestSecret = strpos($stripeSecret, 'sk_test_') === 0;
+            
+            if (!$isTestSecret && !empty($stripeSecret)) {
+                return response()->json([
+                    'error' => true,
+                    'message' => '⚠️ Live mode keys detected in local environment! Please update your .env file:\nSTRIPE_KEY=pk_test_...\nSTRIPE_SECRET=sk_test_...\n\nGet your test keys from: https://dashboard.stripe.com/test/apikeys'
+                ], 400);
+            }
+        }
+        
+        Stripe::setApiKey(config('services.stripe.secret'));
+        
+        // Create a temporary setup intent without customer (we'll attach it later)
+        $setupIntent = \Stripe\SetupIntent::create([
+            'payment_method_types' => ['card'],
+        ]);
+        
+        return response()->json(['clientSecret' => $setupIntent->client_secret]);
+    } catch (CardException $e) {
+        // Card was declined - provide helpful error message
+        $message = $e->getMessage();
+        
+        // In local environment, provide more helpful test mode guidance
+        if (config('app.env') === 'local' && strpos($message, 'live mode') !== false) {
+            $message = 'Test card used with live mode keys. Please ensure you are using Stripe TEST keys in your .env file when in local environment. Test card: 4242 4242 4242 4242';
+        }
+        
+        return response()->json([
+            'error' => true,
+            'message' => $message
+        ], 400);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => true,
+            'message' => config('app.env') === 'local' 
+                ? 'Stripe error. Make sure you are using TEST API keys in your .env file: STRIPE_KEY=pk_test_... and STRIPE_SECRET=sk_test_...'
+                : $e->getMessage()
+        ], 400);
+    }
 });
 
 Route::post('/store-payment-method', function (Request $request) {

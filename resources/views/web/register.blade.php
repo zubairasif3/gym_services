@@ -215,6 +215,35 @@
         text-decoration: underline;
     }
 
+    .error-message {
+        color: #ff4444;
+        font-size: 12px;
+        margin-top: 5px;
+        padding-left: 10px;
+        font-family: var(--body-font-family, 'DM Sans', sans-serif);
+    }
+
+    .form-input-register.error,
+    .form-select-register.error {
+        border-color: #ff4444;
+    }
+
+    .alert-error {
+        background-color: rgba(255, 68, 68, 0.1);
+        border: 1px solid #ff4444;
+        color: #ffcccc;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        font-family: var(--body-font-family, 'DM Sans', sans-serif);
+    }
+
+    .alert-error ul {
+        margin: 5px 0 0 20px;
+        padding: 0;
+    }
+
     .register-submit-btn {
         width: 100%;
         max-width: 400px;
@@ -309,65 +338,109 @@
             @csrf
             <input type="hidden" name="user_type" value="2">
             <div class="register-form-container">
+                @if($errors->any() && old('user_type') == '2')
+                    <div class="alert-error">
+                        <strong>Please correct the following errors:</strong>
+                        <ul>
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert-error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <div class="register-form-grid">
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Name<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="name" placeholder="Name" required>
+                        <input type="text" class="form-input-register @error('name') error @enderror" name="name" placeholder="Name" value="{{ old('name') }}" required>
+                        @error('name')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Surname<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="surname" placeholder="Surname" required>
+                        <input type="text" class="form-input-register @error('surname') error @enderror" name="surname" placeholder="Surname" value="{{ old('surname') }}" required>
+                        @error('surname')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Date of Birth<span class="required">*</span>
                         </label>
-                        <input type="date" class="form-input-register" name="date_of_birth" required>
+                        <input type="date" class="form-input-register @error('date_of_birth') error @enderror" name="date_of_birth" value="{{ old('date_of_birth') }}" required>
+                        @error('date_of_birth')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Username<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="username" placeholder="Username" required>
+                        <input type="text" class="form-input-register @error('username') error @enderror" name="username" placeholder="Username" value="{{ old('username') }}" required>
+                        @error('username')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             E-mail<span class="required">*</span>
                         </label>
-                        <input type="email" class="form-input-register" name="email" placeholder="email@example.com" required>
+                        <input type="email" class="form-input-register @error('email') error @enderror" name="email" placeholder="email@example.com" value="{{ old('email') }}" required>
+                        @error('email')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Country<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="country" placeholder="Country" required>
+                        <input type="text" class="form-input-register @error('country') error @enderror" name="country" placeholder="Country" value="{{ old('country') }}" required>
+                        @error('country')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             City<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="city" placeholder="City" required>
+                        <input type="text" class="form-input-register @error('city') error @enderror" name="city" placeholder="City" value="{{ old('city') }}" required>
+                        @error('city')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Cap<span class="required">*</span>
+                            Zip code<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="cap" placeholder="CAP" required>
+                        <input type="text" class="form-input-register @error('cap') error @enderror" name="cap" placeholder="Zip c" value="{{ old('cap') }}" required>
+                        @error('cap')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Password<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input-register" name="password" id="customer_password" placeholder="Password" required>
+                            <input type="password" class="form-input-register @error('password') error @enderror" name="password" id="customer_password" placeholder="Password" required>
                             <button type="button" class="password-toggle" onclick="togglePassword('customer_password', this)">
                                 <i class="far fa-eye"></i>
                             </button>
                         </div>
+                        @error('password')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
@@ -385,11 +458,14 @@
                 <p class="required-fields-note">* Required fields</p>
 
                 <div class="privacy-checkbox-wrapper">
-                    <input type="checkbox" class="privacy-checkbox" id="customer_privacy" name="privacy_consent" required>
+                    <input type="checkbox" class="privacy-checkbox @error('privacy_consent') error @enderror" id="customer_privacy" name="privacy_consent" {{ old('privacy_consent') ? 'checked' : '' }} required>
                     <label for="customer_privacy" class="privacy-text">
-                        Dichiaro di aver letto e compreso l'<a href="{{ route('web.privacy_policy') }}" target="_blank">Informativa Privacy</a> e autorizzo il trattamento dei miei dati personali ai sensi del Regolamento UE 2016/679 (GDPR).
+                        I declare that I have read and understood the <a href="{{ route('web.privacy_policy') }}" target="_blank">Privacy Policy</a> and authorize the processing of my personal data in accordance with the EU General Data Protection Regulation (GDPR).
                     </label>
                 </div>
+                @error('privacy_consent')
+                    <div class="error-message" style="margin-top: -20px; margin-bottom: 15px;">{{ $message }}</div>
+                @enderror
 
                 <button type="submit" class="register-submit-btn">Create Account</button>
             </div>
@@ -400,106 +476,165 @@
             @csrf
             <input type="hidden" name="user_type" value="3">
             <div class="register-form-container">
+                @if($errors->any() && old('user_type') == '3')
+                    <div class="alert-error">
+                        <strong>Please correct the following errors:</strong>
+                        <ul>
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert-error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <div class="register-form-grid">
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Name<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="name" placeholder="Name" required>
+                        <input type="text" class="form-input-register @error('name') error @enderror" name="name" placeholder="Name" value="{{ old('name') }}" required>
+                        @error('name')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Surname<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="surname" placeholder="Surname" required>
+                        <input type="text" class="form-input-register @error('surname') error @enderror" name="surname" placeholder="Surname" value="{{ old('surname') }}" required>
+                        @error('surname')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Business Name<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="business_name" placeholder="Business Name" required>
+                        <input type="text" class="form-input-register @error('business_name') error @enderror" name="business_name" placeholder="Business Name" value="{{ old('business_name') }}" required>
+                        @error('business_name')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Username<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="username" placeholder="Username" required>
+                        <input type="text" class="form-input-register @error('username') error @enderror" name="username" placeholder="Username" value="{{ old('username') }}" required>
+                        @error('username')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             E-mail<span class="required">*</span>
                         </label>
-                        <input type="email" class="form-input-register" name="email" placeholder="email@example.com" required>
+                        <input type="email" class="form-input-register @error('email') error @enderror" name="email" placeholder="email@example.com" value="{{ old('email') }}" required>
+                        @error('email')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Country<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="country" placeholder="Country" required>
+                        <input type="text" class="form-input-register @error('country') error @enderror" name="country" placeholder="Country" value="{{ old('country') }}" required>
+                        @error('country')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             City<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="city" placeholder="City" required>
+                        <input type="text" class="form-input-register @error('city') error @enderror" name="city" placeholder="City" value="{{ old('city') }}" required>
+                        @error('city')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Address
                         </label>
-                        <input type="text" class="form-input-register" name="address" placeholder="Address">
+                        <input type="text" class="form-input-register @error('address') error @enderror" name="address" placeholder="Address" value="{{ old('address') }}">
+                        @error('address')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            CAP<span class="required">*</span>
+                            Zip code<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register" name="cap" placeholder="CAP" required>
+                        <input type="text" class="form-input-register @error('cap') error @enderror" name="cap" placeholder="Zip code" value="{{ old('cap') }}" required>
+                        @error('cap')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Choose Category<span class="required">*</span>
                         </label>
-                        <select class="form-select-register" name="category_id" id="professional_category" required onchange="loadSubcategories(this.value, 'professional')">
+                        <select class="form-select-register @error('category_id') error @enderror" name="category_id" id="professional_category" required onchange="loadSubcategories(this.value, 'professional')">
                             <option value="">Choose Category</option>
                             @foreach($active_categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
                         </select>
+                        @error('category_id')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Subcategory 1<span class="required">*</span>
                         </label>
-                        <select class="form-select-register" name="subcategory_1" id="professional_subcategory_1" required>
+                        <select class="form-select-register @error('subcategory_1') error @enderror" name="subcategory_1" id="professional_subcategory_1" required>
                             <option value="">Select Category First</option>
                         </select>
+                        @error('subcategory_1')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Subcategory 2
                         </label>
-                        <select class="form-select-register" name="subcategory_2" id="professional_subcategory_2">
+                        <select class="form-select-register @error('subcategory_2') error @enderror" name="subcategory_2" id="professional_subcategory_2">
                             <option value="">Optional</option>
                         </select>
+                        @error('subcategory_2')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Subcategory 3
                         </label>
-                        <select class="form-select-register" name="subcategory_3" id="professional_subcategory_3">
+                        <select class="form-select-register @error('subcategory_3') error @enderror" name="subcategory_3" id="professional_subcategory_3">
                             <option value="">Optional</option>
                         </select>
+                        @error('subcategory_3')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Password<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input-register" name="password" id="professional_password" placeholder="Password" required>
+                            <input type="password" class="form-input-register @error('password') error @enderror" name="password" id="professional_password" placeholder="Password" required>
                             <button type="button" class="password-toggle" onclick="togglePassword('professional_password', this)">
                                 <i class="far fa-eye"></i>
                             </button>
                         </div>
+                        @error('password')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
@@ -522,6 +657,24 @@
                     <p style="color: #00b3f1; font-size: 13px; margin-bottom: 20px; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
                         First year free, €99/year renewal
                     </p>
+                    @if(config('app.env') === 'local')
+                    <div id="stripe-config-warning" style="display: none; background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                        <p style="color: #ff4444; font-size: 12px; margin: 0; font-weight: 600; margin-bottom: 8px;">⚠️ Configuration Issue Detected</p>
+                        <p style="color: #ff4444; font-size: 11px; margin: 0; line-height: 1.5;">
+                            Live mode keys detected! Please update your <strong>.env</strong> file with TEST keys:<br>
+                            <code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">STRIPE_KEY=pk_test_...</code><br>
+                            <code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">STRIPE_SECRET=sk_test_...</code><br>
+                            <a href="https://dashboard.stripe.com/test/apikeys" target="_blank" style="color: #00b3f1; text-decoration: underline; font-size: 11px;">Get test keys from Stripe Dashboard →</a>
+                        </p>
+                    </div>
+                    <div id="test-mode-info" style="background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                        <p style="color: #ffc107; font-size: 12px; margin: 0; font-weight: 600; margin-bottom: 8px;">✅ Test Mode Active</p>
+                        <p style="color: #ffc107; font-size: 11px; margin: 0; line-height: 1.5;">
+                            Use test card: <strong>4242 4242 4242 4242</strong><br>
+                            Any future expiry date (e.g., 12/34) and any 3-digit CVC
+                        </p>
+                    </div>
+                    @endif
                     <div id="professional-card-element" style="padding: 12px; background: transparent; border: 1px solid #00b3f1; border-radius: 12px; margin-bottom: 10px;">
                         <!-- Stripe Elements will create form elements here -->
                     </div>
@@ -532,11 +685,14 @@
                 <p class="required-fields-note">* Required fields</p>
 
                 <div class="privacy-checkbox-wrapper">
-                    <input type="checkbox" class="privacy-checkbox" id="professional_privacy" name="privacy_consent" required>
+                    <input type="checkbox" class="privacy-checkbox @error('privacy_consent') error @enderror" id="professional_privacy" name="privacy_consent" {{ old('privacy_consent') ? 'checked' : '' }} required>
                     <label for="professional_privacy" class="privacy-text">
-                        Dichiaro di aver letto e compreso l'<a href="{{ route('web.privacy_policy') }}" target="_blank">Informativa Privacy</a> e autorizzo il trattamento dei miei dati personali ai sensi del Regolamento UE 2016/679 (GDPR).
+                        I declare that I have read and understood the <a href="{{ route('web.privacy_policy') }}" target="_blank">Privacy Policy</a> and authorize the processing of my personal data in accordance with the EU General Data Protection Regulation (GDPR).
                     </label>
                 </div>
+                @error('privacy_consent')
+                    <div class="error-message" style="margin-top: -20px; margin-bottom: 15px;">{{ $message }}</div>
+                @enderror
 
                 <button type="submit" class="register-submit-btn" id="professional-submit-btn">Create Account</button>
             </div>
@@ -603,8 +759,10 @@
             try {
                 // Create setup intent first (we'll handle this server-side after user creation)
                 // For now, we'll just validate the card and continue with form submission
+                const clientSecret = await getSetupIntentClientSecret();
+                
                 const {setupIntent, error} = await professionalStripe.confirmCardSetup(
-                    await getSetupIntentClientSecret(), {
+                    clientSecret, {
                         payment_method: {
                             card: professionalCardElement,
                             billing_details: {
@@ -616,7 +774,17 @@
                 );
                 
                 if (error) {
-                    professionalCardErrors.textContent = error.message;
+                    let errorMessage = error.message;
+                    
+                    // Provide helpful message in local environment
+                    @if(config('app.env') === 'local')
+                    if (errorMessage.includes('live mode') || errorMessage.includes('test card')) {
+                        errorMessage = '⚠️ Test card detected with live mode keys. Please check your .env file and ensure you are using Stripe TEST keys (pk_test_... and sk_test_...)';
+                    }
+                    @endif
+                    
+                    professionalCardErrors.textContent = errorMessage;
+                    professionalCardErrors.style.color = '#ff4444';
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Create Account';
                     return;
@@ -629,7 +797,16 @@
                 professionalForm.submit();
                 
             } catch (err) {
-                professionalCardErrors.textContent = 'An error occurred. Please try again.';
+                let errorMessage = err.message || 'An error occurred. Please try again.';
+                
+                @if(config('app.env') === 'local')
+                if (errorMessage.includes('test') || errorMessage.includes('STRIPE')) {
+                    errorMessage = '⚠️ Stripe Configuration Error: Please ensure your .env file contains TEST mode keys:\nSTRIPE_KEY=pk_test_...\nSTRIPE_SECRET=sk_test_...';
+                }
+                @endif
+                
+                professionalCardErrors.textContent = errorMessage;
+                professionalCardErrors.style.color = '#ff4444';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Account';
             }
@@ -653,6 +830,12 @@
         });
         
         const data = await response.json();
+        
+        // Check for errors from the API
+        if (data.error) {
+            throw new Error(data.message || 'Failed to create setup intent');
+        }
+        
         return data.clientSecret;
     }
 </script>
@@ -723,7 +906,7 @@
     }
 
     // Load subcategories when category is selected
-    function loadSubcategories(categoryId, prefix) {
+    function loadSubcategories(categoryId, prefix, restoreValues = null) {
         if (!categoryId) {
             // Reset subcategories
             ['1', '2', '3'].forEach(num => {
@@ -752,6 +935,11 @@
                             option.textContent = subcategory.name;
                             select.appendChild(option);
                         });
+                        
+                        // Restore old value if provided
+                        if (restoreValues && restoreValues[`subcategory_${num}`]) {
+                            select.value = restoreValues[`subcategory_${num}`];
+                        }
                     }
                 });
             })
@@ -759,5 +947,83 @@
                 console.error('Error loading subcategories:', error);
             });
     }
+
+    // Check Stripe configuration on page load (for local environment)
+    @if(config('app.env') === 'local')
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/check-stripe-config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.isLocal) {
+                    const warningDiv = document.getElementById('stripe-config-warning');
+                    const testInfoDiv = document.getElementById('test-mode-info');
+                    
+                    if (data.hasKeys && (!data.isTestKey || !data.isTestSecret)) {
+                        // Show warning if live keys detected
+                        if (warningDiv) warningDiv.style.display = 'block';
+                        if (testInfoDiv) testInfoDiv.style.display = 'none';
+                    } else if (data.isTestKey && data.isTestSecret) {
+                        // Show test mode info if test keys are configured
+                        if (warningDiv) warningDiv.style.display = 'none';
+                        if (testInfoDiv) testInfoDiv.style.display = 'block';
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Error checking Stripe config:', err);
+            });
+    });
+    @endif
+
+    // Restore form state on page load if validation errors occurred
+    document.addEventListener('DOMContentLoaded', function() {
+        @php
+            $oldUserType = old('user_type');
+            $oldCategoryId = old('category_id');
+            $oldSubcategory1 = old('subcategory_1');
+            $oldSubcategory2 = old('subcategory_2');
+            $oldSubcategory3 = old('subcategory_3');
+        @endphp
+        @if($oldUserType)
+            const oldUserType = @json($oldUserType);
+            const oldCategoryId = @json($oldCategoryId);
+            const restoreValues = {
+                subcategory_1: @json($oldSubcategory1),
+                subcategory_2: @json($oldSubcategory2),
+                subcategory_3: @json($oldSubcategory3)
+            };
+            
+            if (oldUserType === '3') {
+                // Switch to professional tab
+                document.querySelectorAll('.register-tab').forEach(t => t.classList.remove('active'));
+                const professionalTab = document.querySelector('.register-tab[data-tab="professional"]');
+                if (professionalTab) professionalTab.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                const professionalForm = document.getElementById('professionalForm');
+                if (professionalForm) professionalForm.classList.add('active');
+                
+                // Load subcategories if category was selected
+                if (oldCategoryId) {
+                    setTimeout(() => {
+                        loadSubcategories(oldCategoryId, 'professional', restoreValues);
+                    }, 200);
+                }
+            } else if (oldUserType === '2') {
+                // Switch to customer tab
+                document.querySelectorAll('.register-tab').forEach(t => t.classList.remove('active'));
+                const customerTab = document.querySelector('.register-tab[data-tab="customer"]');
+                if (customerTab) customerTab.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                const customerForm = document.getElementById('customerForm');
+                if (customerForm) customerForm.classList.add('active');
+            }
+        @endif
+    });
 </script>
 @endpush

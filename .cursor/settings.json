@@ -1,0 +1,18 @@
+{
+  "mcp.servers": {
+    "mysql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mysql"
+      ],
+      "env": {
+        "MYSQL_HOST": "127.0.0.1",
+        "MYSQL_PORT": "3306",
+        "MYSQL_DATABASE": "gym_services",
+        "MYSQL_USER": "root",
+        "MYSQL_PASSWORD": ""
+      }
+    }
+  }
+}
