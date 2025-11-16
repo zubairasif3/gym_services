@@ -70,8 +70,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     {
         $types = [
             1 => 'Admin',
-            2 => 'Professional',
-            3 => 'Customer',
+            2 => 'Customer',
+            3 => 'Professional',
         ];
 
         return $types[$this->user_type] ?? 'Unknown';

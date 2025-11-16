@@ -17,11 +17,13 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Relationship;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\Category;
 
 
 class UserResource extends Resource
@@ -49,13 +51,22 @@ class UserResource extends Resource
                             ->schema([
                                 TextInput::make('name')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
+
+                                TextInput::make('surname')
+                                    ->maxLength(255)
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
+
+                                TextInput::make('username')
+                                    ->maxLength(255)
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
 
                                 TextInput::make('email')
                                     ->required()
                                     ->email()
-                                    // ->unique(User::class, 'email')
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
 
                                 TextInput::make('password')
                                     ->required(
@@ -64,21 +75,145 @@ class UserResource extends Resource
                                     ->dehydrated(fn($state) => filled($state))
                                     ->string()
                                     ->minLength(6)
-                                    ->password(),
+                                    ->password()
+                                    ->visible(fn ($record) => !$record || $record->user_type == 1)
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
 
                                 Select::make('user_type')
                                     ->options([
                                         1 => 'Admin',
-                                        2 => 'Buyer',
-                                        3 => 'Seller',
+                                        2 => 'Customer',
+                                        3 => 'Professional',
                                     ])
                                     ->required()
                                     ->default(1)
-                                    ->label('User Type'),
+                                    ->label('User Type')
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
+
+                                TextInput::make('business_name')
+                                    ->label('Business Name')
+                                    ->maxLength(255)
+                                    ->visible(fn ($record) => $record && $record->user_type == 3)
+                                    ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
                             ])
                     ]),
+                
+                // Customer-specific fields
+                Section::make('Customer Information')
+                    ->visible(fn ($record) => $record && $record->user_type == 2)
+                    ->schema([
+                        Grid::make(['default' => 2])
+                            ->schema([
+                                DatePicker::make('profile.date_of_birth')
+                                    ->label('Date of Birth')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->date_of_birth);
+                                        }
+                                    }),
+
+                                TextInput::make('profile.country')
+                                    ->label('Country')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->country);
+                                        }
+                                    }),
+
+                                TextInput::make('profile.city')
+                                    ->label('City')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->city);
+                                        }
+                                    }),
+
+                                TextInput::make('profile.cap')
+                                    ->label('Zip Code')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->cap);
+                                        }
+                                    }),
+                            ])
+                    ]),
+
+                // Professional-specific fields
+                Section::make('Professional Information')
+                    ->visible(fn ($record) => $record && $record->user_type == 3)
+                    ->schema([
+                        Grid::make(['default' => 2])
+                            ->schema([
+                                TextInput::make('profile.country')
+                                    ->label('Country')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->country);
+                                        }
+                                    }),
+
+                                TextInput::make('profile.city')
+                                    ->label('City')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->city);
+                                        }
+                                    }),
+
+                                TextInput::make('profile.address')
+                                    ->label('Address')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->address);
+                                        }
+                                    }),
+
+                                TextInput::make('profile.cap')
+                                    ->label('Zip Code')
+                                    ->disabled()
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->profile) {
+                                            $component->state($record->profile->cap);
+                                        }
+                                    }),
+                            ])
+                    ]),
+
+                // Professional Subcategories
+                Section::make('Professional Categories')
+                    ->visible(fn ($record) => $record && $record->user_type == 3)
+                    ->schema([
+                        Forms\Components\Placeholder::make('subcategories_display')
+                            ->label('Subcategories')
+                            ->content(function ($record) {
+                                if (!$record) {
+                                    return 'No subcategories assigned';
+                                }
+                                
+                                $userSubcategories = $record->userSubcategories()->with('subcategory')->orderBy('priority')->get();
+                                
+                                if ($userSubcategories->isEmpty()) {
+                                    return 'No subcategories assigned';
+                                }
+                                
+                                $subcategoryNames = $userSubcategories->map(function ($userSubcategory) {
+                                    return $userSubcategory->subcategory->name ?? 'Unknown';
+                                })->filter()->implode(', ');
+                                
+                                return $subcategoryNames ?: 'No subcategories assigned';
+                            }),
+                    ]),
+
+                // Admin/General Profile Information (for Admin users only)
                 Section::make('Profile Information')
-                    ->label('Profile')
+                    ->visible(fn ($record) => !$record || $record->user_type == 1)
                     ->schema([
                         Grid::make(['default' => 2])
                             ->schema([
@@ -96,21 +231,6 @@ class UserResource extends Resource
                                     ->nullable()
                                     ->image()
                                     ->directory('avartar'),
-                                    // ->loadStateFromRelationshipsUsing(function ($component, $record) {
-                                    //     if ($record?->profile?->profile_picture) {
-                                    //         $component->state($record->profile->profile_picture);
-                                    //     }
-                                    // })
-                                    // ->afterStateUpdated(function ($state, $record) {
-                                    //     if ($record?->profile && $state) {
-                                    //         $path = is_array($state) ? reset($state) : $state;
-                                    //         $record->profile->update(['profile_picture' => $path]);
-                                    //     }
-                                    // }),
-
-                                // Toggle::make('is_provider')
-                                //     ->label('Is Provider')
-                                //     ->default(false),
 
                                 TextInput::make('profile.phone')
                                     ->nullable()
@@ -146,8 +266,7 @@ class UserResource extends Resource
                                         if ($record && $record->profile) {
                                             $component->state($record->profile->languages);
                                         }
-                                    }), // Can be a comma-separated list or JSON
-
+                                    }),
                             ])
                     ])
             ]);
@@ -161,13 +280,25 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('surname')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('profile.phone')
                     ->label('Phone')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('business_name')
+                    ->label('Business Name')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('user_type_label')
                     ->label('User Type')
@@ -178,8 +309,10 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => $record->user_type == 1), // Only allow edit for Admin users
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => $record->user_type == 1), // Only allow delete for Admin users
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -200,6 +333,7 @@ class UserResource extends Resource
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
+            'view' => Pages\ViewUser::route('/{record}'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
