@@ -129,6 +129,11 @@
                             @guest
                                 <a class="ud-btn btn-white add-joining me-2" href="{{ route('web.register') }}">Subscribe</a>
                                 <a class="ud-btn btn-white add-joining" href="{{ route('web.login') }}">Log In</a>
+                            @else
+                                <form method="POST" action="{{ route('web.logout') }}">
+                                    @csrf
+                                    <button type="submit" class="ud-btn btn-white add-joining">Logout</button>
+                                </form>
                             @endguest
                        </div>
                     </div>
@@ -228,7 +233,14 @@
                     <div class="mobile_menu_bar d-flex justify-content-between align-items-center">
                        <a class="mobile_logo" href="#"><img src="{{ asset('web/images/logo.png') }}" alt="" width="120px"></a>
                        <div class="right-side text-end">
-                          <a class="text-white" href="{{ route('web.login') }}">Log In</a>
+                          @guest
+                            <a class="text-white" href="{{ route('web.login') }}">Log In</a>
+                          @else
+                            <form method="POST" action="{{ route('web.logout') }}" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="text-white" style="background:none;border:none;padding:0;">Logout</button>
+                            </form>
+                          @endguest
                           <a class="menubar ml30" href="#menu"><img src="{{ asset('web/images/white-nav-icon.svg') }}" alt=""></a>
                        </div>
                     </div>

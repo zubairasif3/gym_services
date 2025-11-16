@@ -67,14 +67,16 @@
         
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
         
-        <p style="margin-bottom: 15px; font-size: 16px;">
-            📎 In allegato trovi:
+        <p style="margin-bottom: 15px; font-size: 26px; font-weight: 600;">
+            📎 SCAN ME
         </p>
         
         <p style="margin-bottom: 25px; font-size: 16px; color: #ff4444; padding-left: 20px;">
-            • Il QR code (in PDF): stampalo ed esponilo nel tuo punto vendita o studio.
+            <img src="{{ asset('web/images/qr-code.png') }}" alt="QR Code" style="max-width: 150px;">
         </p>
-        
+        <p style="margin-bottom: 15px; font-size: 16px;">
+            Racconta la tua esperienza e lascia una recensione.
+        </p>
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
         
         <p style="margin-bottom: 15px; font-size: 16px;">

@@ -20,6 +20,7 @@ Route::get('/term-of-services', [HomeController::class, 'term_of_services'])->na
 Route::get('/privacy-policy', [HomeController::class, 'privacy_policy'])->name('web.privacy_policy');
 Route::get('/login', [HomeController::class, 'login'])->name('web.login');
 Route::post('/login', [HomeController::class, 'loginProcess'])->name('web.login.post');
+Route::post('/logout', [HomeController::class, 'logout'])->name('web.logout');
 Route::get('/register', [HomeController::class, 'register'])->name('web.register');
 Route::post('/register', [HomeController::class, 'registerProcess'])->name('web.register.process');
 

@@ -330,7 +330,7 @@
         <!-- Tabs -->
         <div class="register-tabs">
             <button type="button" class="register-tab active" data-tab="customer">Customer</button>
-            <button type="button" class="register-tab" data-tab="professional">Professional</button>
+            <button type="button" class="register-tab notranslate" translate="no" data-tab="professional">Professionals</button>
         </div>
 
         <!-- Customer Form -->
@@ -623,7 +623,7 @@
                         @enderror
                     </div>
                     <div class="form-group-register">
-                        <label class="form-label-register">
+                        <label class="form-label-register notranslate" translate="no">
                             Password<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
@@ -655,7 +655,7 @@
                         Payment Information <span class="required">*</span>
                     </h3>
                     <p style="color: #00b3f1; font-size: 13px; margin-bottom: 20px; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
-                        First year free, €99/year renewal
+                        30-day free trial, renewal 29 €/month or 290 €/year (payable in 3 installments)
                     </p>
                     @if(config('app.env') === 'local')
                     <div id="stripe-config-warning" style="display: none; background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
@@ -678,6 +678,9 @@
                     <div id="professional-card-element" style="padding: 12px; background: transparent; border: 1px solid #00b3f1; border-radius: 12px; margin-bottom: 10px;">
                         <!-- Stripe Elements will create form elements here -->
                     </div>
+                    <p style="color: #00b3f1; font-size: 12px; margin: 4px 2px 0; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
+                        For the first 200 professionals the free trial is 90 days; once this limit is reached, new registrations will have a 30-day free trial.
+                    </p>
                     <div id="professional-card-errors" role="alert" style="color: #ff4444; font-size: 13px; margin-top: 10px; min-height: 20px;"></div>
                     <input type="hidden" name="payment_method_id" id="professional_payment_method_id">
                 </div>

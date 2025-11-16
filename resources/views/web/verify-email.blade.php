@@ -38,8 +38,8 @@
 
                     <div class="mb-4">
                         <p style="font-size: 16px; line-height: 1.8; color: #333;">
-                                Before continuing, check your email for the verification link.
-                            If you didn't receive the email, we can send you another one.
+                            Before continuing, check your email (including your <strong>Spam/Junk</strong> folder) for the verification link.
+                            If you didn't receive the email, we can send you another one using the button below.
                         </p>
                     </div>
 
