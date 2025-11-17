@@ -8,7 +8,7 @@
 <body style="font-family: 'DM Sans', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: #ffffff; padding: 30px;">
         <div style="text-align: center; margin-bottom: 30px;">
-            <img src="{{ asset('web/images/logo.png') }}" alt="FitScout" style="max-width: 150px;">
+            <img src="{{ asset('web/images/logo-dark.png') }}" alt="FitScout" style="max-width: 150px;">
         </div>
         
         <h1 style="color: #00b3f1; font-size: 28px; margin-bottom: 20px; text-align: center;">Benvenuto su FitScout!</h1>

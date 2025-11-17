@@ -8,7 +8,7 @@
 <body style="font-family: 'DM Sans', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: #ffffff; padding: 30px;">
         <div style="text-align: center; margin-bottom: 30px;">
-            <img src="{{ asset('web/images/logo.png') }}" alt="FitScout" style="max-width: 150px;">
+            <img src="{{ asset('web/images/logo-dark.png') }}" alt="FitScout" style="max-width: 150px;">
         </div>
         
         <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">
@@ -77,6 +77,13 @@
         <p style="margin-bottom: 15px; font-size: 16px;">
             Racconta la tua esperienza e lascia una recensione.
         </p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="{{ asset('web/pdf/QR CODE FITSCOUT.pdf') }}" download style="display: inline-block; background-color: #00b3f1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">
+                📥 Scarica il QR Code PDF / Download QR Code PDF
+            </a>
+        </div>
+        
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
         
         <p style="margin-bottom: 15px; font-size: 16px;">

@@ -330,7 +330,7 @@
         <!-- Tabs -->
         <div class="register-tabs">
             <button type="button" class="register-tab active" data-tab="customer">Customer</button>
-            <button type="button" class="register-tab notranslate" translate="no" data-tab="professional">Professionals</button>
+            <button type="button" class="register-tab" data-tab="professional">Professionals</button>
         </div>
 
         <!-- Customer Form -->
@@ -429,7 +429,7 @@
                         @enderror
                     </div>
                     <div class="form-group-register">
-                        <label class="form-label-register">
+                        <label class="form-label-register notranslate" translate="no">
                             Password<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
@@ -512,7 +512,7 @@
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="form-group-register">
+                    {{-- <div class="form-group-register">
                         <label class="form-label-register">
                             Business Name<span class="required">*</span>
                         </label>
@@ -520,7 +520,7 @@
                         @error('business_name')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
-                    </div>
+                    </div> --}}
                     <div class="form-group-register">
                         <label class="form-label-register">
                             Username<span class="required">*</span>

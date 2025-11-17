@@ -186,7 +186,7 @@ class HomeController extends Controller
                 $rules['cap'] = 'required|string|max:10';
             } elseif ($userType == 3) {
                 // Professional/Seller specific fields
-                $rules['business_name'] = 'required|string|max:255';
+                $rules['business_name'] = 'nullable|string|max:255';
                 $rules['address'] = 'nullable|string|max:500';
                 $rules['cap'] = 'required|string|max:10';
                 $rules['category_id'] = 'required|exists:categories,id';
@@ -442,6 +442,30 @@ class HomeController extends Controller
         $request->user()->sendEmailVerificationNotification();
 
         return back()->with('status', 'Verification link sent!');
+    }
+
+    /**
+     * Resend the email verification notification for non-authenticated users.
+     */
+    public function resendVerificationEmailGuest(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'User not found with this email address.']);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return back()->with('status', 'Email already verified!');
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return back()->with('status', 'Verification link sent!')->with('email', $user->email);
     }
 
 

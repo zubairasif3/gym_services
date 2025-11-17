@@ -28,6 +28,7 @@ Route::post('/register', [HomeController::class, 'registerProcess'])->name('web.
 Route::get('/email/verify', [HomeController::class, 'showVerificationNotice'])->name('verification.notice');
 Route::get('/email/verify/{id}/{hash}', [HomeController::class, 'verifyEmail'])->middleware('signed')->name('verification.verify');
 Route::post('/email/verification-notification', [HomeController::class, 'resendVerificationEmail'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+Route::post('/email/verification-notification-guest', [HomeController::class, 'resendVerificationEmailGuest'])->middleware(['throttle:6,1'])->name('verification.send.guest');
 Route::get('/gigs-show/{slug}', [HomeController::class, 'gigShow'])->name('gigs.show');
 Route::get('/services-search', [HomeController::class, 'search'])->name('services.search');
 Route::get('/gig-content/{id}', [HomeController::class, 'gigContact'])->name('gig.contact');

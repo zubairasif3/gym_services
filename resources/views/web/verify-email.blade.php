@@ -55,19 +55,27 @@
                         @if (!Auth::user()->hasVerifiedEmail())
                             <form method="POST" action="{{ route('verification.send') }}">
                                 @csrf
-                                <button type="submit" class="btn btn-primary w-100" style="padding: 12px 20px; background: #00b3f1; border: none; border-radius: 4px; color: white; font-weight: 600;">
+                                <button type="submit" class="btn btn-primary w-100" style="padding: 12px 20px; background: #00b3f1; border: none; border-radius: 4px; color: white; font-weight: 600; margin-bottom: 15px;">
                                     Send verification email again
                                 </button>
                             </form>
                         @endif
                     @else
-                        <div class="alert alert-info" role="alert" style="margin-top: 20px;">
-                            <p style="margin: 0; font-size: 14px;">
-                                If you have just registered an account, check your email for the verification link.
-                                After verifying the email, you can login.
-                            </p>
-                        </div>
+                        <form method="POST" action="{{ route('verification.send.guest') }}">
+                            @csrf
+                            <input type="hidden" name="email" value="{{ session('email') }}">
+                            <button type="submit" class="btn btn-primary w-100" style="padding: 12px 20px; background: #00b3f1; border: none; border-radius: 4px; color: white; font-weight: 600; margin-bottom: 15px;">
+                                Send verification email again
+                            </button>
+                        </form>
                     @endauth
+
+                    <div class="alert alert-info" role="alert" style="margin-top: 20px;">
+                        <p style="margin: 0; font-size: 14px;">
+                            If you have just registered an account, check your email for the verification link.
+                            After verifying the email, you can login.
+                        </p>
+                    </div>
 
                     <div class="mt-4 text-center">
                         <a href="{{ route('web.login') }}" style="color: #00b3f1; text-decoration: none;">
