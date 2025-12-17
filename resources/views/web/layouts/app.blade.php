@@ -30,6 +30,11 @@
 </head>
 <body>
 
+    <!-- Toolbar Component (for authenticated users) -->
+    @auth
+        @livewire('toolbar')
+    @endauth
+
     <div class="wrapper ovh">
         <div class="preloader"></div>
         <!-- Main Header Nav -->
@@ -554,5 +559,10 @@
     </script>
     @stack('scripts')
     @stack('custom-scripts')
+
+    <!-- Chat Sidebar Component (for authenticated users) -->
+    @auth
+        @livewire('chat-sidebar')
+    @endauth
 </body>
 </html>

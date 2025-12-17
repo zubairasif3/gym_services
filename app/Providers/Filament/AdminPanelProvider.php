@@ -83,6 +83,10 @@ class AdminPanelProvider extends PanelProvider
                 \Filament\View\PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): ?string => \Illuminate\Support\Facades\Blade::render('@livewire(\App\Livewire\TeamSelector::class)'),
             )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
+                fn(): ?string => \Illuminate\Support\Facades\Blade::render('<div class="flex items-center mr-4">@livewire(\App\Livewire\AdminNotificationBell::class)</div>'),
+            )
             ;
     }
 

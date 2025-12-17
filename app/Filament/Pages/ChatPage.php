@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatPage extends Page
 {
+    // DISABLED - Chat is now handled via toolbar on frontend
+    protected static bool $shouldRegisterNavigation = false;
+    
     protected static ?string $navigationLabel = 'Chats';
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
     protected static string $view = 'filament.pages.chat-page';

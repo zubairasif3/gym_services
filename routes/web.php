@@ -2,6 +2,7 @@
 
 use Stripe\Stripe;
 use App\Models\User;
+use App\Models\Notification;
 use Stripe\Customer;
 use Stripe\Exception\CardException;
 use Illuminate\Http\Request;
@@ -34,6 +35,61 @@ Route::get('/services-search', [HomeController::class, 'search'])->name('service
 Route::get('/gig-content/{id}', [HomeController::class, 'gigContact'])->name('gig.contact');
 
 Route::get('/chat', ChatPage::class);
+
+// Authenticated Routes
+Route::middleware('auth')->group(function () {
+    // Follower Routes
+    Route::post('/follow/{user}', [App\Http\Controllers\FollowerController::class, 'follow'])->name('follow');
+    Route::delete('/unfollow/{user}', [App\Http\Controllers\FollowerController::class, 'unfollow'])->name('unfollow');
+    Route::get('/following', [App\Http\Controllers\FollowerController::class, 'following'])->name('following');
+    Route::get('/followers', [App\Http\Controllers\FollowerController::class, 'followers'])->name('followers');
+    Route::get('/api/follow/count/{user}', [App\Http\Controllers\FollowerController::class, 'getCount'])->name('follow.count');
+    Route::get('/api/follow/check/{user}', [App\Http\Controllers\FollowerController::class, 'checkFollowing'])->name('follow.check');
+    
+    // Notification Routes
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
+    Route::patch('/notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/api/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::get('/api/notifications/latest', [App\Http\Controllers\NotificationController::class, 'getLatest'])->name('notifications.latest');
+    
+    // Chat Routes
+    Route::get('/messages', [App\Http\Controllers\ChatController::class, 'index'])->name('messages');
+    Route::post('/chat/room/{receiver}', [App\Http\Controllers\ChatController::class, 'getOrCreateRoom'])->name('chat.room.create');
+    Route::get('/chat/room/{chatRoom}/messages', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
+    Route::post('/chat/room/{chatRoom}/send', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::post('/chat/upload-attachment', [App\Http\Controllers\ChatController::class, 'uploadAttachment'])->name('chat.upload');
+    Route::get('/api/chat/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('chat.unread-count');
+    
+    // Professional Profile Routes
+    Route::get('/profile/edit', [App\Http\Controllers\ProfessionalProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [App\Http\Controllers\ProfessionalProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/preview', [App\Http\Controllers\ProfessionalProfileController::class, 'preview'])->name('professional.preview');
+    
+    // Gig Review Routes (Authenticated)
+    Route::post('/gigs/{gig}/reviews', [App\Http\Controllers\GigReviewController::class, 'store'])->name('gigs.reviews.store');
+    Route::put('/reviews/{review}', [App\Http\Controllers\GigReviewController::class, 'update'])->name('gigs.reviews.update');
+    Route::delete('/reviews/{review}', [App\Http\Controllers\GigReviewController::class, 'destroy'])->name('gigs.reviews.destroy');
+    Route::post('/reviews/{review}/helpful', [App\Http\Controllers\GigReviewController::class, 'markHelpful'])->name('gigs.reviews.helpful');
+    
+    // Gig Save Routes (Authenticated)
+    Route::post('/gigs/{gig}/save', [App\Http\Controllers\GigSaveController::class, 'toggle'])->name('gigs.save.toggle');
+    Route::get('/api/gigs/{gig}/save/check', [App\Http\Controllers\GigSaveController::class, 'check'])->name('gigs.save.check');
+    Route::get('/api/saved-gigs', [App\Http\Controllers\GigSaveController::class, 'savedGigs'])->name('gigs.saved');
+});
+
+// Public Professional Profile
+Route::get('/@{username}', [App\Http\Controllers\ProfessionalProfileController::class, 'show'])->name('professional.profile');
+
+// Public Gig Review Routes
+Route::get('/api/gigs/{gig}/reviews', [App\Http\Controllers\GigReviewController::class, 'index'])->name('gigs.reviews.index');
+
+// Public Gig Share Routes
+Route::post('/api/gigs/{gig}/share', [App\Http\Controllers\GigShareController::class, 'track'])->name('gigs.share.track');
+Route::get('/api/gigs/{gig}/share/count', [App\Http\Controllers\GigShareController::class, 'count'])->name('gigs.share.count');
+Route::get('/api/gigs/{gig}/share/urls', [App\Http\Controllers\GigShareController::class, 'urls'])->name('gigs.share.urls');
+Route::get('/api/gigs/{gig}/save/count', [App\Http\Controllers\GigSaveController::class, 'count'])->name('gigs.save.count');
 
 // API route for fetching subcategories
 Route::get('/api/subcategories/{categoryId}', function ($categoryId) {
@@ -157,3 +213,46 @@ Route::post('/store-payment-method', function (Request $request) {
 
 //     return response()->json(['message' => 'Seller charged successfully!']);
 // }
+
+// Temporary route to create test notifications (for development only)
+Route::get('/create-test-notifications', function () {
+    $user = User::find(1); // Test User
+    
+    if (!$user) {
+        return 'User not found';
+    }
+    
+    // Clear existing notifications for this user
+    Notification::where('user_id', $user->id)->delete();
+    
+    // Create test notifications
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'follow',
+        'data' => ['message' => 'John Doe started following you'],
+        'read_at' => null,
+    ]);
+    
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'message',
+        'data' => ['message' => 'You have a new message from Sarah Smith'],
+        'read_at' => null,
+    ]);
+    
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'review',
+        'data' => ['message' => 'New 5-star review on "Professional Personal Training"'],
+        'read_at' => null,
+    ]);
+    
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'order',
+        'data' => ['message' => 'New order received for €140.00'],
+        'read_at' => null,
+    ]);
+    
+    return 'Created 4 test notifications for ' . $user->name . '. <br><a href="/admin">Go to Admin Panel</a>';
+})->name('create.test.notifications');

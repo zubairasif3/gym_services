@@ -10,8 +10,8 @@
           <div class="row">
             <div class="col-xl-5">
               <div class="position-relative">
-                <h2 class="text-white">About</h2>
-                <p class="text-white mb30">Give your visitor a smooth online experience with a solid UX design</p>
+                <h2 class="text-white">About FitScout</h2>
+                <p class="text-white mb30">Connecting you with certified fitness and wellness professionals worldwide</p>
               </div>
             </div>
           </div>
@@ -30,16 +30,16 @@
           </div>
           <div class="col-md-6 col-xl-5 offset-xl-1">
             <div class="position-relative wow fadeInLeft" data-wow-delay="300ms">
-              <h2 class="mb25">Join World's Best Marketplace <br class="d-none d-xl-block"> for Workers</h2>
-              <p class="text mb25">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+              <h2 class="mb25">Your Premier Marketplace for <br class="d-none d-xl-block"> Fitness & Wellness Professionals</h2>
+              <p class="text mb25">FitScout is the leading platform connecting individuals with certified fitness trainers, nutritionists, yoga instructors, and wellness coaches. Whether you're looking to transform your body, improve your nutrition, or enhance your overall wellbeing, our verified professionals are here to guide you on your journey to a healthier lifestyle.</p>
               <div class="list-style2">
                 <ul class="mb20">
-                  <li><i class="far fa-check"></i>Connect to freelancers with proven business experience</li>
-                  <li><i class="far fa-check"></i>Get matched with the perfect talent by a customer success manager</li>
-                  <li><i class="far fa-check"></i>Unmatched quality of remote, hybrid, and flexible jobs</li>
+                  <li><i class="far fa-check"></i>Connect with certified fitness professionals with proven track records</li>
+                  <li><i class="far fa-check"></i>Browse specialized services from personal training to meal planning</li>
+                  <li><i class="far fa-check"></i>Book sessions, track progress, and achieve your fitness goals</li>
                 </ul>
               </div>
-              <a href="#" class="ud-btn btn-thm-border">Find Talent<i class="fal fa-arrow-right-long"></i></a>
+              <a href="{{ route('web.services') }}" class="ud-btn btn-thm-border">Find Your Trainer<i class="fal fa-arrow-right-long"></i></a>
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@
                   <li><div class="timer">834</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Total Freelancer</p>
+                <p class="text mb-0">Fitness Professionals</p>
               </div>
             </div>
           </div>
@@ -68,7 +68,7 @@
                   <li><div class="timer">732</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Positive Review</p>
+                <p class="text mb-0">5-Star Reviews</p>
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@
                   <li><div class="timer">90</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Order recieved</p>
+                <p class="text mb-0">Sessions Booked</p>
               </div>
             </div>
           </div>
@@ -90,7 +90,7 @@
                   <li><div class="timer">236</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Projects Completed</p>
+                <p class="text mb-0">Goals Achieved</p>
               </div>
             </div>
           </div>

@@ -74,18 +74,59 @@ class HomeController extends Controller
 
     public function gigShow($slug)
     {
-        $gig = Gig::with(['user.profile', 'packages', 'images'])
+        $gig = Gig::with([
+                'user.profile',
+                'user.followers',
+                'user.following',
+                'packages',
+                'images',
+                'reviews' => function($query) {
+                    $query->with('user.profile')
+                        ->recent()
+                        ->limit(5);
+                },
+            ])
+            ->withCount(['saves', 'shares', 'reviews'])
             ->where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();
 
-        $relatedGigs = Gig::where('subcategory_id', $gig->subcategory_id)
+        // Check if current user saved this gig
+        $isSaved = auth()->check() ? $gig->isSavedByUser(auth()->id()) : false;
+
+        // Get related gigs with their stats
+        $relatedGigs = Gig::with(['user.profile', 'images'])
+            ->withCount(['reviews', 'saves'])
+            ->where('subcategory_id', $gig->subcategory_id)
             ->where('id', '!=', $gig->id)
+            ->where('is_active', true)
             ->latest()
             ->take(4)
             ->get();
 
-        return view('web.gigi-show', compact('gig', 'relatedGigs'));
+        // Increment impressions count
+        $gig->increment('impressions');
+
+        // Calculate review statistics
+        $reviewStats = [
+            'average' => $gig->reviews()->avg('rating') ?? 0,
+            'total' => $gig->reviews_count,
+            'breakdown' => $this->getReviewBreakdown($gig),
+        ];
+
+        return view('web.gigi-show', compact('gig', 'relatedGigs', 'isSaved', 'reviewStats'));
+    }
+
+    /**
+     * Get review rating breakdown
+     */
+    private function getReviewBreakdown($gig)
+    {
+        $breakdown = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $breakdown[$i] = $gig->reviews()->where('rating', $i)->count();
+        }
+        return $breakdown;
     }
 
     public function contact(){
@@ -383,7 +424,7 @@ class HomeController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('web.index')->with('success', 'Logged out successfully.');
+        return redirect()->route('web.login')->with('success', 'Logged out successfully.');
     }
 
     /**

@@ -1,234 +1,522 @@
 @extends('web.layouts.app')
 
-@section('title', 'Home Page')
+@section('title', $gig->title)
 
 @section('content')
-<div style="padding-top: 78px;"></div>
-<!-- Breadcumb Sections -->
-<section class="breadcumb-section">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-8 col-lg-10">
-          <div class="breadcumb-style1 mb10-xs">
-            <div class="breadcumb-list">
-              <a href="{{ route('web.index') }}">Home</a>
-              <a href="{{ route('web.services') }}">Services</a>
-              <a href="#">{{ $gig->title }}</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-4 col-lg-2">
-          <div class="d-flex align-items-center justify-content-sm-end">
-            <div class="share-save-widget d-flex align-items-center">
-              <span class="icon flaticon-share dark-color fz12 mr10"></span>
-              <div class="h6 mb-0">Share</div>
-            </div>
-            <div class="share-save-widget d-flex align-items-center ml15">
-              <span class="icon flaticon-like dark-color fz12 mr10"></span>
-              <div class="h6 mb-0">Save</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-</section>
-<!-- Breadcumb Sections -->
-<section class="breadcumb-section pt-0">
-    <div class="cta-service-single cta-banner mx-auto maxw1700 pt120 pt60-sm pb120 pb60-sm bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg">
-      <img class="left-top-img wow zoomIn" src="images/vector-img/left-top.png" alt="">
-      <img class="right-bottom-img wow zoomIn" src="images/vector-img/right-bottom.png" alt="">
-      <img class="service-v1-vector bounce-y d-none d-xl-block" src="images/vector-img/vector-service-v1.png" alt="">
-      <div class="container">
-        <div class="row wow fadeInUp">
-          <div class="col-xl-7">
-            <div class="position-relative">
-                <h2>{{ $gig->title }}</h2>
-                <span class="fz14 notranslate" translate="no">{{ $gig->user->name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-</section>
 
-<!-- Service Details -->
-<section class="pt10 pb90 pb30-md">
-    <div class="container">
-      <div class="row wrap">
-        <div class="col-lg-8">
-          <div class="column">
-            <div class="row">
-              <div class="col-sm-6 col-md-4">
-                <div class="iconbox-style1 contact-style d-flex align-items-start mb30">
-                  <div class="icon flex-shrink-0"><span class="flaticon-calendar"></span></div>
-                  <div class="details">
-                    <h5 class="title">Delivery Time</h5>
-                    <p class="mb-0 text">{{ $gig->delivery_time }} Days</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-md-4">
-                <div class="iconbox-style1 contact-style d-flex align-items-start mb30">
-                  <div class="icon flex-shrink-0"><span class="flaticon-goal"></span></div>
-                  <div class="details">
-                    <h5 class="title">Language</h5>
-                    <p class="mb-0 text">{{ $gig->user->profile->languages }}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-md-4">
-                <div class="iconbox-style1 contact-style d-flex align-items-start mb30">
-                  <div class="icon flex-shrink-0"><span class="flaticon-tracking"></span></div>
-                  <div class="details">
-                    <h5 class="title">Location</h5>
-                    <p class="mb-0 text">{{ $gig->user->profile->city }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="service-single-sldier vam_nav_style slider-1-grid owl-carousel owl-theme mb60">
-
-                @foreach($gig->images as $image)
-                    <div class="item">
-                        <div class="thumb p50 p30-sm">
-                            <img src="{{ asset('storage/' . $image->image_path) }}" class="w-100" alt="">
+<!-- Professional Profile Header Section -->
+<section class="professional-header-section mt-5 pt-4">
+    <div class="container-fluid p-0">
+        <!-- Wallpaper Background -->
+        <div class="profile-wallpaper position-relative" 
+             style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ $gig->user->profile && $gig->user->profile->wallpaper_image ? asset('storage/' . $gig->user->profile->wallpaper_image) : 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=400&fit=crop' }}'); 
+                    height: 300px; 
+                    background-size: cover; 
+                    background-position: center;">
+            
+            <!-- Profile Info Overlay -->
+            <div class="container h-100">
+                <div class="profile-info-overlay position-absolute d-flex align-items-end" style="bottom: 20px; left: 0; right: 0;">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-end gap-4">
+                                    <!-- Profile Avatar -->
+                                    <div class="profile-avatar-large">
+                                        @if($gig->user->avatar_url)
+                                            <img src="{{ asset('storage/' . $gig->user->avatar_url) }}" 
+                                                 class="rounded-circle border border-5 border-white shadow-lg" 
+                                                 width="120" 
+                                                 height="120" 
+                                                 alt="{{ $gig->user->name }}">
+                                        @else
+                                            <div class="rounded-circle border border-5 border-white shadow-lg bg-primary text-white d-flex align-items-center justify-content-center" 
+                                                 style="width: 120px; height: 120px; font-size: 3rem; font-weight: bold;">
+                                                {{ $gig->user->initials }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Profile Name & Info -->
+                                    <div class="profile-info text-white mb-3">
+                                        <h3 class="mb-2 text-white fw-bold">{{ $gig->user->name }} {{ $gig->user->surname ?? '' }}</h3>
+                                        <p class="mb-1 text-white-50" style="font-size: 0.95rem;">
+                                            <i class="flaticon-goal me-2"></i>
+                                            <span>Lingua: {{ $gig->user->profile->languages ?? 'English' }}</span>
+                                        </p>
+                                        <p class="mb-0 text-white-50" style="font-size: 0.95rem;">
+                                            <i class="flaticon-tracking me-2"></i>
+                                            <span>Posizione: {{ $gig->user->profile->city ?? 'New York' }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="col-md-4">
+                                <div class="d-flex gap-3 justify-content-end align-items-center mb-3">
+                                    <!-- Follow/Follower Card (Combined) -->
+                                    @livewire('follow-button', ['user' => $gig->user], key('follow-gig-' . $gig->user->id))
+                                    
+                                    <!-- Share Button -->
+                                    @livewire('share-button', ['gig' => $gig], key('share-gig-' . $gig->id))
+                                    
+                                    <!-- Save Button -->
+                                    @livewire('save-button', ['gig' => $gig], key('save-gig-' . $gig->id))
+                                </div>
+                            </div>
                         </div>
                     </div>
-                @endforeach
+                </div>
             </div>
-            <div class="service-about">
-              <h4>About</h4>
-              <p class="text mb30">{!! strip_tags($gig->about) !!}</p>
-              <hr class="opacity-100 mb60">
-            </div>
-          </div>
         </div>
-        <div class="col-lg-4">
-            @php $packages = $gig->packages @endphp
-            @if (count($packages) > 0)
-            <div class="column">
-                <div class="blog-sidebar ms-lg-auto">
-                    <div class="price-widget">
-                        <div class="navtab-style1">
-                            <nav>
-                                <div class="nav nav-tabs mb20" id="nav-tab2p" role="tablist">
-                                    @foreach($packages as $key => $package)
-                                        <button class="nav-link fw500 {{ $key == 0 ? 'active' : '' }}" id="nav-item{{ $key }}p-tab" data-bs-toggle="tab" data-bs-target="#nav-item{{ $key }}p" type="button" role="tab" aria-controls="nav-item{{ $key }}p" aria-selected="{{ $key == 0 ? 'true' : 'false' }}">{{ $package->title }}</button>
-                                    @endforeach
+    </div>
+</section>
+
+<!-- Service Details Section -->
+<section class="service-details-section pt-5 pb-5">
+    <div class="container">
+        <div class="row">
+            <!-- Left Column: Service Information -->
+            <div class="col-lg-8">
+                <!-- Service Title & Info -->
+                <div class="service-title-section mb-4">
+                    <h1 class="mb-3">{{ $gig->title }}</h1>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <i class="flaticon-calendar text-primary me-2"></i>
+                                <strong>Delivery Time:</strong> {{ $gig->delivery_time }} Days
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <i class="flaticon-goal text-primary me-2"></i>
+                                <strong>Language:</strong> {{ $gig->user->profile->languages ?? 'English' }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <i class="flaticon-tracking text-primary me-2"></i>
+                                <strong>Location:</strong> {{ $gig->user->profile->city ?? 'new York' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Service Gallery -->
+                @if($gig->images && $gig->images->count() > 0)
+                <div class="service-gallery mb-5">
+                    <h4 class="mb-3">
+                        <i class="far fa-images text-primary me-2"></i> Photos and Videos
+                    </h4>
+                    <div class="service-single-slider owl-carousel owl-theme">
+                        @foreach($gig->images as $image)
+                            <div class="item">
+                                <div class="gallery-item position-relative">
+                                    <img src="{{ file_exists(public_path('storage/' . $image->image_path)) ? asset('storage/' . $image->image_path) : 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=500&fit=crop' }}" 
+                                         class="w-100 rounded" 
+                                         alt="{{ $gig->title }}"
+                                         style="max-height: 500px; object-fit: cover;">
+                                    <button class="btn btn-light btn-sm position-absolute" 
+                                            style="bottom: 10px; right: 10px;"
+                                            onclick="openFullscreen(this)">
+                                        <i class="fas fa-expand me-1"></i> Schermo intero
+                                    </button>
                                 </div>
-                            </nav>
-                            <div class="tab-content" id="nav-tabContent">
-                                @foreach($packages as $key => $package)
-                                    <div class="tab-pane fade {{ $key == 0 ? 'show active' : '' }}" id="nav-item{{ $key }}p">
-                                        <div class="price-content">
-                                            <div class="price">€{{ $package->price }}</div>
-                                            <div class="h5 mb-2">{{ $package->title }}</div>
-                                            <p class="text fz14">{!! strip_tags($package->description) !!}</p>
-                                            <ul class="p-0 mb15 d-sm-flex align-items-center">
-                                                <li class="fz14 fw500 dark-color">
-                                                    <i class="flaticon-sandclock fz20 text-thm2 me-2 vam"></i>{{ $package->delivery_time }} Days Delivery
-                                                </li>
-                                                @if($package->revision_limit > 0)
-                                                  <li class="fz14 fw500 dark-color ml20 ml0-xs">
-                                                      <i class="flaticon-recycle fz20 text-thm2 me-2 vam"></i>{{ $package->revision_limit }} Revisions
-                                                  </li>
-                                                @endif
-                                            </ul>
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                    <!-- Thumbnail Navigation -->
+                    <div class="gallery-thumbnails mt-3 d-flex gap-2 flex-wrap">
+                        @foreach($gig->images->take(6) as $index => $image)
+                            <div class="thumbnail-item">
+                                <img src="{{ file_exists(public_path('storage/' . $image->image_path)) ? asset('storage/' . $image->image_path) : 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=100&h=80&fit=crop' }}" 
+                                     class="rounded" 
+                                     width="100" 
+                                     height="80" 
+                                     style="object-fit: cover; cursor: pointer;"
+                                     onclick="goToSlide({{ $index }})">
+                            </div>
+                        @endforeach
+                        @if($gig->images->count() > 6)
+                            <div class="thumbnail-item d-flex align-items-center justify-content-center bg-light rounded" 
+                                 style="width: 100px; height: 80px;">
+                                <span class="fw-bold">+{{ $gig->images->count() - 6 }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                @else
+                <div class="service-gallery mb-5">
+                    <h4 class="mb-3">
+                        <i class="far fa-images text-primary me-2"></i> Photos and Videos
+                    </h4>
+                    <div class="service-single-slider owl-carousel owl-theme">
+                        <div class="item">
+                            <div class="gallery-item position-relative">
+                                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=500&fit=crop" 
+                                     class="w-100 rounded" 
+                                     alt="{{ $gig->title }}"
+                                     style="max-height: 500px; object-fit: cover;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
+                <!-- About Section -->
+                <div class="service-about mb-5">
+                    <h4 class="mb-3">
+                        <i class="far fa-file-alt text-primary me-2"></i> About
+                    </h4>
+                    <div class="about-content">
+                        <p class="text-muted">{!! nl2br(strip_tags($gig->about ?? $gig->description)) !!}</p>
+                    </div>
+                </div>
+                
+                <!-- Reviews Section -->
+                <div class="reviews-section mb-5">
+                    <h4 class="mb-4">
+                        <i class="far fa-thumbs-up text-primary me-2"></i> Reviews
+                        <span class="badge bg-primary ms-2">{{ $reviewStats['total'] }}</span>
+                    </h4>
+                    
+                    @if($gig->reviews && $gig->reviews->count() > 0)
+                        <!-- Show latest reviews -->
+                        <div class="latest-reviews mb-4">
+                            @foreach($gig->reviews->take(3) as $review)
+                                <div class="review-card border rounded p-3 mb-3">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="review-avatar">
+                                            @if($review->user->avatar_url)
+                                                <img src="{{ asset('storage/' . $review->user->avatar_url) }}" 
+                                                     class="rounded-circle" 
+                                                     width="50" 
+                                                     height="50">
+                                            @else
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                                     style="width: 50px; height: 50px;">
+                                                    {{ $review->user->initials }}
+                                                </div>
+                                            @endif
                                         </div>
+                                        <div class="review-content flex-grow-1">
+                                            <h6 class="mb-1">{{ $review->user->name }}</h6>
+                                            <div class="text-warning mb-2">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
+                                                @endfor
+                                            </div>
+                                            <p class="text-muted small mb-2">{{ $review->created_at->diffForHumans() }}</p>
+                                            <p class="mb-0">{{ $review->comment }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- See All Reviews Button -->
+                        <button class="btn btn-outline-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#reviewsModal">
+                            <i class="far fa-eye me-2"></i> See all Reviews ({{ $reviewStats['total'] }})
+                        </button>
+                    @else
+                        <div class="text-center py-4 bg-light rounded">
+                            <i class="far fa-comment-slash text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3 mb-0">No reviews yet. Be the first to review!</p>
+                        </div>
+                    @endif
+                    
+                    <!-- Leave Review Section -->
+                    @auth
+                        <div class="mt-4">
+                            @livewire('review-form', ['gigId' => $gig->id], key('review-form-' . $gig->id))
+                        </div>
+                    @else
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <a href="{{ route('web.login') }}">Log in</a> to leave a review
+                        </div>
+                    @endauth
+                </div>
+            </div>
+            
+            <!-- Right Column: Pricing & Professional Info -->
+            <div class="col-lg-4">
+                <div class="sticky-sidebar" style="position: sticky; top: 100px;">
+                    <!-- Pricing Packages -->
+                    @if($gig->packages && $gig->packages->count() > 0)
+                    <div class="pricing-card card shadow-sm mb-4">
+                        <div class="card-body">
+                            <!-- Package Tabs -->
+                            <ul class="nav nav-pills nav-justified mb-3" role="tablist">
+                                @foreach($gig->packages as $index => $package)
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link {{ $index == 0 ? 'active' : '' }}" 
+                                                id="package-{{ $index }}-tab" 
+                                                data-bs-toggle="tab" 
+                                                data-bs-target="#package-{{ $index }}" 
+                                                type="button">
+                                            {{ $package->title }}
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            
+                            <!-- Package Content -->
+                            <div class="tab-content">
+                                @foreach($gig->packages as $index => $package)
+                                    <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" 
+                                         id="package-{{ $index }}">
+                                        <h3 class="text-primary mb-3">€{{ number_format($package->price, 2) }}</h3>
+                                        <h6 class="mb-2">{{ $package->title }}</h6>
+                                        <p class="text-muted small mb-3">{!! strip_tags($package->description) !!}</p>
+                                        <ul class="list-unstyled mb-3">
+                                            <li class="mb-2">
+                                                <i class="flaticon-sandclock text-primary me-2"></i>
+                                                {{ $package->delivery_time }} Days Delivery
+                                            </li>
+                                            @if($package->revision_limit > 0)
+                                                <li class="mb-2">
+                                                    <i class="flaticon-recycle text-primary me-2"></i>
+                                                    {{ $package->revision_limit }} Revisions
+                                                </li>
+                                            @endif
+                                        </ul>
                                     </div>
                                 @endforeach
                             </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-primary btn-lg">
+                                    <i class="far fa-calendar-check me-2"></i> Book now
+                                </button>
+                                @auth
+                                    <button class="btn btn-outline-primary" 
+                                            onclick="Livewire.dispatch('open-chat-sidebar', { userId: {{ $gig->user->id }} })">
+                                        <i class="far fa-paper-plane me-2"></i> Contact me
+                                    </button>
+                                @else
+                                    <a href="{{ route('web.login') }}" class="btn btn-outline-primary">
+                                        <i class="far fa-paper-plane me-2"></i> Contact me
+                                    </a>
+                                @endauth
+                            </div>
                         </div>
                     </div>
-                    <div class="freelancer-style1 service-single mb-0">
-                        <div class="wrapper d-flex align-items-center">
-                            <div class="thumb position-relative mb25">
-                                <img class="rounded-circle mx-auto" src="{{ asset($gig->user->profile->photo ?? 'web/images/team/fl-s-2.png') }}" alt="">
-                                <span class="online"></span>
+                    @endif
+                    
+                    <!-- Professional Card -->
+                    <div class="professional-card card shadow-sm">
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                @if($gig->user->avatar_url)
+                                    <img src="{{ asset('storage/' . $gig->user->avatar_url) }}" 
+                                         class="rounded-circle mb-2" 
+                                         width="80" 
+                                         height="80">
+                                @else
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2" 
+                                         style="width: 80px; height: 80px; font-size: 2rem;">
+                                        {{ $gig->user->initials }}
+                                    </div>
+                                @endif
+                                <h6 class="mb-1">{{ $gig->user->name }} {{ $gig->user->surname ?? '' }}</h6>
+                                <p class="text-muted small mb-0">@<span>{{ $gig->user->username ?? strtolower($gig->user->name) }}</span></p>
                             </div>
-                            <div class="ml20 notranslate" translate="no">
-                                <h5 class="title mb-1">{{ $gig->user->name }}</h5>
-                                <p class="mb-0">{{ $gig->user->name }}</p>
+                            
+                            <hr>
+                            
+                            <div class="professional-stats">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Location:</span>
+                                    <span class="fw-bold">{{ $gig->user->profile->city ?? 'N/A' }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Language:</span>
+                                    <span class="fw-bold">{{ $gig->user->profile->languages ?? 'English' }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Services:</span>
+                                    <span class="fw-bold">{{ $gig->user->gigs->count() }}</span>
+                                </div>
                             </div>
-                        </div>
-                        <hr class="opacity-100">
-                        <div class="details">
-                            <div class="fl-meta d-flex align-items-center justify-content-between">
-                                <a class="meta fw500 text-start">Location<br><span class="fz14 fw400">{{ $gig->user->profile->city }}</span></a>
-                                <a class="meta fw500 text-start">Langauage<br><span class="fz14 fw400">{{ $gig->user->profile->languages }}</span></a>
-                            </div>
-                        </div>
-                        <div class="d-grid mt30">
-                            @guest
-                                <a href="{{ route('web.login') }}" class="ud-btn btn-thm-border">Contact Me<i class="fal fa-arrow-right-long"></i></a>
-                            @endguest
-                            @auth
-                                <a href="{{ route('gig.contact', $gig->id) }}" class="ud-btn btn-thm-border">Contact Me<i class="fal fa-arrow-right-long"></i></a>
-                            @endauth
+                            
+                            <hr>
+                            
+                            @if($gig->user->isProfessional())
+                                <a href="{{ route('professional.profile', $gig->user->username ?? $gig->user->id) }}" 
+                                   class="btn btn-outline-dark w-100">
+                                    <i class="far fa-user me-2"></i> View Full Profile
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
-            @endif
         </div>
-      </div>
     </div>
 </section>
 
-<!-- Related Gigs -->
-@if($relatedGigs->count() > 0)
-<section class="pt30 pb90 pb30-md">
+<!-- Related Services -->
+@if($relatedGigs && $relatedGigs->count() > 0)
+<section class="related-services-section pt-5 pb-5 bg-light">
     <div class="container">
-      <div class="row wow fadeInUp">
-        <div class="col-lg-12">
-          <div class="main-title mb35">
-            <h2>Related Services</h2>
-            <p class="text">Discover similar services from other professionals</p>
-          </div>
-        </div>
-      </div>
-      <div class="row wow fadeInUp">
-        @foreach($relatedGigs as $relatedGig)
-        <div class="col-sm-6 col-lg-3">
-          <div class="listing-style1">
-            <div class="list-thumb">
-              @if($relatedGig->images->count() > 0)
-                <img class="w-100" src="{{ asset($relatedGig->images->first()->image_path) }}" alt="{{ $relatedGig->title }}">
-              @else
-                <img class="w-100" src="{{ asset('web/images/listings/default-gig.jpg') }}" alt="{{ $relatedGig->title }}">
-              @endif
-              <a href="#" class="listing-fav fz12"><span class="far fa-heart"></span></a>
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="mb-2">Related Services</h3>
+                <p class="text-muted">Discover similar services from other professionals</p>
             </div>
-            <div class="list-content">
-              <p class="list-text body-color fz14 mb-1">{{ $relatedGig->subcategory->name ?? 'Service' }}</p>
-              <h5 class="list-title"><a href="{{ route('gigs.show', $relatedGig->slug) }}">{{ Str::limit($relatedGig->title, 60) }}</a></h5>
-              <div class="review-meta d-flex align-items-center">
-                <i class="fas fa-star fz10 review-color me-2"></i>
-                <p class="mb-0 body-color fz14">
-                  <span class="dark-color me-2">{{ number_format($relatedGig->rating, 2) }}</span>
-                  {{ $relatedGig->ratings_count }} {{ $relatedGig->ratings_count == 1 ? 'review' : 'reviews' }}
-                </p>
-              </div>
-              <hr class="my-2">
-              <div class="list-meta d-flex justify-content-between align-items-center mt15">
-                <a href="{{ route('gigs.show', $relatedGig->slug) }}">
-                  <span class="position-relative mr10">
-                    <img class="rounded-circle" src="{{ asset($relatedGig->user->profile->photo ?? 'web/images/team/default-avatar.png') }}" alt="{{ $relatedGig->user->name }}">
-                    <span class="online-badge"></span>
-                  </span>
-                  <span class="fz14 notranslate" translate="no">{{ $relatedGig->user->name }}</span>
-                </a>
-                <div class="budget">
-                  <p class="mb-0 body-color">Starting at<span class="fz17 fw500 dark-color ms-1">${{ number_format($relatedGig->starting_price, 0) }}</span></p>
+        </div>
+        <div class="row">
+            @foreach($relatedGigs as $relatedGig)
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card h-100 service-card">
+                        <div class="position-relative">
+                            @if($relatedGig->images && $relatedGig->images->count() > 0)
+                                <img src="{{ asset('storage/' . $relatedGig->images->first()->image_path) }}" 
+                                     class="card-img-top" 
+                                     alt="{{ $relatedGig->title }}"
+                                     style="height: 200px; object-fit: cover;">
+                            @else
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="far fa-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-2">{{ $relatedGig->subcategory->name ?? 'Service' }}</p>
+                            <h6 class="card-title">
+                                <a href="{{ route('gigs.show', $relatedGig->slug) }}" 
+                                   class="text-dark text-decoration-none">
+                                    {{ Str::limit($relatedGig->title, 60) }}
+                                </a>
+                            </h6>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="text-warning me-2">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="fw-bold me-1">{{ number_format($relatedGig->rating ?? 0, 1) }}</span>
+                                <span class="text-muted small">({{ $relatedGig->ratings_count ?? 0 }})</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                @if($relatedGig->user->avatar_url)
+                                    <img src="{{ asset('storage/' . $relatedGig->user->avatar_url) }}" 
+                                         class="rounded-circle me-2" 
+                                         width="30" 
+                                         height="30">
+                                @else
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 30px; height: 30px; font-size: 0.75rem;">
+                                        {{ $relatedGig->user->initials }}
+                                    </div>
+                                @endif
+                                <small>{{ $relatedGig->user->name }}</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">From</small>
+                                <div class="fw-bold text-primary">€{{ number_format($relatedGig->starting_price, 0) }}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
+            @endforeach
         </div>
-        @endforeach
-      </div>
     </div>
 </section>
 @endif
+
+<!-- Reviews Modal -->
+<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewsModalLabel">
+                    <i class="far fa-thumbs-up text-primary me-2"></i> All Reviews
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @livewire('reviews-list', ['gigId' => $gig->id], key('reviews-list-' . $gig->id))
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/service-detail.css') }}">
+<style>
+    /* Additional page-specific styles */
+    .toast-notification {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        opacity: 0;
+        transform: translateX(400px);
+        transition: all 0.3s ease;
+    }
+    
+    .toast-notification.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .toast-notification.success {
+        border-left: 4px solid #28a745;
+    }
+    
+    .toast-notification.error {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .toast-notification.info {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    body.loading::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 9998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="{{ asset('js/service-detail.js') }}"></script>
+<script>
+    // Page-specific JavaScript
+    $(document).ready(function() {
+        // Mark first thumbnail as active
+        $('.thumbnail-item').first().addClass('active');
+        
+        // Handle Book Now button
+        $('.btn-primary:contains("Book now")').on('click', function(e) {
+            e.preventDefault();
+            alert('Booking functionality will be implemented soon!');
+            // TODO: Integrate with booking/order system
+        });
+    });
+</script>
+@endpush
 
 @endsection

@@ -32,6 +32,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         'default_payment_method',
         'stripe_customer_id',
         'user_type',
+        'followers_count',
+        'following_count',
     ];
 
     /**
@@ -81,6 +83,39 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return $this->hasMany(Gig::class);
     }
 
+    /**
+     * Get the reviews written by this user
+     */
+    public function gigReviews()
+    {
+        return $this->hasMany(GigReview::class);
+    }
+
+    /**
+     * Get the gigs saved by this user
+     */
+    public function savedGigs()
+    {
+        return $this->belongsToMany(Gig::class, 'gig_saves')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get all saves by this user
+     */
+    public function gigSaves()
+    {
+        return $this->hasMany(GigSave::class);
+    }
+
+    /**
+     * Get all shares by this user
+     */
+    public function gigShares()
+    {
+        return $this->hasMany(GigShare::class);
+    }
+
     public function userSubcategories()
     {
         return $this->hasMany(UserSubcategory::class);
@@ -91,6 +126,70 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return $this->belongsToMany(Subcategory::class, 'user_subcategories')
                     ->withPivot('priority')
                     ->withTimestamps();
+    }
+
+    // Followers & Following Relationships
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'following_id', 'follower_id')
+            ->withTimestamps();
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'following_id')
+            ->withTimestamps();
+    }
+
+    public function isFollowing(User $user)
+    {
+        return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    // Notifications Relationships
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->latest();
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->hasMany(Notification::class)->whereNull('read_at');
+    }
+
+    // Chat Relationships
+    public function chatRooms()
+    {
+        return $this->hasMany(ChatRoom::class, 'sender_id')
+            ->orWhere('receiver_id', $this->id);
+    }
+
+    public function chatMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    // Helper Methods
+    public function getInitialsAttribute()
+    {
+        $firstInitial = $this->name ? strtoupper(substr($this->name, 0, 1)) : '';
+        $lastInitial = $this->surname ? strtoupper(substr($this->surname, 0, 1)) : '';
+        return $firstInitial . $lastInitial;
+    }
+
+    public function isProfessional()
+    {
+        return $this->user_type === 3;
+    }
+
+    public function isCustomer()
+    {
+        return $this->user_type === 2;
+    }
+
+    public function isAdmin()
+    {
+        return $this->user_type === 1;
     }
 
     /**

@@ -9,8 +9,8 @@
           <div class="row align-items-center wow fadeInUp" data-wow-delay="300ms">
             <div class="col-lg-9">
               <div class="main-title2">
-                <h2 class="title">Browse talent by category</h2>
-                <p class="paragraph">Aliquam lacinia diam quis lacus euismod</p>
+                <h2 class="title">Discover Fitness & Wellness Professionals</h2>
+                <p class="paragraph">Find certified trainers, nutritionists, and wellness experts to achieve your health goals</p>
               </div>
             </div>
             <div class="col-lg-3">
@@ -54,8 +54,8 @@
           <div class="row align-items-center wow fadeInUp">
             <div class="col-xl-3">
               <div class="main-title mb30-lg">
-                <h2 class="title">Popular Services</h2>
-                <p class="paragraph">Most viewed and all-time top-selling services</p>
+                <h2 class="title">Featured Services</h2>
+                <p class="paragraph">Top-rated fitness and wellness services from certified professionals</p>
               </div>
             </div>
             <div class="col-xl-9">
