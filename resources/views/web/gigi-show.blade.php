@@ -498,6 +498,10 @@
         align-items: center;
         justify-content: center;
     }
+    .owl-prev, .owl-next {
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 @endpush
 

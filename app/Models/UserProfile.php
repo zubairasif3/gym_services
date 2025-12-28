@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserProfile extends Model
 {
     protected $fillable = [
-        'bio', 'profile_picture', 'is_provider', 'phone', 'country', 'city', 'address', 'cap', 'date_of_birth', 'languages', 'provider_level', 'user_id'
+        'bio', 'profile_picture', 'is_provider', 'phone', 'country', 'city', 'address', 'cap', 'date_of_birth', 'languages', 'provider_level', 'user_id', 'wallpaper_image', 'about', 'skills'
     ];
 
     protected $casts = [

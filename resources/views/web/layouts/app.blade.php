@@ -384,6 +384,9 @@
 
     {{-- google translator --}}
     <style>
+        .header-nav {
+            z-index: 10000;
+        }
         .skiptranslate {
             display: none !important;
         }

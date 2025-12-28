@@ -166,12 +166,8 @@
                                     <div class="card service-gallery-item h-100">
                                         <!-- Service Image -->
                                         <a href="{{ route('gigs.show', $gig->slug) }}">
-                                            @if($gig->images && count(json_decode($gig->images, true)) > 0)
-                                                @php
-                                                    $images = json_decode($gig->images, true);
-                                                    $firstImage = $images[0];
-                                                @endphp
-                                                <img src="{{ asset('storage/' . $firstImage) }}" 
+                                            @if($gig->images && $gig->images->count() > 0)
+                                                <img src="{{ asset('storage/' . $gig->images->first()->image_path) }}" 
                                                      class="card-img-top" 
                                                      alt="{{ $gig->title }}"
                                                      style="height: 200px; object-fit: cover;">
@@ -192,13 +188,13 @@
                                                 </a>
                                             </h6>
                                             <p class="card-text small text-muted">
-                                                {{ Str::limit($gig->description, 80) }}
+                                                {{ Str::limit(strip_tags($gig->description), 80) }}
                                             </p>
                                             
                                             <!-- Price & Rating -->
                                             <div class="d-flex justify-content-between align-items-center mt-3">
                                                 <span class="fw-bold text-primary">
-                                                    ${{ number_format($gig->price, 2) }}
+                                                    €{{ number_format($gig->starting_price, 2) }}
                                                 </span>
                                                 @if($gig->rating > 0)
                                                     <span class="text-warning">
