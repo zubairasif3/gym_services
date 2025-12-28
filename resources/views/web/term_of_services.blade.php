@@ -2,7 +2,7 @@
 @section('title', 'Terms of Service')
 
 @section('content')
-    <div style="padding-top: 78px;"></div>
+    {{-- <div style="padding-top: 78px;"></div> --}}
 
     <!-- Breadcrumb Section -->
     <section class="breadcumb-section wow fadeInUp">

@@ -2,7 +2,7 @@
 @section('title', 'Services')
 
 @section('content')
-    <div style="padding-top: 78px;"></div>
+    {{-- <div style="padding-top: 78px;"></div> --}}
     <!-- Breadcumb Sections -->
     <section class="breadcumb-section">
         <div class="container">

@@ -2,7 +2,7 @@
 @section('title', 'Forgot Password')
 
 @section('content')
-    <div style="padding-top: 78px;"></div>
+    {{-- <div style="padding-top: 78px;"></div> --}}
     <!-- Forgot Password Area -->
     <section class="our-login">
         <div class="container">

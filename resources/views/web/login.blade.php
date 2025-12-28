@@ -2,7 +2,7 @@
 @section('title', 'Home Page')
 
 @section('content')
-    <div style="padding-top: 78px;"></div>
+    {{-- <div style="padding-top: 78px;"></div> --}}
     <!-- Our LogIn Area -->
     <section class="our-login">
         <div class="container">
