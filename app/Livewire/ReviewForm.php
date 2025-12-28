@@ -57,6 +57,19 @@ class ReviewForm extends Component
         
         $this->validate();
         
+        // Get the gig to check ownership
+        $gig = Gig::find($this->gigId);
+        if (!$gig) {
+            session()->flash('error', 'Service not found.');
+            return;
+        }
+        
+        // Prevent users from reviewing their own services
+        if (Auth::id() === $gig->user_id) {
+            session()->flash('error', 'You cannot review your own service.');
+            return;
+        }
+        
         // Check if already reviewed
         if ($this->hasReviewed) {
             session()->flash('error', 'You have already reviewed this service.');

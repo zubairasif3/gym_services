@@ -33,24 +33,24 @@
                 <span>My Public Profile</span>
             </a>
             
-            <a href="{{ route('professional.preview') }}" 
+            {{-- <a href="{{ route('professional.preview') }}" 
                class="dropdown-item d-flex align-items-center py-2">
                 <i class="far fa-user me-3 text-primary" style="width: 20px;"></i>
                 <span>Preview Profile</span>
+            </a> --}}
+
+            <a href="{{ route('profile.edit') }}" 
+               class="dropdown-item d-flex align-items-center py-2">
+                <i class="far fa-edit me-3 text-primary" style="width: 20px;"></i>
+                <span>Edit Profile</span>
+            </a>
+            
+            <a href="{{ route('filament.admin.pages.dashboard') }}" 
+               class="dropdown-item d-flex align-items-center py-2">
+                <i class="far fa-tachometer-alt me-3 text-primary" style="width: 20px;"></i>
+                <span>Dashboard</span>
             </a>
         @endif
-        
-        <a href="{{ route('profile.edit') }}" 
-           class="dropdown-item d-flex align-items-center py-2">
-            <i class="far fa-edit me-3 text-primary" style="width: 20px;"></i>
-            <span>Edit Profile</span>
-        </a>
-        
-        <a href="{{ route('filament.admin.pages.dashboard') }}" 
-           class="dropdown-item d-flex align-items-center py-2">
-            <i class="far fa-tachometer-alt me-3 text-primary" style="width: 20px;"></i>
-            <span>Dashboard</span>
-        </a>
         
         <a href="{{ route('following') }}" 
            class="dropdown-item d-flex align-items-center py-2">

@@ -1,0 +1,83 @@
+/* Override Bootstrap Primary Colors with Theme Color #00b3f1 */
+:root {
+    --bs-primary: #00b3f1 !important;
+    --bs-primary-rgb: 0, 179, 241 !important;
+    --bs-blue: #00b3f1 !important;
+}
+
+.btn-primary,
+.bg-primary,
+/* .text-primary, */
+.border-primary,
+.btn-outline-primary {
+    background-color: #00b3f1 !important;
+    border-color: #00b3f1 !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #0099d4 !important;
+    border-color: #0099d4 !important;
+}
+
+.btn-outline-primary {
+    background-color: transparent !important;
+    color: #00b3f1 !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: #00b3f1 !important;
+    border-color: #00b3f1 !important;
+    color: #ffffff !important;
+}
+
+.text-primary {
+    color: #00b3f1 !important;
+}
+
+.bg-primary {
+    background-color: #00b3f1 !important;
+}
+
+.border-primary {
+    border-color: #00b3f1 !important;
+}
+
+.bg-primary.bg-opacity-10 {
+    background-color: rgba(0, 179, 241, 0.1) !important;
+}
+
+.bg-primary.bg-opacity-25 {
+    background-color: rgba(0, 179, 241, 0.25) !important;
+}
+
+.bg-primary.bg-opacity-50 {
+    background-color: rgba(0, 179, 241, 0.5) !important;
+}
+
+.bg-primary.bg-opacity-75 {
+    background-color: rgba(0, 179, 241, 0.75) !important;
+}
+
+/* Chat sidebar specific overrides */
+.chat-sidebar .bg-primary {
+    background-color: #00b3f1 !important;
+}
+
+.chat-sidebar .text-primary {
+    color: #00b3f1 !important;
+}
+
+.chat-sidebar .btn-primary {
+    background-color: #00b3f1 !important;
+    border-color: #00b3f1 !important;
+}
+
+.chat-sidebar .conversation-item.bg-primary.bg-opacity-10 {
+    background-color: rgba(0, 179, 241, 0.1) !important;
+}
+

@@ -25,6 +25,12 @@ Route::post('/logout', [HomeController::class, 'logout'])->name('web.logout');
 Route::get('/register', [HomeController::class, 'register'])->name('web.register');
 Route::post('/register', [HomeController::class, 'registerProcess'])->name('web.register.process');
 
+// Password Reset Routes
+Route::get('/forgot-password', [HomeController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [HomeController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [HomeController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/reset-password', [HomeController::class, 'resetPassword'])->name('password.update');
+
 // Email verification routes
 Route::get('/email/verify', [HomeController::class, 'showVerificationNotice'])->name('verification.notice');
 Route::get('/email/verify/{id}/{hash}', [HomeController::class, 'verifyEmail'])->middleware('signed')->name('verification.verify');
@@ -66,6 +72,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [App\Http\Controllers\ProfessionalProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [App\Http\Controllers\ProfessionalProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/preview', [App\Http\Controllers\ProfessionalProfileController::class, 'preview'])->name('professional.preview');
+    
+    // Profile Media Routes
+    Route::post('/profile/media/upload', [App\Http\Controllers\ProfessionalProfileController::class, 'uploadMedia'])->name('profile.media.upload');
+    Route::delete('/profile/media/{id}', [App\Http\Controllers\ProfessionalProfileController::class, 'deleteMedia'])->name('profile.media.delete');
+    Route::post('/profile/media/reorder', [App\Http\Controllers\ProfessionalProfileController::class, 'reorderMedia'])->name('profile.media.reorder');
     
     // Gig Review Routes (Authenticated)
     Route::post('/gigs/{gig}/reviews', [App\Http\Controllers\GigReviewController::class, 'store'])->name('gigs.reviews.store');

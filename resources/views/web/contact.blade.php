@@ -2,7 +2,7 @@
 @section('title', 'Contact Us')
 
 @section('content')
-    <div style="padding-top: 78px;"></div>
+    {{-- <div style="padding-top: 78px;"></div> --}}
     <!-- Breadcumb Sections -->
     <section class="breadcumb-section wow fadeInUp">
         <div class="cta-commmon-v1 cta-banner bgc-thm2 mx-auto maxw1700 pt120 pb120 bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg">
@@ -13,7 +13,7 @@
                 <div class="col-xl-5">
                     <div class="position-relative wow fadeInUp" data-wow-delay="300ms">
                     <h2 class="text-white">Contact us</h2>
-                    <p class="text mb0 text-white">We'd love to talk about how we can help you.</p>
+                    <p class="text mb0 text-white">Help us grow with your advice</p>
                     </div>
                 </div>
             </div>
@@ -27,36 +27,21 @@
             <div class="col-lg-6">
                 <div class="position-relative mt40">
                     <div class="main-title">
-                    <h4 class="form-title mb25">Keep In Touch With Us.</h4>
-                    <p class="text">Neque convallis a cras semper auctor. Libero id faucibus nisl tincidunt egetnvallis.</p>
+                        <h4 class="form-title mb25">Keep In Touch With Us.</h4>
                     </div>
                     <div class="iconbox-style1 contact-style d-flex align-items-start mb30">
-                    <div class="icon flex-shrink-0"><span class="flaticon-tracking"></span></div>
-                    <div class="details">
-                        <h5 class="title">Address</h5>
-                        <p class="mb-0 text">328 Queensberry Street, North <br> Melbourne VIC 3051, Australia.</p>
-                    </div>
-                    </div>
-                    <div class="iconbox-style1 contact-style d-flex align-items-start mb30">
-                    <div class="icon flex-shrink-0"><span class="flaticon-call"></span></div>
-                    <div class="details">
-                        <h5 class="title">Phone</h5>
-                        <p class="mb-0 text">+(0) 392 94 03 01</p>
-                    </div>
-                    </div>
-                    <div class="iconbox-style1 contact-style d-flex align-items-start mb30">
-                    <div class="icon flex-shrink-0"><span class="flaticon-mail"></span></div>
-                    <div class="details">
-                        <h5 class="title">Email</h5>
-                        <p class="mb-0 text">hello@FitScout.com</p>
-                    </div>
+                        <div class="icon flex-shrink-0"><span class="flaticon-mail"></span></div>
+                        <div class="details">
+                            <h5 class="title">Email</h5>
+                            <p class="mb-0 text">hello@fitscout.it</p>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="contact-page-form default-box-shadow1 bdrs8 bdr1 p50 mb30-md bgc-white">
                     <h4 class="form-title mb25">Tell us about yourself</h4>
-                    <p class="text mb30">Whether you have questions or you would just like to say hello, contact us.</p>
+                    <p class="text mb30">Tell us about your experience on FitScout or how we can be useful to you</p>
                     <form action="#" class="form-style1">
                     <div class="row">
                         <div class="col-md-6">
@@ -96,7 +81,7 @@
         </div>
     </section>
     <!-- Faq -->
-    <section class="pb70">
+    {{-- <section class="pb70">
         <div class="container">
         <div class="row">
             <div class="col-lg-6 m-auto wow fadeInUp" data-wow-delay="300ms">
@@ -157,7 +142,7 @@
             </div>
         </div>
         </div>
-    </section>
+    </section> --}}
 
 
 

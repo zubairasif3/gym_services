@@ -62,6 +62,23 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     {
         return $this->hasOne(UserProfile::class);
     }
+
+    /**
+     * Get all profile media for this user
+     */
+    public function profileMedia()
+    {
+        return $this->hasMany(ProfileMedia::class)->ordered();
+    }
+
+    /**
+     * Get active profile media for this user
+     */
+    public function activeProfileMedia()
+    {
+        return $this->hasMany(ProfileMedia::class)->active()->ordered();
+    }
+
     // For checking if the user is a provider
     public function isProvider()
     {
@@ -214,7 +231,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        // Only Admin (1) and Professional (3) can access the admin panel
+        // Customer (2) cannot access
+        return in_array($this->user_type, [1, 3]);
     }
 
 }

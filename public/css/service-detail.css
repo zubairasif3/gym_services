@@ -41,7 +41,7 @@
     background: #f8f9fa;
     border-radius: 8px;
     font-size: 0.9rem;
-    border-left: 3px solid #0d6efd;
+    border-left: 3px solid #00b3f1;
     transition: all 0.3s ease;
 }
 
@@ -79,12 +79,12 @@
 }
 
 .service-gallery .thumbnail-item:hover {
-    border-color: #0d6efd;
+    border-color: #00b3f1;
     box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
 }
 
 .service-gallery .thumbnail-item.active {
-    border-color: #0d6efd;
+    border-color: #00b3f1;
 }
 
 /* Owl Carousel Custom Navigation */
@@ -125,7 +125,7 @@
 
 .reviews-section .review-card:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    border-color: #0d6efd;
+    border-color: #00b3f1;
 }
 
 .reviews-section .review-avatar img,
@@ -172,7 +172,7 @@
 }
 
 .pricing-card .nav-pills .nav-link.active {
-    background: #0d6efd;
+    background: #00b3f1;
     color: white;
 }
 
@@ -395,7 +395,7 @@
 /* ===== Loading States ===== */
 .loading-spinner {
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #0d6efd;
+    border-top: 3px solid #00b3f1;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -421,7 +421,7 @@
 .btn:focus,
 .form-control:focus,
 .nav-link:focus {
-    outline: 2px solid #0d6efd;
+    outline: 2px solid #00b3f1;
     outline-offset: 2px;
 }
 

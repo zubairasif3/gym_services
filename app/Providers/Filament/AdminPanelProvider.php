@@ -8,6 +8,7 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -32,6 +33,13 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Conversation'),
                 NavigationGroup::make('Users'),
                 NavigationGroup::make('Setting'),
+            ])
+            ->navigationItems([
+                NavigationItem::make('Visit Website')
+                // ->url('/', shouldOpenInNewTab: true)
+                ->url('/')
+                    ->icon('heroicon-o-globe-alt')
+                    ->sort(999),
             ])
             ->default()
             ->id('admin')
@@ -61,15 +69,15 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->plugins([
-                FilamentEditProfilePlugin::make()
-                    ->slug('my-profile')
-                    ->setTitle('Edit Profile')
-                    ->setNavigationLabel('Edit Profile')
-                    ->setNavigationGroup('Setting')
-                    ->setIcon('heroicon-o-cog-6-tooth')
-                    ->shouldShowBrowserSessionsForm()
-                    // ->shouldShowAvatarForm()
-                    ,
+                // FilamentEditProfilePlugin::make()
+                //     ->slug('my-profile')
+                //     ->setTitle('Edit Profile')
+                //     ->setNavigationLabel('Edit Profile')
+                //     ->setNavigationGroup('Setting')
+                //     ->setIcon('heroicon-o-cog-6-tooth')
+                //     ->shouldShowBrowserSessionsForm()
+                //     // ->shouldShowAvatarForm()
+                //     ,
             ])
             ->authMiddleware([
                 Authenticate::class,

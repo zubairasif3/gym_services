@@ -55,14 +55,24 @@
                             <!-- Action Buttons -->
                             <div class="col-md-4">
                                 <div class="d-flex gap-3 justify-content-end align-items-center mb-3">
-                                    <!-- Follow/Follower Card (Combined) -->
-                                    @livewire('follow-button', ['user' => $gig->user], key('follow-gig-' . $gig->user->id))
+                                    @auth
+                                        @if(auth()->id() !== $gig->user->id)
+                                            <!-- Follow/Follower Card (Combined) -->
+                                            @livewire('follow-button', ['user' => $gig->user], key('follow-gig-' . $gig->user->id))
+                                            
+                                            <!-- Save Button -->
+                                            @livewire('save-button', ['gig' => $gig], key('save-gig-' . $gig->id))
+                                        @endif
+                                    @else
+                                        <!-- Follow/Follower Card (Combined) -->
+                                        @livewire('follow-button', ['user' => $gig->user], key('follow-gig-' . $gig->user->id))
+                                        
+                                        <!-- Save Button -->
+                                        @livewire('save-button', ['gig' => $gig], key('save-gig-' . $gig->id))
+                                    @endauth
                                     
-                                    <!-- Share Button -->
+                                    <!-- Share Button (Always visible) -->
                                     @livewire('share-button', ['gig' => $gig], key('share-gig-' . $gig->id))
-                                    
-                                    <!-- Save Button -->
-                                    @livewire('save-button', ['gig' => $gig], key('save-gig-' . $gig->id))
                                 </div>
                             </div>
                         </div>
@@ -166,6 +176,11 @@
                 </div>
                 @endif
                 
+                <!-- Reaction Buttons Section -->
+                <div class="service-reactions mb-5">
+                    @livewire('reaction-button', ['gig' => $gig], key('reaction-gig-' . $gig->id))
+                </div>
+                
                 <!-- About Section -->
                 <div class="service-about mb-5">
                     <h4 class="mb-3">
@@ -232,9 +247,16 @@
                     
                     <!-- Leave Review Section -->
                     @auth
-                        <div class="mt-4">
-                            @livewire('review-form', ['gigId' => $gig->id], key('review-form-' . $gig->id))
-                        </div>
+                        @if(auth()->id() !== $gig->user->id)
+                            <div class="mt-4">
+                                @livewire('review-form', ['gigId' => $gig->id], key('review-form-' . $gig->id))
+                            </div>
+                        @else
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                You cannot review your own service.
+                            </div>
+                        @endif
                     @else
                         <div class="alert alert-info mt-4">
                             <i class="fas fa-info-circle me-2"></i>
@@ -292,15 +314,24 @@
                             
                             <!-- Action Buttons -->
                             <div class="d-grid gap-2 mt-4">
-                                <button class="btn btn-primary btn-lg">
-                                    <i class="far fa-calendar-check me-2"></i> Book now
-                                </button>
                                 @auth
-                                    <button class="btn btn-outline-primary" 
-                                            onclick="Livewire.dispatch('open-chat-sidebar', { userId: {{ $gig->user->id }} })">
-                                        <i class="far fa-paper-plane me-2"></i> Contact me
-                                    </button>
+                                    @if(auth()->id() !== $gig->user->id)
+                                        <button class="btn btn-primary btn-lg">
+                                            <i class="far fa-calendar-check me-2"></i> Book now
+                                        </button>
+                                        <button class="btn btn-outline-primary" 
+                                                onclick="Livewire.dispatch('open-chat-sidebar', { userId: {{ $gig->user->id }} })">
+                                            <i class="far fa-paper-plane me-2"></i> Contact me
+                                        </button>
+                                    @else
+                                        <a href="{{ url('/admin/gigs/' . $gig->id . '/edit') }}" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-edit me-2"></i> Edit Service
+                                        </a>
+                                    @endif
                                 @else
+                                    <button class="btn btn-primary btn-lg">
+                                        <i class="far fa-calendar-check me-2"></i> Book now
+                                    </button>
                                     <a href="{{ route('web.login') }}" class="btn btn-outline-primary">
                                         <i class="far fa-paper-plane me-2"></i> Contact me
                                     </a>

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Gig;
+use App\Models\ProfileMedia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProfessionalProfileController extends Controller
 {
@@ -17,6 +19,7 @@ class ProfessionalProfileController extends Controller
             ->where('user_type', 3) // Only professionals
             ->with([
                 'profile',
+                'activeProfileMedia',
                 'gigs' => function($query) {
                     $query->where('is_active', true)
                           ->with(['images', 'packages'])
@@ -40,6 +43,11 @@ class ProfessionalProfileController extends Controller
      */
     public function update(Request $request)
     {
+        // Restrict to professionals only
+        if (!auth()->check() || !auth()->user()->isProfessional()) {
+            return redirect()->route('web.index')->with('error', 'Only professionals can edit their profile');
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
@@ -174,8 +182,13 @@ class ProfessionalProfileController extends Controller
      */
     public function edit()
     {
+        // Restrict to professionals only
+        if (!auth()->check() || !auth()->user()->isProfessional()) {
+            return redirect()->route('web.index')->with('error', 'Only professionals can edit their profile');
+        }
+        
         $user = auth()->user();
-        $user->load('profile', 'subcategories');
+        $user->load('profile', 'subcategories', 'activeProfileMedia');
         
         return view('web.profile-edit', compact('user'));
     }
@@ -193,6 +206,7 @@ class ProfessionalProfileController extends Controller
         
         $user->load([
             'profile',
+            'activeProfileMedia',
             'gigs' => function($query) {
                 $query->where('is_active', true)
                       ->with(['images', 'packages'])
@@ -210,5 +224,143 @@ class ProfessionalProfileController extends Controller
             'subcategories' => $subcategories,
             'isPreview' => true
         ]);
+    }
+
+    /**
+     * Upload profile media (images/videos)
+     */
+    public function uploadMedia(Request $request)
+    {
+        // Restrict to professionals only
+        if (!auth()->check() || !auth()->user()->isProfessional()) {
+            return response()->json(['error' => 'Only professionals can upload media'], 403);
+        }
+
+        $request->validate([
+            'media' => 'required|file|mimes:jpeg,jpg,png,gif,mp4,mov,avi|max:20480', // 20MB max
+            'media_type' => 'required|in:image,video',
+        ]);
+
+        $user = auth()->user();
+        $mediaType = $request->media_type;
+
+        // For videos, validate duration (max 10 seconds)
+        if ($mediaType === 'video') {
+            // We'll check duration after upload
+        }
+
+        // Count existing media
+        $existingMediaCount = $user->profileMedia()->count();
+        if ($existingMediaCount >= 20) {
+            return response()->json(['error' => 'Maximum 20 media items allowed'], 400);
+        }
+
+        // Ensure public storage directories exist
+        $publicStoragePath = public_path('storage');
+        if (!is_dir($publicStoragePath . '/profiles/media')) {
+            \File::makeDirectory($publicStoragePath . '/profiles/media', 0755, true);
+        }
+
+        // Store the file
+        $filePath = $request->file('media')->store('profiles/media', 'public');
+
+        // Copy to public storage (Windows symlink workaround)
+        $sourcePath = storage_path('app/public/' . $filePath);
+        $destPath = $publicStoragePath . '/' . $filePath;
+        if (file_exists($sourcePath) && is_dir(dirname($destPath))) {
+            @copy($sourcePath, $destPath);
+        }
+
+        $duration = null;
+        $thumbnailPath = null;
+
+        // For videos, we'll need to extract duration and create thumbnail
+        // This requires FFmpeg or similar tool installed on server
+        if ($mediaType === 'video') {
+            // Basic duration check - you may want to use FFmpeg for accurate duration
+            // For now, we'll store null and let frontend handle validation
+            $duration = $request->input('duration'); // Expect from frontend
+        }
+
+        // Create media record
+        $media = ProfileMedia::create([
+            'user_id' => $user->id,
+            'media_type' => $mediaType,
+            'file_path' => $filePath,
+            'thumbnail_path' => $thumbnailPath,
+            'duration' => $duration,
+            'order' => $existingMediaCount, // Add to end
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'media' => $media,
+            'url' => asset('storage/' . $filePath),
+        ]);
+    }
+
+    /**
+     * Delete profile media
+     */
+    public function deleteMedia($id)
+    {
+        // Restrict to professionals only
+        if (!auth()->check() || !auth()->user()->isProfessional()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $media = ProfileMedia::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Delete file from storage
+        if ($media->file_path) {
+            Storage::disk('public')->delete($media->file_path);
+            // Delete from public storage
+            $publicPath = public_path('storage/' . $media->file_path);
+            if (file_exists($publicPath)) {
+                @unlink($publicPath);
+            }
+        }
+
+        // Delete thumbnail if exists
+        if ($media->thumbnail_path) {
+            Storage::disk('public')->delete($media->thumbnail_path);
+            $publicPath = public_path('storage/' . $media->thumbnail_path);
+            if (file_exists($publicPath)) {
+                @unlink($publicPath);
+            }
+        }
+
+        $media->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Reorder profile media
+     */
+    public function reorderMedia(Request $request)
+    {
+        // Restrict to professionals only
+        if (!auth()->check() || !auth()->user()->isProfessional()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'media_ids' => 'required|array',
+            'media_ids.*' => 'integer|exists:profile_media,id',
+        ]);
+
+        $user = auth()->user();
+
+        foreach ($request->media_ids as $index => $mediaId) {
+            ProfileMedia::where('id', $mediaId)
+                ->where('user_id', $user->id)
+                ->update(['order' => $index]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

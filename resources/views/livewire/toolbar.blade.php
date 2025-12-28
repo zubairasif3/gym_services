@@ -66,8 +66,8 @@
                              height="36"
                              alt="{{ auth()->user()->name }}">
                     @else
-                        <div class="avatar-initials bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
-                             style="width: 36px; height: 36px; font-size: 14px; font-weight: bold;">
+                        <div class="avatar-initials bg-primary text-white rounded-circle d-flex align-items-center justify-content-center notranslate" 
+                             style="width: 36px; height: 36px; font-size: 14px; font-weight: bold;" >
                             {{ auth()->user()->initials }}
                         </div>
                     @endif
@@ -88,9 +88,11 @@
     <style>
     .toolbar-wrapper {
         background-color: #1b1b18 !important;
-        position: sticky;
+        position: fixed;
         top: 0;
-        z-index: 1000;
+        left: 0;
+        right: 0;
+        z-index: 10000;
     }
 
     .toolbar-icon {
@@ -124,4 +126,35 @@
         padding: 0.25em 0.5em;
     }
     </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                const toolbar = document.querySelector('.toolbar-wrapper');
+                
+                if (!toolbar) return;
+                
+                // Check if click is outside all toolbar dropdowns
+                const clickedInsideNotifications = event.target.closest('.col-auto.position-relative:has(.notifications-dropdown)');
+                const clickedInsideMessages = event.target.closest('.col-auto.position-relative:has(.messages-dropdown)');
+                const clickedInsideProfile = event.target.closest('.col-auto.position-relative:has(.profile-dropdown)');
+                
+                // Close notifications if clicked outside
+                if (!clickedInsideNotifications && document.querySelector('.notifications-dropdown')) {
+                    @this.set('showNotifications', false);
+                }
+                
+                // Close messages if clicked outside
+                if (!clickedInsideMessages && document.querySelector('.messages-dropdown')) {
+                    @this.set('showMessages', false);
+                }
+                
+                // Close profile if clicked outside
+                if (!clickedInsideProfile && document.querySelector('.profile-dropdown')) {
+                    @this.set('showProfile', false);
+                }
+            });
+        });
+    </script>
 </div>

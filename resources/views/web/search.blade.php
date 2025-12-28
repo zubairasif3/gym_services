@@ -36,16 +36,20 @@
                             </h5>
                             <hr class="my-2">
                             <div class="list-meta d-flex justify-content-between align-items-center mt15">
-                                <a class="d-flex" href="#">
+                                <a class="d-flex" href="{{ route('professional.profile', $gig->user->username) }}">
                                     <span class="position-relative mr10">
-                                        <img class="rounded-circle wa" src="{{ asset($gig->user->profile->photo ?? 'web/images/team/fl-s-2.png') }}" alt="Freelancer Photo">
+                                        <img class="rounded-circle wa" src="{{ asset($gig->user->avatar_url ? 'storage/' . $gig->user->avatar_url : 'web/images/team/fl-s-2.png') }}" alt="Freelancer Photo" style="width: 32px; height: 32px;">
                                         <span class="online-badges"></span>
                                     </span>
-                                    <span class="fz14 notranslate" translate="no">{{ $gig->user->name }}</span>
+                                    <div>
+                                        <div>
+                                            <span class="fz14 notranslate" translate="no">{{ $gig->user->name }}</span>
+                                        </div>
+                                        <div class="budget">
+                                            <p class="mb-0 body-color">Starting at<span class="fz17 fw500 dark-color ms-1">€{{ $gig->starting_price }}</span></p>
+                                        </div>
+                                    </div>
                                 </a>
-                                <div class="budget">
-                                    <p class="mb-0 body-color">Starting at<span class="fz17 fw500 dark-color ms-1">€{{ $gig->starting_price }}</span></p>
-                                </div>
                             </div>
                         </div>
                     </div>

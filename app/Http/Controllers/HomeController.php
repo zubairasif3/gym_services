@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
 use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\PaymentMethod;
@@ -134,7 +137,68 @@ class HomeController extends Controller
     }
 
     public function about(){
-        return view('web.about');
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->with([
+                'subcategories' => function ($query) {
+                    $query->where('is_active', true)
+                        ->orderByRaw('COALESCE(display_order, 999999), id');
+                }
+            ])
+            ->orderByRaw('COALESCE(display_order, 999999), id')
+            ->take(3)
+            ->get();
+
+        // Dummy testimonials generated from your real categories/subcategories (no DB testimonials needed)
+        $seedNames = [
+            ['name' => 'Marco R.', 'role' => 'Customer'],
+            ['name' => 'Sara L.', 'role' => 'Customer'],
+            ['name' => 'Giulia P.', 'role' => 'Customer'],
+        ];
+        $seedAvatars = [
+            'web/images/testimonials/1.jpg',
+            'web/images/testimonials/2.jpg',
+            'web/images/testimonials/3.jpg',
+        ];
+
+        $testimonials = collect();
+
+        foreach ($categories as $i => $category) {
+            $topSubcats = $category->subcategories->take(3)->pluck('name')->filter()->values();
+            $subcatsText = $topSubcats->isNotEmpty()
+                ? $topSubcats->implode(', ')
+                : 'servizi specializzati';
+
+            $testimonials->push([
+                'id' => 'testimonial-' . $i,
+                'active' => $i === 0,
+                'name' => $seedNames[$i]['name'] ?? 'Customer',
+                'role' => $seedNames[$i]['role'] ?? 'Customer',
+                'avatar' => $seedAvatars[$i] ?? $seedAvatars[0],
+                'text' => sprintf(
+                    '“Ho trovato rapidamente il professionista giusto nella categoria %s. Tra %s, la scelta è stata semplice: profili chiari, comunicazione veloce e servizio davvero professionale. Consigliatissimo.”',
+                    $category->name,
+                    $subcatsText
+                ),
+            ]);
+        }
+
+        // If you have fewer than 3 categories, pad with generic but realistic testimonials
+        while ($testimonials->count() < 3) {
+            $i = $testimonials->count();
+            $testimonials->push([
+                'id' => 'testimonial-' . $i,
+                'active' => $i === 0 && $testimonials->isEmpty(),
+                'name' => $seedNames[$i]['name'] ?? 'Customer',
+                'role' => $seedNames[$i]['role'] ?? 'Customer',
+                'avatar' => $seedAvatars[$i] ?? $seedAvatars[0],
+                'text' => '“Piattaforma comoda e affidabile: ho confrontato più profili, letto le recensioni e prenotato in pochi minuti. Esperienza ottima dall’inizio alla fine.”',
+            ]);
+        }
+
+        $testimonials = $testimonials->take(3)->values();
+
+        return view('web.about', compact('testimonials'));
     }
     public function term_of_services(){
         return view('web.term_of_services');
@@ -542,5 +606,69 @@ class HomeController extends Controller
 
         $url = "/chat?chat_room_id=". $chatRoom->id;
         return redirect($url);
+    }
+
+    /**
+     * Show the form for requesting a password reset link.
+     */
+    public function showForgotPasswordForm()
+    {
+        return view('web.forgot-password');
+    }
+
+    /**
+     * Send a reset link to the given user.
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        // Send password reset link
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with('status', __($status))
+            : back()->withErrors(['email' => __($status)]);
+    }
+
+    /**
+     * Show the form for resetting the password.
+     */
+    public function showResetPasswordForm($token)
+    {
+        return view('web.reset-password', ['token' => $token, 'email' => request('email')]);
+    }
+
+    /**
+     * Reset the given user's password.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('web.login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 }

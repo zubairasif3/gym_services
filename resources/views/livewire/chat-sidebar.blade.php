@@ -2,12 +2,12 @@
     @if($isOpen)
     <!-- Chat Sidebar Overlay -->
 <div class="chat-sidebar-overlay position-fixed top-0 start-0 w-100 h-100" 
-     style="background: rgba(0,0,0,0.5); z-index: 1040;"
+     style="background: rgba(0,0,0,0.5); z-index: 10400;"
      wire:click="closeChat">
 </div>
 
 <div class="chat-sidebar position-fixed top-0 end-0 h-100 bg-white shadow-lg" 
-     style="width: 900px; max-width: 95vw; z-index: 1050; animation: slideIn 0.3s ease;">
+     style="width: 900px; max-width: 95vw; z-index: 10500; animation: slideIn 0.3s ease;">
      
     <div class="d-flex flex-column h-100">
         <!-- Header -->
@@ -94,37 +94,53 @@
                     <div class="messages-area flex-grow-1 p-3" 
                          style="overflow-y: auto; background: #f8f9fa;"
                          id="messages-container">
-                        @forelse($messages as $message)
-                            <div class="message-bubble mb-3 {{ $message['is_own'] ? 'text-end' : '' }}">
-                                <div class="d-inline-block {{ $message['is_own'] ? 'bg-primary text-white' : 'bg-white' }} rounded p-3 shadow-sm" 
-                                     style="max-width: 70%;">
-                                     
-                                    @if($message['message'])
-                                        <div class="message-text">{{ $message['message'] }}</div>
-                                    @endif
-                                    
-                                    @if($message['attachment_path'])
-                                        <div class="attachment mt-2">
-                                            @if($message['attachment_type'] === 'image')
-                                                <img src="{{ $message['attachment_path'] }}" 
-                                                     class="img-fluid rounded" 
-                                                     style="max-height: 200px;">
-                                            @else
-                                                <a href="{{ $message['attachment_path'] }}" 
-                                                   target="_blank" 
-                                                   class="{{ $message['is_own'] ? 'text-white' : 'text-primary' }}">
-                                                    <i class="far fa-file me-1"></i>
-                                                    {{ $message['attachment_name'] }}
-                                                </a>
-                                            @endif
+                        @forelse($messages as $item)
+                            @if($item['type'] === 'date_separator')
+                                <div class="date-separator text-center my-3">
+                                    <span class="badge bg-light text-muted px-3 py-1 rounded-pill">
+                                        {{ $item['date'] }}
+                                    </span>
+                                </div>
+                            @else
+                                <div class="message-bubble mb-3 {{ $item['is_own'] ? 'text-end' : '' }}">
+                                    <div class="d-inline-block {{ $item['is_own'] ? 'bg-primary text-white' : 'bg-white' }} rounded p-3 shadow-sm" 
+                                         style="max-width: 70%;">
+                                         
+                                        @if($item['message'])
+                                            <div class="message-text">{{ $item['message'] }}</div>
+                                        @endif
+                                        
+                                        @if($item['attachment_path'])
+                                            <div class="attachment mt-2">
+                                                @if($item['attachment_type'] === 'image')
+                                                    <img src="{{ $item['attachment_path'] }}" 
+                                                         class="img-fluid rounded" 
+                                                         style="max-height: 300px; cursor: pointer;"
+                                                         onclick="window.open('{{ $item['attachment_path'] }}', '_blank')"
+                                                         alt="Attachment">
+                                                @elseif($item['attachment_type'] === 'video')
+                                                    <video controls class="img-fluid rounded" style="max-height: 300px;">
+                                                        <source src="{{ $item['attachment_path'] }}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                    </video>
+                                                @else
+                                                    <a href="{{ $item['attachment_path'] }}" 
+                                                       target="_blank" 
+                                                       download="{{ $item['attachment_name'] ?? 'attachment' }}"
+                                                       class="d-inline-flex align-items-center {{ $item['is_own'] ? 'text-white' : 'text-primary' }} text-decoration-none">
+                                                        <i class="far fa-file me-2"></i>
+                                                        <span>{{ $item['attachment_name'] ?? 'Download Attachment' }}</span>
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        
+                                        <div class="message-time small {{ $item['is_own'] ? 'text-white-50' : 'text-muted' }} mt-1">
+                                            {{ $item['created_at'] }}
                                         </div>
-                                    @endif
-                                    
-                                    <div class="message-time small {{ $message['is_own'] ? 'text-white-50' : 'text-muted' }} mt-1">
-                                        {{ $message['created_at'] }}
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         @empty
                             <div class="text-center text-muted py-5">
                                 <i class="far fa-comment-dots fs-1 mb-2 d-block"></i>
@@ -139,7 +155,7 @@
                             <!-- Emoji Picker -->
                             @if($showEmojiPicker)
                                 <div class="emoji-picker bg-light border rounded p-2 mb-2" style="max-height: 150px; overflow-y: auto;">
-                                    @foreach(['😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '👍', '👎', '👏', '🙌', '👐', '🤝', '🙏', '💪', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '✨', '⭐', '🌟', '💫', '🔥', '💯', '✅', '❌'] as $emoji)
+                                    @foreach(['😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎','🔝', '👍', '👎', '👏', '🙌', '👐', '🤝', '🙏', '💪', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '✨', '⭐', '🌟', '💫', '🔥', '💯', '✅', '❌'] as $emoji)
                                         <button type="button" 
                                                 wire:click="addEmoji('{{ $emoji }}')" 
                                                 class="btn btn-sm btn-light m-1">
@@ -158,7 +174,7 @@
                                 </button>
                                 
                                 <!-- File Upload -->
-                                <label class="btn btn-outline-secondary mb-0" style="cursor: pointer;">
+                                <label class="btn btn-outline-secondary mb-0 d-flex align-items-center" style="cursor: pointer;">
                                     <i class="far fa-paperclip"></i>
                                     <input type="file" 
                                            wire:model="attachment" 
@@ -210,6 +226,11 @@
 </div>
 
 <style>
+/* Hide main page scrollbar when chat is open */
+body.chat-open {
+    overflow: hidden !important;
+}
+
 @keyframes slideIn {
     from {
         transform: translateX(100%);
@@ -258,16 +279,61 @@
         transform: translateY(0);
     }
 }
+
+.date-separator {
+    position: relative;
+}
+
+.date-separator::before,
+.date-separator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: #dee2e6;
+}
+
+.date-separator::before {
+    left: 0;
+}
+
+.date-separator::after {
+    right: 0;
+}
 </style>
 
 <script>
+    // Hide main page scrollbar when chat opens, show when closes
+    document.addEventListener('livewire:init', function () {
+        Livewire.on('chat-opened', () => {
+            document.body.classList.add('chat-open');
+        });
+        
+        Livewire.on('chat-closed', () => {
+            document.body.classList.remove('chat-open');
+        });
+    });
+    
     // Auto-scroll to bottom when new messages arrive
     document.addEventListener('livewire:load', function () {
         Livewire.on('message-sent', () => {
-            const container = document.getElementById('messages-container');
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
+            setTimeout(() => {
+                const container = document.getElementById('messages-container');
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 100);
+        });
+        
+        // Auto-scroll on room selection
+        Livewire.on('message-read', () => {
+            setTimeout(() => {
+                const container = document.getElementById('messages-container');
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 100);
         });
     });
 </script>

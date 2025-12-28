@@ -9,7 +9,7 @@
           <div class="row align-items-center wow fadeInUp" data-wow-delay="300ms">
             <div class="col-lg-9">
               <div class="main-title2">
-                <h2 class="title">Discover Fitness & Wellness Professionals</h2>
+                <h2 class="title">Discover the professionals present in FitScout</h2>
                 <p class="paragraph">Find certified trainers, nutritionists, and wellness experts to achieve your health goals</p>
               </div>
             </div>
@@ -54,7 +54,8 @@
           <div class="row align-items-center wow fadeInUp">
             <div class="col-xl-3">
               <div class="main-title mb30-lg">
-                <h2 class="title">Featured Services</h2>
+                <h2 class="title">Discover the services most chosen by other
+                  users</h2>
                 <p class="paragraph">Top-rated fitness and wellness services from certified professionals</p>
               </div>
             </div>
@@ -107,9 +108,9 @@
                                                 </div> --}}
                                                 <hr class="my-2">
                                                 <div class="list-meta d-flex justify-content-between align-items-center mt15">
-                                                    <a class="d-flex" href="#">
+                                                    <a class="d-flex" href="{{ route('professional.profile', $gig->user->username) }}">
                                                         <span class="position-relative mr10">
-                                                            <img class="rounded-circle wa" src="{{ asset($gig->user->profile->photo ?? 'web/images/team/fl-s-2.png') }}" alt="Freelancer Photo">
+                                                            <img class="rounded-circle wa" src="{{ asset($gig->user->avatar_url ? 'storage/' . $gig->user->avatar_url : 'web/images/team/fl-s-2.png') }}" alt="Freelancer Photo" style="width: 32px; height: 32px;">
                                                             <span class="online-badges"></span>
                                                         </span>
                                                         <div>
@@ -181,7 +182,7 @@
                         </div>
                     </form> --}}
                 </div>
-                <div class="row mt20 animate-up-4">
+                {{-- <div class="row mt20 animate-up-4">
                   <div class="col-xl-9">
                     <div class="row justify-content-between">
                       <div class="col-6 col-sm-3 funfact_one at-home2-hero">
@@ -222,7 +223,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> --}}
               </div>
             </div>
             <div class="col-xl-5 d-none d-xl-block position-relative">
@@ -232,14 +233,14 @@
                   <span class="icon flaticon-review"></span>
                   <div class="details pl20">
                     <h6 class="mb-1">Proof of quality</h6>
-                    <p class="text fz13 mb-0">Lorem Ipsum Dolar Amet</p>
+                    <p class="text fz13 mb-0">Our professionals put seriousness and quality first</p>
                   </div>
                 </div>
                 <div class="iconbox-small2 d-none d-xl-flex wow fadeInLeft default-box-shadow4 bounce-y animate-up-2">
                   <span class="icon flaticon-review"></span>
                   <div class="details pl20">
                     <h6 class="mb-1">Safe and secure</h6>
-                    <p class="text fz13 mb-0">Lorem Ipsum Dolar Amet</p>
+                    <p class="text fz13 mb-0">We guarantee you a unique and safe experience</p>
                   </div>
                 </div>
                 <img src="{{ asset('web/images/about/happy-client.png') }}" alt="" class="bounce-x bdrs16 img-1 default-box-shadow4">
@@ -569,10 +570,10 @@
           <div class="row align-items-md-center">
             <div class="col-md-6 col-lg-8 mb30-md wow fadeInUp" data-wow-delay="100ms">
               <div class="main-title">
-                <h2 class="title">People Love To Learn With FitScout</h2>
-                <p class="paragraph">Lorem ipsum dolor sit amet, consectetur.</p>
+                <h2 class="title">People love to improve with FitScout</h2>
+                <p class="paragraph">With the help of the professionals present in this platform every small step can become a big change</p>
               </div>
-              <div class="row">
+              {{-- <div class="row">
                 <div class="col-sm-6 col-lg-4">
                   <div class="funfact_one">
                     <div class="details">
@@ -606,7 +607,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> --}}
             </div>
             <div class="col-md-6 col-lg-4 col-xl-4">
               <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme wow fadeInUp" data-wow-delay="300ms">

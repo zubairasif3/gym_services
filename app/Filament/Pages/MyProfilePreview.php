@@ -9,7 +9,7 @@ class MyProfilePreview extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-eye';
     
-    protected static ?string $navigationLabel = 'Preview My Profile';
+    protected static ?string $navigationLabel = 'Preview/Edit my profile';
     
     protected static ?string $navigationGroup = 'Profile';
     

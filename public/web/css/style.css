@@ -5155,9 +5155,10 @@ section {
 }
 
 .cta-about-v1 {
-    background-image: url(../images/background/cta-about-banner.jpg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2400&h=700&q=80');
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
     height: 300px;
 }
 

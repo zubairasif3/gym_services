@@ -13,16 +13,16 @@
              style="top: 100%; right: 0; z-index: 1000; min-width: 220px; margin-top: 8px;">
             <div class="d-flex flex-column gap-2">
                 <button wire:click="share('facebook')" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-primary">
-                    <i class="fab fa-facebook text-primary"></i> <span>Facebook</span>
+                    <i class="fab fa-facebook text-primary"></i> <span class="notranslate">Facebook</span>
                 </button>
                 <button wire:click="share('twitter')" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-info">
-                    <i class="fab fa-twitter text-info"></i> <span>Twitter</span>
+                    <i class="fab fa-twitter text-info"></i> <span class="notranslate">Twitter</span>
                 </button>
                 <button wire:click="share('whatsapp')" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-success">
-                    <i class="fab fa-whatsapp text-success"></i> <span>WhatsApp</span>
+                    <i class="fab fa-whatsapp text-success"></i> <span class="notranslate">WhatsApp</span>
                 </button>
                 <button wire:click="share('linkedin')" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-primary">
-                    <i class="fab fa-linkedin text-primary"></i> <span>LinkedIn</span>
+                    <i class="fab fa-linkedin text-primary"></i> <span class="notranslate">LinkedIn</span>
                 </button>
                 <hr class="my-2">
                 <button wire:click="copyLink" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-dark">

@@ -35,6 +35,251 @@
     font-weight: 500;
 }
 
+/* Media Gallery Styles */
+.profile-media-slider-wrapper {
+    position: relative;
+    padding: 0 50px;
+}
+
+.profile-media-slider-container {
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.media-gallery-container {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.media-gallery-item {
+    flex: 0 0 auto;
+    width: 250px;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    aspect-ratio: 1;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+.media-gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.media-gallery-item img,
+.media-gallery-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #00b3f1;
+    color: #00b3f1;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-slider-nav:hover:not(:disabled) {
+    background: #00b3f1;
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 16px rgba(0, 179, 241, 0.4);
+}
+
+.profile-slider-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+.profile-slider-nav.prev {
+    left: 0;
+}
+
+.profile-slider-nav.next {
+    right: 0;
+}
+
+@media (max-width: 768px) {
+    .profile-media-slider-wrapper {
+        padding: 0 40px;
+    }
+    
+    .media-gallery-item {
+        width: 200px;
+    }
+    
+    .profile-slider-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-media-slider-wrapper {
+        padding: 0 35px;
+    }
+    
+    .media-gallery-item {
+        width: 180px;
+    }
+    
+    .profile-slider-nav {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+}
+
+.media-type-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 179, 241, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.media-type-badge.video {
+    background: rgba(220, 53, 69, 0.9);
+}
+
+.media-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 179, 241, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.media-gallery-item:hover .media-play-icon {
+    transform: translate(-50%, -50%) scale(1.1);
+    background: rgba(0, 179, 241, 1);
+}
+
+/* Lightbox Styles */
+.media-lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.media-lightbox.active {
+    display: flex;
+}
+
+.lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+}
+
+.lightbox-content img,
+.lightbox-content video {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.lightbox-close:hover {
+    background: #00b3f1;
+    color: white;
+    transform: rotate(90deg);
+}
+
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    justify-content: center;
+    align-items: center;
+}
+
+.lightbox-nav:hover {
+    background: #00b3f1;
+    color: white;
+}
+
+.lightbox-nav.prev {
+    left: -70px;
+}
+
+.lightbox-nav.next {
+    right: -70px;
+}
+
 .service-gallery-item {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -104,13 +349,17 @@
                             <!-- Action Buttons -->
                             <div class="col-auto">
                                 <div class="d-flex flex-column gap-2">
-                                    @livewire('follow-button', ['user' => $user], key('follow-profile-' . $user->id))
-                                    
                                     @auth
                                         @if(auth()->id() !== $user->id)
+                                            @livewire('follow-button', ['user' => $user], key('follow-profile-' . $user->id))
+                                            
                                             <button class="btn btn-primary" onclick="openChatWith({{ $user->id }})">
                                                 <i class="far fa-envelope me-1"></i> Message
                                             </button>
+                                        @else
+                                            <a href="{{ route('profile.edit') }}" class="btn btn-primary">
+                                                <i class="fas fa-edit me-1"></i> Edit Profile
+                                            </a>
                                         @endif
                                     @else
                                         <a href="{{ route('web.login') }}" class="btn btn-primary">
@@ -147,6 +396,62 @@
                         @foreach(json_decode($user->profile->skills, true) as $skill)
                             <span class="skill-badge">{{ $skill }}</span>
                         @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        
+        <!-- Media Gallery Section -->
+        @if($user->activeProfileMedia && $user->activeProfileMedia->count() > 0)
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="bg-white p-4 shadow-sm rounded">
+                    <h4 class="mb-4">
+                        <i class="fas fa-photo-video text-primary me-2"></i> 
+                        Media Gallery ({{ $user->activeProfileMedia->count() }})
+                    </h4>
+                    <div class="profile-media-slider-wrapper">
+                        <button type="button" class="profile-slider-nav prev" onclick="slideProfileMedia(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="profile-media-slider-container">
+                            <div class="media-gallery-container" id="profileMediaTrack">
+                                @foreach($user->activeProfileMedia as $media)
+                                    <div class="media-gallery-item" 
+                                         data-media-id="{{ $media->id }}"
+                                         data-media-type="{{ $media->media_type }}"
+                                         data-media-url="{{ asset('storage/' . $media->file_path) }}">
+                                        @if($media->media_type === 'image')
+                                            <img src="{{ asset('storage/' . $media->file_path) }}" 
+                                                 alt="Profile media"
+                                                 loading="lazy">
+                                            <div class="media-type-badge">
+                                                <i class="far fa-image"></i> Image
+                                            </div>
+                                        @else
+                                            <video src="{{ asset('storage/' . $media->file_path) }}" 
+                                                   muted 
+                                                   loop
+                                                   preload="metadata">
+                                            </video>
+                                            <div class="media-type-badge video">
+                                                <i class="far fa-video"></i>
+                                                @if($media->duration)
+                                                    {{ $media->duration }}s
+                                                @endif
+                                            </div>
+                                            <div class="media-play-icon">
+                                                <i class="fas fa-play"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <button type="button" class="profile-slider-nav next" onclick="slideProfileMedia(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -227,12 +532,221 @@
         </div>
     </div>
 </section>
+
+<!-- Media Lightbox -->
+<div class="media-lightbox" id="mediaLightbox">
+    <div class="lightbox-content">
+        {{-- <button class="lightbox-close" onclick="closeLightbox()">
+            <i class="fas fa-times"></i>
+        </button> --}}
+        <button class="lightbox-nav prev" onclick="navigateLightbox(-1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-nav next" onclick="navigateLightbox(1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div id="lightboxMedia"></div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
     function openChatWith(userId) {
         Livewire.dispatch('open-chat-sidebar', { userId: userId });
+    }
+    
+    // Profile Media Slider
+    let profileSliderPosition = 0;
+    
+    function slideProfileMedia(direction) {
+        const track = document.getElementById('profileMediaTrack');
+        if (!track) return;
+        
+        const items = track.querySelectorAll('.media-gallery-item');
+        if (items.length === 0) return;
+        
+        const itemWidth = items[0].offsetWidth;
+        const gap = 20;
+        const slideDistance = itemWidth + gap;
+        const containerWidth = track.parentElement.offsetWidth;
+        const totalWidth = (itemWidth + gap) * items.length - gap;
+        const maxScroll = Math.max(0, totalWidth - containerWidth);
+        
+        profileSliderPosition += direction * slideDistance;
+        profileSliderPosition = Math.max(0, Math.min(profileSliderPosition, maxScroll));
+        
+        track.style.transform = `translateX(-${profileSliderPosition}px)`;
+        updateProfileSliderButtons();
+    }
+    
+    function updateProfileSliderButtons() {
+        const prevBtn = document.querySelector('.profile-slider-nav.prev');
+        const nextBtn = document.querySelector('.profile-slider-nav.next');
+        const track = document.getElementById('profileMediaTrack');
+        
+        if (!prevBtn || !nextBtn || !track) return;
+        
+        const items = track.querySelectorAll('.media-gallery-item');
+        if (items.length === 0) {
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            return;
+        }
+        
+        const itemWidth = items[0].offsetWidth;
+        const gap = 20;
+        const containerWidth = track.parentElement.offsetWidth;
+        const totalWidth = (itemWidth + gap) * items.length - gap;
+        const maxScroll = Math.max(0, totalWidth - containerWidth);
+        
+        prevBtn.disabled = profileSliderPosition === 0;
+        nextBtn.disabled = profileSliderPosition >= maxScroll;
+    }
+    
+    // Media Gallery Lightbox
+    let currentMediaIndex = 0;
+    let mediaItems = [];
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize slider buttons
+        updateProfileSliderButtons();
+        
+        // Collect all media items
+        const galleryItems = document.querySelectorAll('.media-gallery-item');
+        mediaItems = Array.from(galleryItems).map(item => ({
+            type: item.dataset.mediaType,
+            url: item.dataset.mediaUrl
+        }));
+        
+        // Add click handlers
+        galleryItems.forEach((item, index) => {
+            item.addEventListener('click', function() {
+                openLightbox(index);
+            });
+            
+            // Auto-play video on hover
+            if (item.dataset.mediaType === 'video') {
+                const video = item.querySelector('video');
+                if (video) {
+                    item.addEventListener('mouseenter', () => video.play());
+                    item.addEventListener('mouseleave', () => {
+                        video.pause();
+                        video.currentTime = 0;
+                    });
+                }
+            }
+        });
+        
+        // Close lightbox on background click
+        document.getElementById('mediaLightbox').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLightbox();
+            }
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const lightbox = document.getElementById('mediaLightbox');
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                } else if (e.key === 'ArrowLeft') {
+                    navigateLightbox(-1);
+                } else if (e.key === 'ArrowRight') {
+                    navigateLightbox(1);
+                }
+            }
+        });
+        
+        // Handle window resize for slider
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                profileSliderPosition = 0;
+                const track = document.getElementById('profileMediaTrack');
+                if (track) {
+                    track.style.transform = 'translateX(0)';
+                    updateProfileSliderButtons();
+                }
+            }, 250);
+        });
+    });
+    
+    function openLightbox(index) {
+        currentMediaIndex = index;
+        const lightbox = document.getElementById('mediaLightbox');
+        const mediaContainer = document.getElementById('lightboxMedia');
+        const media = mediaItems[currentMediaIndex];
+        
+        // Clear previous content
+        mediaContainer.innerHTML = '';
+        
+        // Create media element
+        if (media.type === 'image') {
+            const img = document.createElement('img');
+            img.src = media.url;
+            img.alt = 'Profile media';
+            mediaContainer.appendChild(img);
+        } else {
+            const video = document.createElement('video');
+            video.src = media.url;
+            video.controls = true;
+            video.autoplay = true;
+            video.style.maxWidth = '100%';
+            video.style.maxHeight = '90vh';
+            video.style.borderRadius = '8px';
+            mediaContainer.appendChild(video);
+        }
+        
+        // Show lightbox
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Update nav button visibility
+        updateNavButtons();
+    }
+    
+    function closeLightbox() {
+        const lightbox = document.getElementById('mediaLightbox');
+        const mediaContainer = document.getElementById('lightboxMedia');
+        
+        // Stop any playing video
+        const video = mediaContainer.querySelector('video');
+        if (video) {
+            video.pause();
+        }
+        
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function navigateLightbox(direction) {
+        currentMediaIndex += direction;
+        
+        // Loop around
+        if (currentMediaIndex < 0) {
+            currentMediaIndex = mediaItems.length - 1;
+        } else if (currentMediaIndex >= mediaItems.length) {
+            currentMediaIndex = 0;
+        }
+        
+        openLightbox(currentMediaIndex);
+    }
+    
+    function updateNavButtons() {
+        const prevBtn = document.querySelector('.lightbox-nav.prev');
+        const nextBtn = document.querySelector('.lightbox-nav.next');
+        
+        if (mediaItems.length <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        } else {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        }
     }
 </script>
 @endpush

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{{ asset('web/css/animate.css') }}">
     <link rel="stylesheet" href="{{ asset('web/css/slider.css') }}">
     <link rel="stylesheet" href="{{ asset('web/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('web/css/theme-override.css') }}">
     <link rel="stylesheet" href="{{ asset('web/css/ud-custom-spacing.css') }}">
     <link rel="stylesheet" href="{{ asset('web/css/responsive.css') }}">
 
@@ -26,9 +27,11 @@
     <link href="{{ asset('web/images/apple-touch-icon-72x72.png') }}" sizes="72x72" rel="apple-touch-icon">
     <link href="{{ asset('web/images/apple-touch-icon-114x114.png') }}" sizes="114x114" rel="apple-touch-icon">
     <link href="{{ asset('web/images/apple-touch-icon-180x180.png') }}" sizes="180x180" rel="apple-touch-icon">
+    
+    @livewireStyles
     @stack('styles')
 </head>
-<body>
+<body class="{{ auth()->check() ? 'two-top-bars' : 'one-top-bar' }}">
 
     <!-- Toolbar Component (for authenticated users) -->
     @auth
@@ -393,6 +396,35 @@
         body {
             top: 0px !important;
         }
+        
+        /* Fix for toolbar and header navigation */
+        .toolbar-wrapper {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0;
+            right: 0;
+            z-index: 10000 !important;
+        }
+        
+        /* Initial state - header below toolbar */
+        header.nav-homepage-style {
+            position: relative;
+            margin-top: 0;
+        }
+        
+        /* When scrolled and fixed */
+        header.nav-homepage-style.stricky.stricky-fixed {
+            position: fixed !important;
+            top: 52px !important; /* Height of toolbar - adjust if needed */
+            left: 0;
+            right: 0;
+            z-index: 9999 !important;
+        }
+        
+        .one-top-bar header.nav-homepage-style.stricky.stricky-fixed {
+            top: 0 !important;
+        }
+        
         .switch-toggle {
             position: relative;
             display: inline-block;
@@ -560,8 +592,30 @@
 
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
     </script>
+    
+    <!-- Script to handle fixed headers -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated (toolbar exists)
+            const toolbar = document.querySelector('.toolbar-wrapper');
+            const header = document.querySelector('header.nav-homepage-style');
+            const wrapper = document.querySelector('.wrapper');
+            
+            if (toolbar && header && wrapper) {
+                // Calculate heights
+                const toolbarHeight = toolbar.offsetHeight;
+                const headerHeight = header.offsetHeight;
+                
+                // Apply padding to wrapper instead of body to prevent white space
+                wrapper.style.paddingTop = toolbarHeight + 'px';
+            }
+        });
+    </script>
+    
     @stack('scripts')
     @stack('custom-scripts')
+    
+    @livewireScripts
 
     <!-- Chat Sidebar Component (for authenticated users) -->
     @auth

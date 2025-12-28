@@ -63,6 +63,14 @@ class Gig extends Model
     }
 
     /**
+     * Get the reactions for this gig
+     */
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(GigReaction::class);
+    }
+
+    /**
      * Get the subcategory this gig belongs to
      */
     public function subcategory(): BelongsTo
@@ -93,6 +101,36 @@ class Gig extends Model
     public function isSavedByUser($userId): bool
     {
         return $this->saves()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Get user's reaction to this gig
+     */
+    public function getUserReaction($userId): ?string
+    {
+        $reaction = $this->reactions()->where('user_id', $userId)->first();
+        return $reaction ? $reaction->emoji : null;
+    }
+
+    /**
+     * Get reaction counts grouped by emoji
+     */
+    public function getReactionCounts(): array
+    {
+        $reactions = $this->reactions()
+            ->selectRaw('emoji, COUNT(*) as count')
+            ->groupBy('emoji')
+            ->pluck('count', 'emoji')
+            ->toArray();
+        
+        // Ensure all emojis are present with 0 count if not reacted
+        $allEmojis = GigReaction::EMOJIS;
+        $result = [];
+        foreach ($allEmojis as $emoji) {
+            $result[$emoji] = $reactions[$emoji] ?? 0;
+        }
+        
+        return $result;
     }
 
     /**

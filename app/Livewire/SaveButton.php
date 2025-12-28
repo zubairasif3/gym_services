@@ -30,6 +30,12 @@ class SaveButton extends Component
             return redirect()->route('web.login');
         }
         
+        // Prevent users from saving their own services
+        if (Auth::id() === $this->gig->user_id) {
+            session()->flash('error', 'You cannot save your own service.');
+            return;
+        }
+        
         if ($this->isSaved) {
             // Unsave
             $this->gig->saves()->where('user_id', Auth::id())->delete();
