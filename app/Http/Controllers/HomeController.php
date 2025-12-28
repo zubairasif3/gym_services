@@ -22,6 +22,96 @@ use Stripe\PaymentMethod;
 
 class HomeController extends Controller
 {
+    /**
+     * Build dummy testimonials from real categories/subcategories (no DB testimonials needed).
+     */
+    private function getDummyTestimonials(int $count = 3, bool $includeTabMeta = false)
+    {
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->with([
+                'subcategories' => function ($query) {
+                    $query->where('is_active', true)
+                        ->orderByRaw('COALESCE(display_order, 999999), id');
+                }
+            ])
+            ->orderByRaw('COALESCE(display_order, 999999), id')
+            ->take(max(1, $count))
+            ->get();
+
+        $seedNames = [
+            ['name' => 'Marco R.', 'role' => 'Customer'],
+            ['name' => 'Sara L.', 'role' => 'Customer'],
+            ['name' => 'Giulia P.', 'role' => 'Customer'],
+            ['name' => 'Luca M.', 'role' => 'Customer'],
+            ['name' => 'Alessia C.', 'role' => 'Customer'],
+        ];
+        $seedAvatars = [
+            'web/images/testimonials/1.jpg',
+            'web/images/testimonials/2.jpg',
+            'web/images/testimonials/3.jpg',
+            'web/images/testimonials/testi-4.png',
+            'web/images/testimonials/testi-5.png',
+        ];
+        $seedTitles = [
+            'Great Experience',
+            'Highly Recommended',
+            'Perfect Match',
+            'Fast & Easy',
+            'Excellent Service',
+        ];
+
+        $testimonials = collect();
+
+        foreach ($categories as $i => $category) {
+            $topSubcats = $category->subcategories->take(3)->pluck('name')->filter()->values();
+            $subcatsText = $topSubcats->isNotEmpty()
+                ? $topSubcats->implode(', ')
+                : 'servizi specializzati';
+
+            $item = [
+                'title' => $seedTitles[$i] ?? 'Great Experience',
+                'name' => $seedNames[$i]['name'] ?? 'Customer',
+                'role' => $seedNames[$i]['role'] ?? 'Customer',
+                'avatar' => $seedAvatars[$i] ?? $seedAvatars[0],
+                'text' => sprintf(
+                    '“Ho trovato rapidamente il professionista giusto nella categoria %s. Tra %s, la scelta è stata semplice: profili chiari, comunicazione veloce e servizio davvero professionale. Consigliatissimo.”',
+                    $category->name,
+                    $subcatsText
+                ),
+            ];
+
+            if ($includeTabMeta) {
+                $item['id'] = 'testimonial-' . $i;
+                $item['active'] = $i === 0;
+            }
+
+            $testimonials->push($item);
+        }
+
+        // Pad with generic but realistic testimonials if fewer categories exist
+        while ($testimonials->count() < $count) {
+            $i = $testimonials->count();
+
+            $item = [
+                'title' => $seedTitles[$i] ?? 'Great Experience',
+                'name' => $seedNames[$i]['name'] ?? 'Customer',
+                'role' => $seedNames[$i]['role'] ?? 'Customer',
+                'avatar' => $seedAvatars[$i] ?? $seedAvatars[0],
+                'text' => '“Piattaforma comoda e affidabile: ho confrontato più profili, letto le recensioni e prenotato in pochi minuti. Esperienza ottima dall’inizio alla fine.”',
+            ];
+
+            if ($includeTabMeta) {
+                $item['id'] = 'testimonial-' . $i;
+                $item['active'] = $i === 0 && $testimonials->isEmpty();
+            }
+
+            $testimonials->push($item);
+        }
+
+        return $testimonials->take($count)->values();
+    }
+
     public function index(){
 
         $categories = Category::with([
@@ -52,7 +142,9 @@ class HomeController extends Controller
             'web/images/listings/category-5.jpg'
         ];
 
-        return view('web.index', compact('categories', 'subcategories', 'staticImages'));
+        $testimonials = $this->getDummyTestimonials(4);
+
+        return view('web.index', compact('categories', 'subcategories', 'staticImages', 'testimonials'));
     }
     public function search(Request $request)
     {
@@ -137,66 +229,7 @@ class HomeController extends Controller
     }
 
     public function about(){
-        $categories = Category::query()
-            ->where('is_active', true)
-            ->with([
-                'subcategories' => function ($query) {
-                    $query->where('is_active', true)
-                        ->orderByRaw('COALESCE(display_order, 999999), id');
-                }
-            ])
-            ->orderByRaw('COALESCE(display_order, 999999), id')
-            ->take(3)
-            ->get();
-
-        // Dummy testimonials generated from your real categories/subcategories (no DB testimonials needed)
-        $seedNames = [
-            ['name' => 'Marco R.', 'role' => 'Customer'],
-            ['name' => 'Sara L.', 'role' => 'Customer'],
-            ['name' => 'Giulia P.', 'role' => 'Customer'],
-        ];
-        $seedAvatars = [
-            'web/images/testimonials/1.jpg',
-            'web/images/testimonials/2.jpg',
-            'web/images/testimonials/3.jpg',
-        ];
-
-        $testimonials = collect();
-
-        foreach ($categories as $i => $category) {
-            $topSubcats = $category->subcategories->take(3)->pluck('name')->filter()->values();
-            $subcatsText = $topSubcats->isNotEmpty()
-                ? $topSubcats->implode(', ')
-                : 'servizi specializzati';
-
-            $testimonials->push([
-                'id' => 'testimonial-' . $i,
-                'active' => $i === 0,
-                'name' => $seedNames[$i]['name'] ?? 'Customer',
-                'role' => $seedNames[$i]['role'] ?? 'Customer',
-                'avatar' => $seedAvatars[$i] ?? $seedAvatars[0],
-                'text' => sprintf(
-                    '“Ho trovato rapidamente il professionista giusto nella categoria %s. Tra %s, la scelta è stata semplice: profili chiari, comunicazione veloce e servizio davvero professionale. Consigliatissimo.”',
-                    $category->name,
-                    $subcatsText
-                ),
-            ]);
-        }
-
-        // If you have fewer than 3 categories, pad with generic but realistic testimonials
-        while ($testimonials->count() < 3) {
-            $i = $testimonials->count();
-            $testimonials->push([
-                'id' => 'testimonial-' . $i,
-                'active' => $i === 0 && $testimonials->isEmpty(),
-                'name' => $seedNames[$i]['name'] ?? 'Customer',
-                'role' => $seedNames[$i]['role'] ?? 'Customer',
-                'avatar' => $seedAvatars[$i] ?? $seedAvatars[0],
-                'text' => '“Piattaforma comoda e affidabile: ho confrontato più profili, letto le recensioni e prenotato in pochi minuti. Esperienza ottima dall’inizio alla fine.”',
-            ]);
-        }
-
-        $testimonials = $testimonials->take(3)->values();
+        $testimonials = $this->getDummyTestimonials(3, true);
 
         return view('web.about', compact('testimonials'));
     }

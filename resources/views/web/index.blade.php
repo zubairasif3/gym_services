@@ -52,14 +52,14 @@
     <section class="pt60 pb100">
         <div class="container">
           <div class="row align-items-center wow fadeInUp">
-            <div class="col-xl-3">
+            <div class="col-xl-7">
               <div class="main-title mb30-lg">
                 <h2 class="title">Discover the services most chosen by other
                   users</h2>
                 <p class="paragraph">Top-rated fitness and wellness services from certified professionals</p>
               </div>
             </div>
-            <div class="col-xl-9">
+            <div class="col-xl-5">
               <div class="navpill-style2 at-home9 mb50-lg">
                 <ul class="nav nav-pills mb20 justify-content-xl-end" id="pills-tab" role="tablist">
                     @foreach($categories as $index => $category)
@@ -153,6 +153,24 @@
                 <h1 class="animate-up-1 mb25 text-white">Find the service <br class="d-none d-xl-block">
                     that best suits you</h1>
                 <p class="text-white animate-up-2">search for the professional based on your needs</p>
+
+                <div class="home2-hero-feature-cards animate-up-3">
+                  <div class="hero-feature-card default-box-shadow4">
+                    <span class="icon flaticon-review"></span>
+                    <div class="details">
+                      <h6 class="mb-1">Proof of quality</h6>
+                      <p class="text fz13 mb-0">Our professionals put seriousness and quality first</p>
+                    </div>
+                  </div>
+                  <div class="hero-feature-card default-box-shadow4">
+                    <span class="icon flaticon-review"></span>
+                    <div class="details">
+                      <h6 class="mb-1">Safe and secure</h6>
+                      <p class="text fz13 mb-0">We guarantee you a unique and safe experience</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="advance-search-tab  bdrs4-sm bdrs60 banner-btn position-relative zi1 animate-up-3 mt30 pb30">
                     {{-- <form class="form-search position-relative" action="{{ route('services.search') }}" method="GET" >
                         <div class="row justify-content-between">
@@ -226,24 +244,13 @@
                 </div> --}}
               </div>
             </div>
-            <div class="col-xl-5 d-none d-xl-block position-relative">
-              <img src="{{ asset('web/images/about/about-1.png') }}" alt="" class="animate-up-1 main-img-home2">
-              <div class="home2-hero-content position-relative">
-                <div class="iconbox-small1 d-none d-xl-flex wow fadeInRight default-box-shadow4 bounce-x animate-up-1">
-                  <span class="icon flaticon-review"></span>
-                  <div class="details pl20">
-                    <h6 class="mb-1">Proof of quality</h6>
-                    <p class="text fz13 mb-0">Our professionals put seriousness and quality first</p>
-                  </div>
-                </div>
-                <div class="iconbox-small2 d-none d-xl-flex wow fadeInLeft default-box-shadow4 bounce-y animate-up-2">
-                  <span class="icon flaticon-review"></span>
-                  <div class="details pl20">
-                    <h6 class="mb-1">Safe and secure</h6>
-                    <p class="text fz13 mb-0">We guarantee you a unique and safe experience</p>
-                  </div>
-                </div>
-                <img src="{{ asset('web/images/about/happy-client.png') }}" alt="" class="bounce-x bdrs16 img-1 default-box-shadow4">
+            <div class="col-xl-5 d-none d-xl-block">
+              <div class="home2-hero-visual animate-up-1 ms-auto">
+                <div
+                  class="home2-hero-visual-bg"
+                  style="background-size: cover; background-position: center; background-repeat: no-repeat; background-image: linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.12)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&h=900&q=80');"
+                  aria-label="Fitness & wellness professionals"
+                ></div>
               </div>
             </div>
           </div>
@@ -565,13 +572,86 @@
         </div>
     </section>
     <!-- Learn With FitScout -->
-    <section class="bgc-thm3">
+    <section class="bgc-thm3 home-testimonials">
         <div class="container">
-          <div class="row align-items-md-center">
-            <div class="col-md-6 col-lg-8 mb30-md wow fadeInUp" data-wow-delay="100ms">
-              <div class="main-title">
+          <div class="row align-items-center">
+            <div class="col-lg-5 mb30-md wow fadeInUp" data-wow-delay="100ms">
+              <div class="main-title mb30">
                 <h2 class="title">People love to improve with FitScout</h2>
-                <p class="paragraph">With the help of the professionals present in this platform every small step can become a big change</p>
+                <p class="paragraph mb20">With the help of the professionals present in this platform every small step can become a big change</p>
+                {{-- <div class="d-flex flex-wrap gap-2">
+                  <span class="badge rounded-pill bg-white text-dark border">Verified reviews</span>
+                  <span class="badge rounded-pill bg-white text-dark border">Real categories</span>
+                  <span class="badge rounded-pill bg-white text-dark border">Fast booking</span>
+                </div> --}}
+              </div>
+            </div>
+
+            <div class="col-lg-7 wow fadeInUp" data-wow-delay="200ms">
+              <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme">
+                @php
+                  $homeTestimonials = $testimonials ?? collect();
+                @endphp
+
+                @forelse($homeTestimonials as $t)
+                  <div class="item">
+                    <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35 home-testimonial-card">
+                      <div class="testimonial-content">
+                        <div class="d-flex align-items-center justify-content-between mb15">
+                          <h4 class="title text-thm mb-0">{{ $t['title'] ?? 'Great Experience' }}</h4>
+                          <div class="home-testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span class="ms-2 fw500">4.9</span>
+                          </div>
+                        </div>
+                        <span class="icon fas fa-quote-left"></span>
+                        <div class="t_content">{{ $t['text'] ?? '' }}</div>
+                      </div>
+                      <div class="thumb d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                          <img class="home-testimonial-avatar rounded-circle" src="{{ asset($t['avatar'] ?? 'web/images/testimonials/1.jpg') }}" alt="{{ $t['name'] ?? 'Customer' }}">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h6 class="mb-0">{{ $t['name'] ?? 'Customer' }}</h6>
+                          <p class="fz14 mb-0">{{ $t['role'] ?? 'Customer' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                @empty
+                  <div class="item">
+                    <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35 home-testimonial-card">
+                      <div class="testimonial-content">
+                        <div class="d-flex align-items-center justify-content-between mb15">
+                          <h4 class="title text-thm mb-0">Great Experience</h4>
+                          <div class="home-testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span class="ms-2 fw500">4.9</span>
+                          </div>
+                        </div>
+                        <span class="icon fas fa-quote-left"></span>
+                        <div class="t_content">“Piattaforma comoda e affidabile: ho confrontato più profili, letto le recensioni e prenotato in pochi minuti.”</div>
+                      </div>
+                      <div class="thumb d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                          <img class="home-testimonial-avatar rounded-circle" src="{{ asset('web/images/testimonials/1.jpg') }}" alt="Customer">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h6 class="mb-0">Customer</h6>
+                          <p class="fz14 mb-0">Review</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                @endforelse
               </div>
               {{-- <div class="row">
                 <div class="col-sm-6 col-lg-4">
@@ -608,82 +688,6 @@
                   </div>
                 </div>
               </div> --}}
-            </div>
-            <div class="col-md-6 col-lg-4 col-xl-4">
-              <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme wow fadeInUp" data-wow-delay="300ms">
-                <div class="item">
-                  <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                    <div class="testimonial-content">
-                      <h4 class="title text-thm">Great Work</h4>
-                      <span class="icon fas fa-quote-left"></span>
-                      <h4 class="t_content">“I found the course material to be highly engaging, and the instructors to be helpful and communicative.”</h4>
-                    </div>
-                    <div class="thumb d-flex align-items-center">
-                      <div class="flex-shrink-0">
-                        <img class="wa" src="{{ asset('web/images/testimonials/testimonial-1.png') }}" alt="">
-                      </div>
-                      <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">Courtney Henry</h6>
-                        <p class="fz14 mb-0">Web Designer</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="item">
-                  <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                    <div class="testimonial-content">
-                      <h4 class="title text-thm">Great Work</h4>
-                      <span class="icon fas fa-quote-left"></span>
-                      <h4 class="t_content">“I found the course material to be highly engaging, and the instructors to be helpful and communicative.”</h4>
-                    </div>
-                    <div class="thumb d-flex align-items-center">
-                      <div class="flex-shrink-0">
-                        <img class="wa" src="{{ asset('web/images/testimonials/testimonial-2.png') }}" alt="">
-                      </div>
-                      <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">Courtney Henry</h6>
-                        <p class="fz14 mb-0">Web Designer</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="item">
-                  <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                    <div class="testimonial-content">
-                      <h4 class="title text-thm">Great Work</h4>
-                      <span class="icon fas fa-quote-left"></span>
-                      <h4 class="t_content">“I found the course material to be highly engaging, and the instructors to be helpful and communicative.”</h4>
-                    </div>
-                    <div class="thumb d-flex align-items-center">
-                      <div class="flex-shrink-0">
-                        <img class="wa" src="{{ asset('web/images/testimonials/testimonial-3.png') }}" alt="">
-                      </div>
-                      <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">Courtney Henry</h6>
-                        <p class="fz14 mb-0">Web Designer</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="item">
-                  <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                    <div class="testimonial-content">
-                      <h4 class="title text-thm">Great Work</h4>
-                      <span class="icon fas fa-quote-left"></span>
-                      <h4 class="t_content">“I found the course material to be highly engaging, and the instructors to be helpful and communicative.”</h4>
-                    </div>
-                    <div class="thumb d-flex align-items-center">
-                      <div class="flex-shrink-0">
-                        <img class="wa" src="{{ asset('web/images/testimonials/testimonial-3.png') }}" alt="">
-                      </div>
-                      <div class="flex-grow-1 ms-3">
-                        <h6 class="mb-0">Courtney Henry</h6>
-                        <p class="fz14 mb-0">Web Designer</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
