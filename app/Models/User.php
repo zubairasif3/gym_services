@@ -101,11 +101,35 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     }
 
     /**
+     * Get all services for this user
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
      * Get the reviews written by this user
      */
     public function gigReviews()
     {
         return $this->hasMany(GigReview::class);
+    }
+
+    /**
+     * Get profile reviews received by this user (as the profile owner)
+     */
+    public function profileReviews()
+    {
+        return $this->hasMany(ProfileReview::class, 'profile_user_id');
+    }
+
+    /**
+     * Get profile reviews written by this user (as the reviewer)
+     */
+    public function writtenProfileReviews()
+    {
+        return $this->hasMany(ProfileReview::class, 'reviewer_id');
     }
 
     /**

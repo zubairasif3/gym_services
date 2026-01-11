@@ -34,6 +34,26 @@ class ProfileMedia extends Model
     }
 
     /**
+     * Get all reactions for this media
+     */
+    public function reactions()
+    {
+        return $this->hasMany(ProfileMediaReaction::class);
+    }
+
+    /**
+     * Get reaction counts grouped by emoji
+     */
+    public function getReactionCountsAttribute()
+    {
+        return $this->reactions()
+            ->selectRaw('emoji, COUNT(*) as count')
+            ->groupBy('emoji')
+            ->pluck('count', 'emoji')
+            ->toArray();
+    }
+
+    /**
      * Scope to get only active media
      */
     public function scopeActive($query)

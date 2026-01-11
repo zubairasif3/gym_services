@@ -4,26 +4,32 @@
 
 @section('content')
 <style>
-.profile-wallpaper {
-    height: 350px;
-    background-size: cover;
-    background-position: center;
-    background-color: #1b1b18;
-    position: relative;
-}
+    .profile-wallpaper {
+        height: 300px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
 
-.profile-avatar-section {
-    margin-top: -80px;
-    position: relative;
-    z-index: 10;
-}
+    .professional-header-section {
+        margin-bottom: 30px;
+    }
 
-.profile-avatar-large {
-    width: 150px;
-    height: 150px;
-    border: 5px solid white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+    .profile-info-overlay {
+        z-index: 10;
+    }
+
+    .profile-avatar-large img {
+        object-fit: cover;
+    }
+
+    .profile-info h3 {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .profile-info p {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
 
 .skill-badge {
     display: inline-block;
@@ -35,51 +41,100 @@
     font-weight: 500;
 }
 
-/* Media Gallery Styles */
-.profile-media-slider-wrapper {
+/* Info Box Styles */
+.info-box {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border-left: 3px solid #00b3f1;
+    transition: all 0.3s ease;
+}
+
+.info-box:hover {
+    background: #e9ecef;
+    border-left-width: 4px;
+}
+
+.info-box i {
+    font-size: 1.2rem;
+}
+
+/* Service Gallery / Media Carousel Styles */
+/* .service-gallery {
+    margin-bottom: 2rem;
+} */
+
+.media-carousel-wrapper {
     position: relative;
     padding: 0 50px;
 }
 
-.profile-media-slider-container {
+.media-carousel-container {
     overflow: hidden;
     border-radius: 12px;
 }
 
-.media-gallery-container {
+.media-carousel-track {
     display: flex;
     gap: 20px;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.media-gallery-item {
+.media-carousel-item {
     flex: 0 0 auto;
-    width: 250px;
+    width: 100%;
+}
+
+.media-content {
     position: relative;
+    width: 100%;
+    max-height: 500px;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    aspect-ratio: 1;
-    background: #f8f9fa;
     cursor: pointer;
+    background: #f8f9fa;
 }
 
-.media-gallery-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.media-gallery-item img,
-.media-gallery-item video {
+.media-content img,
+.media-content video {
     width: 100%;
     height: 100%;
+    max-height: 500px;
     object-fit: cover;
 }
 
-.profile-slider-nav {
+.video-play-overlay {
     position: absolute;
     top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 179, 241, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    pointer-events: none;
+}
+
+.video-duration {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.carousel-nav-btn {
+    position: absolute;
+    top: 40%;
     transform: translateY(-50%);
     width: 45px;
     height: 45px;
@@ -97,275 +152,569 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
-.profile-slider-nav:hover:not(:disabled) {
+.carousel-nav-btn:hover:not(:disabled) {
     background: #00b3f1;
     color: white;
     transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 4px 16px rgba(0, 179, 241, 0.4);
 }
 
-.profile-slider-nav:disabled {
+.carousel-nav-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
-    border-color: #dee2e6;
-    color: #6c757d;
 }
 
-.profile-slider-nav.prev {
+.carousel-nav-btn.prev {
     left: 0;
 }
 
-.profile-slider-nav.next {
+.carousel-nav-btn.next {
     right: 0;
 }
 
-@media (max-width: 768px) {
-    .profile-media-slider-wrapper {
-        padding: 0 40px;
-    }
-    
-    .media-gallery-item {
-        width: 200px;
-    }
-    
-    .profile-slider-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
+.service-reactions {
+    margin-bottom: 2rem;
 }
 
-@media (max-width: 480px) {
-    .profile-media-slider-wrapper {
-        padding: 0 35px;
-    }
-    
-    .media-gallery-item {
-        width: 180px;
-    }
-    
-    .profile-slider-nav {
-        width: 35px;
-        height: 35px;
-        font-size: 14px;
-    }
-}
+/* Emoji Reaction Bar Styles */
+/* .reaction-emoji-bar {
+    background: white;
+    border-radius: 50px;
+    padding: 8px 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: inline-flex;
+    gap: 5px;
+} */
 
-.media-type-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(0, 179, 241, 0.9);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    backdrop-filter: blur(4px);
+.emoji-bar-container {
     display: flex;
+    gap: 5px;
     align-items: center;
-    gap: 4px;
 }
 
-.media-type-badge.video {
-    background: rgba(220, 53, 69, 0.9);
+.emoji-bar-item {
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 30px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    gap: 2px;
+    min-width: 50px;
 }
 
-.media-play-icon {
+.emoji-bar-item:hover {
+    transform: translateY(-3px);
+    border-color: #00b3f1;
+    background: #f0f9ff;
+}
+
+.emoji-bar-item.active {
+    border-color: #00b3f1;
+    background: linear-gradient(135deg, #e3f5ff 0%, #f0f9ff 100%);
+}
+
+.emoji-icon-bar {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.emoji-count-bar {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #00b3f1;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .emoji-bar-item {
+        min-width: 45px;
+        padding: 6px 10px;
+    }
+    
+    .emoji-icon-bar {
+        font-size: 1.3rem;
+    }
+    
+    .emoji-count-bar {
+        font-size: 0.65rem;
+    }
+}
+
+/* Media Thumbnails Styles */
+.media-thumbnails-container {
+    margin-top: 1.5rem;
+}
+
+.media-thumbnails-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.media-thumbnail-card {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.media-thumbnail-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    border-color: #00b3f1;
+}
+
+.media-thumbnail-card.active {
+    border-color: #00b3f1;
+    box-shadow: 0 4px 12px rgba(0, 179, 241, 0.4);
+}
+
+.media-thumbnail-card img,
+.media-thumbnail-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail-video-icon {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
+    width: 24px;
+    height: 24px;
     background: rgba(0, 179, 241, 0.9);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 24px;
+    font-size: 10px;
     pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .media-thumbnail-card {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .thumbnail-video-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 8px;
+    }
+}
+
+.hover-shadow {
     transition: all 0.3s ease;
 }
 
-.media-gallery-item:hover .media-play-icon {
-    transform: translate(-50%, -50%) scale(1.1);
-    background: rgba(0, 179, 241, 1);
+.hover-shadow:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px);
 }
 
-/* Lightbox Styles */
-.media-lightbox {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.media-lightbox.active {
-    display: flex;
-}
-
-.lightbox-content {
-    max-width: 90vw;
-    max-height: 90vh;
-    position: relative;
-}
-
-.lightbox-content img,
-.lightbox-content video {
-    max-width: 100%;
-    max-height: 90vh;
-    border-radius: 8px;
-}
-
-.lightbox-close {
-    position: absolute;
-    top: -40px;
-    right: 0;
-    background: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    color: #333;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.service-card {
     transition: all 0.3s ease;
 }
 
-.lightbox-close:hover {
-    background: #00b3f1;
-    color: white;
-    transform: rotate(90deg);
+.service-card:hover {
+    border-color: #00b3f1 !important;
 }
 
-.lightbox-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    color: #333;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    justify-content: center;
-    align-items: center;
-}
+    /* Media Gallery Styles */
+    .profile-media-slider-wrapper {
+        position: relative;
+        padding: 0 50px;
+    }
 
-.lightbox-nav:hover {
-    background: #00b3f1;
-    color: white;
-}
+    .profile-media-slider-container {
+        overflow: hidden;
+        border-radius: 12px;
+    }
 
-.lightbox-nav.prev {
-    left: -70px;
-}
+    .media-gallery-container {
+        display: flex;
+        gap: 20px;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-.lightbox-nav.next {
-    right: -70px;
-}
+    .media-gallery-item {
+        flex: 0 0 auto;
+        width: 250px;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        aspect-ratio: 1;
+        background: #f8f9fa;
+        cursor: pointer;
+    }
 
-.service-gallery-item {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    .media-gallery-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
 
-.service-gallery-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
+    .media-gallery-item img,
+    .media-gallery-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-slider-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #00b3f1;
+        color: #00b3f1;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-slider-nav:hover:not(:disabled) {
+        background: #00b3f1;
+        color: white;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 4px 16px rgba(0, 179, 241, 0.4);
+    }
+
+    .profile-slider-nav:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        border-color: #dee2e6;
+        color: #6c757d;
+    }
+
+    .profile-slider-nav.prev {
+        left: 0;
+    }
+
+    .profile-slider-nav.next {
+        right: 0;
+    }
+
+    @media (max-width: 768px) {
+        .profile-media-slider-wrapper {
+            padding: 0 40px;
+        }
+        
+        .media-gallery-item {
+            width: 200px;
+        }
+        
+        .profile-slider-nav {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-media-slider-wrapper {
+            padding: 0 35px;
+        }
+        
+        .media-gallery-item {
+            width: 180px;
+        }
+        
+        .profile-slider-nav {
+            width: 35px;
+            height: 35px;
+            font-size: 14px;
+        }
+    }
+
+    .media-type-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0, 179, 241, 0.9);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .media-type-badge.video {
+        background: rgba(220, 53, 69, 0.9);
+    }
+
+    .media-play-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 179, 241, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .media-gallery-item:hover .media-play-icon {
+        transform: translate(-50%, -50%) scale(1.1);
+        background: rgba(0, 179, 241, 1);
+    }
+
+    /* Lightbox Styles */
+    .media-lightbox {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .media-lightbox.active {
+        display: flex;
+    }
+
+    .lightbox-content {
+        max-width: 90vw;
+        max-height: 90vh;
+        position: relative;
+    }
+
+    .lightbox-content img,
+    .lightbox-content video {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 8px;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        background: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: #333;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .lightbox-close:hover {
+        background: #00b3f1;
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        color: #333;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .lightbox-nav:hover {
+        background: #00b3f1;
+        color: white;
+    }
+
+    .lightbox-nav.prev {
+        left: -70px;
+    }
+
+    .lightbox-nav.next {
+        right: -70px;
+    }
+    .professional-header-section {
+        padding: 5px 0 20px !important;
+        position: relative;
+    }
+
+    /* Pricing Card Styles */
+    .pricing-card {
+        border: none !important;
+        border-radius: 12px;
+    }
+
+    .pricing-card .nav-pills .nav-link {
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-weight: 500;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .pricing-card .nav-pills .nav-link:hover {
+        background-color: #f0f9ff;
+        color: #00b3f1;
+    }
+
+    .pricing-card .nav-pills .nav-link.active {
+        background-color: #00b3f1;
+        color: white;
+        border-color: #00b3f1;
+    }
+
+    .pricing-card h3 {
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .pricing-card h6 {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .pricing-card .list-unstyled li {
+        display: flex;
+        align-items: center;
+        color: #495057;
+    }
+
+    .pricing-card .list-unstyled li i {
+        font-size: 1.1rem;
+    }
+
+    .pricing-card .btn-lg {
+        padding: 12px 24px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .pricing-card .btn-primary:hover {
+        background-color: #0099d6;
+        border-color: #0099d6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 179, 241, 0.3);
+    }
+
+    .pricing-card .btn-outline-primary {
+        border-width: 2px;
+        font-weight: 600;
+    }
+
+    .pricing-card .btn-outline-primary:hover {
+        background-color: #00b3f1;
+        border-color: #00b3f1;
+        transform: translateY(-2px);
+    }
 </style>
 
-<!-- Profile Wallpaper -->
-<div class="profile-wallpaper" 
-     @if($user->profile && $user->profile->wallpaper_image)
-         style="background-image: url('{{ asset('storage/' . $user->profile->wallpaper_image) }}');"
-     @endif>
-</div>
-
-<!-- Profile Content -->
-<section class="our-dashbord pt-0 pb50">
-    <div class="container">
-        <!-- Avatar & Basic Info -->
-        <div class="profile-avatar-section">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="bg-white p-4 shadow rounded">
-                        <div class="row align-items-center">
-                            <!-- Avatar -->
-                            <div class="col-auto">
-                                @if($user->avatar_url)
-                                    <img src="{{ asset('storage/' . $user->avatar_url) }}" 
-                                         class="rounded-circle profile-avatar-large" 
-                                         alt="{{ $user->name }}">
-                                @else
-                                    <div class="rounded-circle profile-avatar-large bg-primary text-white d-flex align-items-center justify-content-center" 
-                                         style="font-size: 48px; font-weight: bold;">
-                                        {{ $user->initials }}
+<!-- Professional Header Section -->
+<section class="professional-header-section mt-5 pt-4">
+    <div class="container-fluid p-0">
+        <!-- Wallpaper Background -->
+        <div class="profile-wallpaper position-relative" 
+             style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ $user->profile && $user->profile->wallpaper_image ? asset('storage/' . $user->profile->wallpaper_image) : 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=400&fit=crop' }}'); 
+                    height: 300px; 
+                    background-size: cover; 
+                    background-position: center;">
+            
+            <!-- Profile Info Overlay -->
+            <div class="container h-100">
+                <div class="profile-info-overlay position-absolute d-flex align-items-end" style="bottom: 20px; left: 0; right: 0;">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-end gap-4">
+                                    <!-- Profile Avatar -->
+                                    <div class="profile-avatar-large">
+                                        @if($user->avatar_url)
+                                            <img src="{{ asset('storage/' . $user->avatar_url) }}" 
+                                                 class="rounded-circle border border-5 border-white shadow-lg" 
+                                                 width="120" 
+                                                 height="120" 
+                                                 alt="{{ $user->name }}">
+                                        @else
+                                            <div class="rounded-circle border border-5 border-white shadow-lg bg-primary text-white d-flex align-items-center justify-content-center" 
+                                                 style="width: 120px; height: 120px; font-size: 3rem; font-weight: bold;">
+                                                {{ $user->initials }}
+                                            </div>
+                                        @endif
                                     </div>
-                                @endif
-                            </div>
-                            
-                            <!-- Name & Stats -->
-                            <div class="col">
-                                <h2 class="mb-1">{{ $user->name }} {{ $user->surname }}</h2>
-                                <p class="text-muted mb-2">@<span>{{ $user->username }}</span></p>
-                                
-                                @if($user->profile && $user->profile->bio)
-                                    <p class="mb-3">{{ $user->profile->bio }}</p>
-                                @endif
-                                
-                                <!-- Stats -->
-                                <div class="d-flex gap-4">
-                                    <div>
-                                        <strong class="h5">{{ $user->followers_count }}</strong>
-                                        <span class="text-muted ms-1">Followers</span>
-                                    </div>
-                                    <div>
-                                        <strong class="h5">{{ $user->following_count }}</strong>
-                                        <span class="text-muted ms-1">Following</span>
-                                    </div>
-                                    <div>
-                                        <strong class="h5">{{ $user->gigs->count() }}</strong>
-                                        <span class="text-muted ms-1">Services</span>
+                                    
+                                    <!-- Profile Name & Info -->
+                                    <div class="profile-info text-white mb-3">
+                                        <h3 class="mb-2 text-white fw-bold">{{ $user->name }} {{ $user->surname ?? '' }}</h3>
+                                        <p class="mb-1 text-white-50" style="font-size: 0.95rem;">
+                                            <i class="flaticon-goal me-2"></i>
+                                            <span>Lingua: {{ $user->profile->languages ?? 'English' }}</span>
+                                        </p>
+                                        <p class="mb-0 text-white-50" style="font-size: 0.95rem;">
+                                            <i class="flaticon-tracking me-2"></i>
+                                            <span>Posizione: {{ $user->profile->city ?? 'New York' }}</span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Action Buttons -->
-                            <div class="col-auto">
-                                <div class="d-flex flex-column gap-2">
+                            <div class="col-md-4">
+                                <div class="d-flex gap-3 justify-content-end align-items-center mb-3">
                                     @auth
                                         @if(auth()->id() !== $user->id)
+                                            <!-- Follow Button -->
                                             @livewire('follow-button', ['user' => $user], key('follow-profile-' . $user->id))
-                                            
-                                            <button class="btn btn-primary" onclick="openChatWith({{ $user->id }})">
-                                                <i class="far fa-envelope me-1"></i> Message
-                                            </button>
-                                        @else
-                                            <a href="{{ route('profile.edit') }}" class="btn btn-primary">
-                                                <i class="fas fa-edit me-1"></i> Edit Profile
-                                            </a>
                                         @endif
                                     @else
-                                        <a href="{{ route('web.login') }}" class="btn btn-primary">
-                                            <i class="far fa-envelope me-1"></i> Message
-                                        </a>
+                                        <!-- Follow Button -->
+                                        @livewire('follow-button', ['user' => $user], key('follow-profile-' . $user->id))
                                     @endauth
+                                    
+                                    <!-- Share Button (Always visible) -->
+                                    @livewire('share-profile-button', ['user' => $user], key('share-profile-' . $user->id))
                                 </div>
                             </div>
                         </div>
@@ -373,75 +722,108 @@
                 </div>
             </div>
         </div>
-        
-        <!-- About Section -->
-        @if($user->profile && $user->profile->about)
+    </div>
+</section>
+
+<!-- Profile Content -->
+<section class="our-dashbord pt-0 pb50">
+    <div class="container">
         <div class="row mt-4">
-            <div class="col-lg-12">
-                <div class="bg-white p-4 shadow-sm rounded">
-                    <h4 class="mb-3"><i class="far fa-user-circle text-primary me-2"></i> About</h4>
-                    <p class="text-muted" style="white-space: pre-line;">{{ $user->profile->about }}</p>
-                </div>
-            </div>
-        </div>
-        @endif
-        
-        <!-- Skills Section -->
-        @if($user->profile && $user->profile->skills && count(json_decode($user->profile->skills, true) ?? []) > 0)
-        <div class="row mt-4">
-            <div class="col-lg-12">
-                <div class="bg-white p-4 shadow-sm rounded">
-                    <h4 class="mb-3"><i class="fas fa-star text-primary me-2"></i> Skills</h4>
-                    <div class="skills-container">
-                        @foreach(json_decode($user->profile->skills, true) as $skill)
-                            <span class="skill-badge">{{ $skill }}</span>
-                        @endforeach
+            <!-- Left Column -->
+            <div class="col-lg-8">
+                <!-- Info Boxes -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <i class="fas fa-user-friends text-primary me-2"></i>
+                            <strong>Followers:</strong> {{ $user->followers_count }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <i class="flaticon-goal text-primary me-2"></i>
+                            <strong>Language:</strong> {{ $user->profile->languages ?? 'English' }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <i class="flaticon-tracking text-primary me-2"></i>
+                            <strong>Location:</strong> {{ $user->profile->city ?? 'Not specified' }}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        @endif
-        
-        <!-- Media Gallery Section -->
-        @if($user->activeProfileMedia && $user->activeProfileMedia->count() > 0)
-        <div class="row mt-4">
-            <div class="col-lg-12">
-                <div class="bg-white p-4 shadow-sm rounded">
-                    <h4 class="mb-4">
-                        <i class="fas fa-photo-video text-primary me-2"></i> 
-                        Media Gallery ({{ $user->activeProfileMedia->count() }})
-                    </h4>
-                    <div class="profile-media-slider-wrapper">
-                        <button type="button" class="profile-slider-nav prev" onclick="slideProfileMedia(-1)">
+                
+                <!-- Photos and Videos Section -->
+                @if($user->activeProfileMedia && $user->activeProfileMedia->count() > 0)
+                <div class="service-gallery">
+                    <h5 class="mb-3">
+                        <i class="far fa-images text-primary me-2"></i> Photos and Videos
+                    </h5>
+                    <div class="media-carousel-wrapper position-relative">
+                        <button type="button" class="carousel-nav-btn prev" onclick="slideMedia(-1)">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <div class="profile-media-slider-container">
-                            <div class="media-gallery-container" id="profileMediaTrack">
+                        
+                        <div class="media-carousel-container">
+                            <div class="media-carousel-track" id="mediaCarouselTrack">
                                 @foreach($user->activeProfileMedia as $media)
-                                    <div class="media-gallery-item" 
-                                         data-media-id="{{ $media->id }}"
-                                         data-media-type="{{ $media->media_type }}"
-                                         data-media-url="{{ asset('storage/' . $media->file_path) }}">
+                                    <div class="media-carousel-item">
+                                        <div class="media-content" onclick="openMediaLightbox({{ $loop->index }})">
+                                            @if($media->media_type === 'image')
+                                                <img src="{{ asset('storage/' . $media->file_path) }}" 
+                                                     alt="Profile media"
+                                                     loading="lazy">
+                                            @else
+                                                <video src="{{ asset('storage/' . $media->file_path) }}" 
+                                                       muted 
+                                                       loop
+                                                       preload="metadata">
+                                                </video>
+                                                <div class="video-play-overlay">
+                                                    <i class="fas fa-play"></i>
+                                                </div>
+                                                @if($media->duration)
+                                                    <div class="video-duration">{{ $media->duration }}s</div>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="carousel-nav-btn next" onclick="slideMedia(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Reaction Buttons Section (Below Photos) -->
+                <div class="service-reactions mb-5">
+                    @if($user->activeProfileMedia && $user->activeProfileMedia->count() > 0)
+                        @foreach($user->activeProfileMedia as $index => $media)
+                            <div class="media-reaction-container" id="reaction-{{ $index }}" style="{{ $index === 0 ? '' : 'display: none;' }}">
+                                @livewire('profile-media-reactions', ['mediaId' => $media->id], key('profile-reactions-' . $media->id))
+                            </div>
+                        @endforeach
+                        
+                        <!-- Media Thumbnails -->
+                        <div class="media-thumbnails-container mt-4">
+                            <div class="media-thumbnails-grid">
+                                @foreach($user->activeProfileMedia as $index => $media)
+                                    <div class="media-thumbnail-card {{ $index === 0 ? 'active' : '' }}" 
+                                         onclick="goToMediaSlide({{ $index }})"
+                                         id="thumbnail-{{ $index }}">
                                         @if($media->media_type === 'image')
                                             <img src="{{ asset('storage/' . $media->file_path) }}" 
-                                                 alt="Profile media"
+                                                 alt="Media {{ $index + 1 }}"
                                                  loading="lazy">
-                                            <div class="media-type-badge">
-                                                <i class="far fa-image"></i> Image
-                                            </div>
                                         @else
                                             <video src="{{ asset('storage/' . $media->file_path) }}" 
-                                                   muted 
-                                                   loop
+                                                   muted
                                                    preload="metadata">
                                             </video>
-                                            <div class="media-type-badge video">
-                                                <i class="far fa-video"></i>
-                                                @if($media->duration)
-                                                    {{ $media->duration }}s
-                                                @endif
-                                            </div>
-                                            <div class="media-play-icon">
+                                            <div class="thumbnail-video-icon">
                                                 <i class="fas fa-play"></i>
                                             </div>
                                         @endif
@@ -449,87 +831,174 @@
                                 @endforeach
                             </div>
                         </div>
-                        <button type="button" class="profile-slider-nav next" onclick="slideProfileMedia(1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                    @endif
+                </div>
+                @else
+                <div class="service-gallery mb-5">
+                    <h5 class="mb-3">
+                        <i class="far fa-images text-primary me-2"></i> Photos and Videos
+                    </h5>
+                    <div class="text-center py-5 bg-light rounded">
+                        <i class="far fa-image text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 mb-0">No media available</p>
                     </div>
                 </div>
-            </div>
-        </div>
-        @endif
-        
-        <!-- Services Gallery -->
-        <div class="row mt-4">
-            <div class="col-lg-12">
-                <div class="bg-white p-4 shadow-sm rounded">
-                    <h4 class="mb-4"><i class="fas fa-briefcase text-primary me-2"></i> Services ({{ $user->gigs->count() }})</h4>
+                @endif
+                
+                <!-- Reviews Section -->
+                <div class="reviews-section mb-5">
+                    <h4 class="mb-4">
+                        <i class="far fa-thumbs-up text-primary me-2"></i> Reviews
+                        <span class="badge bg-primary ms-2">{{ $reviewStats['total'] }}</span>
+                    </h4>
                     
-                    @if($user->gigs->count() > 0)
-                        <div class="row">
-                            @foreach($user->gigs as $gig)
-                                <div class="col-md-6 col-lg-4 mb-4">
-                                    <div class="card service-gallery-item h-100">
-                                        <!-- Service Image -->
-                                        <a href="{{ route('gigs.show', $gig->slug) }}">
-                                            @if($gig->images && $gig->images->count() > 0)
-                                                <img src="{{ asset('storage/' . $gig->images->first()->image_path) }}" 
-                                                     class="card-img-top" 
-                                                     alt="{{ $gig->title }}"
-                                                     style="height: 200px; object-fit: cover;">
+                    @if($user->profileReviews && $user->profileReviews->count() > 0)
+                        <!-- Show latest reviews -->
+                        <div class="latest-reviews mb-4">
+                            @foreach($user->profileReviews->take(3) as $review)
+                                <div class="review-card border rounded p-3 mb-3">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="review-avatar">
+                                            @if($review->reviewer->avatar_url)
+                                                <img src="{{ asset('storage/' . $review->reviewer->avatar_url) }}" 
+                                                     class="rounded-circle" 
+                                                     width="50" 
+                                                     height="50">
                                             @else
-                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                                     style="height: 200px;">
-                                                    <i class="far fa-image text-muted" style="font-size: 3rem;"></i>
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                                     style="width: 50px; height: 50px;">
+                                                    {{ $review->reviewer->initials }}
                                                 </div>
                                             @endif
-                                        </a>
-                                        
-                                        <!-- Service Info -->
-                                        <div class="card-body">
-                                            <h6 class="card-title">
-                                                <a href="{{ route('gigs.show', $gig->slug) }}" 
-                                                   class="text-dark text-decoration-none">
-                                                    {{ Str::limit($gig->title, 50) }}
-                                                </a>
-                                            </h6>
-                                            <p class="card-text small text-muted">
-                                                {{ Str::limit(strip_tags($gig->description), 80) }}
-                                            </p>
-                                            
-                                            <!-- Price & Rating -->
-                                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                                <span class="fw-bold text-primary">
-                                                    €{{ number_format($gig->starting_price, 2) }}
-                                                </span>
-                                                @if($gig->rating > 0)
-                                                    <span class="text-warning">
-                                                        <i class="fas fa-star"></i> {{ number_format($gig->rating, 1) }}
-                                                    </span>
-                                                @endif
-                                            </div>
                                         </div>
-                                        
-                                        <!-- View Button -->
-                                        <div class="card-footer bg-transparent border-top-0">
-                                            <a href="{{ route('gigs.show', $gig->slug) }}" 
-                                               class="btn btn-sm btn-primary w-100">
-                                                View Service
-                                            </a>
+                                        <div class="review-content flex-grow-1">
+                                            <h6 class="mb-1">{{ $review->reviewer->name }}</h6>
+                                            <div class="text-warning mb-2">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
+                                                @endfor
+                                            </div>
+                                            <p class="text-muted small mb-2">{{ $review->created_at->diffForHumans() }}</p>
+                                            <p class="mb-0">{{ $review->comment }}</p>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
+                        
+                        <!-- See All Reviews Button -->
+                        @if($reviewStats['total'] > 3)
+                            <button class="btn btn-outline-primary" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#reviewsModal">
+                                <i class="far fa-eye me-2"></i> See all Reviews ({{ $reviewStats['total'] }})
+                            </button>
+                        @endif
                     @else
-                        <div class="text-center py-5">
-                            <i class="far fa-briefcase text-muted" style="font-size: 4rem;"></i>
-                            <h5 class="mt-3 text-muted">No services yet</h5>
-                            <p class="text-muted">This professional hasn't added any services yet.</p>
+                        <div class="text-center py-4 bg-light rounded">
+                            <i class="far fa-comment-slash text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3 mb-0">No reviews yet. Be the first to review!</p>
                         </div>
                     @endif
+                    
+                    <!-- Leave Review Section -->
+                    @auth
+                        @if(auth()->id() !== $user->id)
+                            <div class="mt-4">
+                                @livewire('profile-review-form', ['profileUserId' => $user->id], key('profile-review-form-' . $user->id))
+                            </div>
+                        @else
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                You cannot review your own profile.
+                            </div>
+                        @endif
+                    @else
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <a href="{{ route('web.login') }}">Log in</a> to leave a review
+                        </div>
+                    @endauth
                 </div>
             </div>
+            
+            <!-- Right Column - Services Tab -->
+            <div class="col-lg-4">
+                <!-- Services Pricing Card -->
+                @if($user->services && $user->services->count() > 0)
+                <div class="pricing-card card shadow-sm mb-4 sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <!-- Service Tabs -->
+                        <ul class="nav nav-pills nav-justified mb-3" role="tablist">
+                            @foreach($user->services as $index => $service)
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link {{ $index == 0 ? 'active' : '' }}" 
+                                            id="service-{{ $index }}-tab" 
+                                            data-bs-toggle="tab" 
+                                            data-bs-target="#service-{{ $index }}" 
+                                            type="button">
+                                        {{ $service->title }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                        
+                        <!-- Service Content -->
+                        <div class="tab-content">
+                            @foreach($user->services as $index => $service)
+                                <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" 
+                                     id="service-{{ $index }}">
+                                    <h3 class="text-primary mb-3">€{{ number_format($service->price, 2) }}</h3>
+                                    <h6 class="mb-2">{{ $service->title }}</h6>
+                                    <p class="text-muted small mb-3">{!! strip_tags($service->description) !!}</p>
+                                    <ul class="list-unstyled mb-3">
+                                        <li class="mb-2">
+                                            <i class="flaticon-sandclock text-primary me-2"></i>
+                                            {{ $service->delivery }} Days Delivery
+                                        </li>
+                                    </ul>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 mt-4">
+                            @auth
+                                @if(auth()->id() !== $user->id)
+                                    <button class="btn btn-primary btn-lg">
+                                        <i class="far fa-calendar-check me-2"></i> Book now
+                                    </button>
+                                    <button class="btn btn-outline-primary" 
+                                            onclick="Livewire.dispatch('open-chat-sidebar', { userId: {{ $user->id }} })">
+                                        <i class="far fa-paper-plane me-2"></i> Contact me
+                                    </button>
+                                @else
+                                    <a href="{{ url('/admin') }}" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-edit me-2"></i> Manage Services
+                                    </a>
+                                @endif
+                            @else
+                                <button class="btn btn-primary btn-lg">
+                                    <i class="far fa-calendar-check me-2"></i> Book now
+                                </button>
+                                <a href="{{ route('web.login') }}" class="btn btn-outline-primary">
+                                    <i class="far fa-paper-plane me-2"></i> Contact me
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
+                </div>
+                @else
+                <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
+                    <div class="card-body text-center py-5">
+                        <i class="far fa-briefcase text-muted" style="font-size: 2.5rem;"></i>
+                        <p class="text-muted mt-3 mb-0">No services available</p>
+                    </div>
+                </div>
+                @endif
+            </div>
         </div>
+        {{-- add review system --}}
     </div>
 </section>
 
@@ -549,6 +1018,53 @@
     </div>
 </div>
 
+<!-- Reviews Modal -->
+<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewsModalLabel">
+                    <i class="far fa-thumbs-up text-primary me-2"></i> All Reviews ({{ $reviewStats['total'] }})
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if($user->profileReviews && $user->profileReviews->count() > 0)
+                    @foreach($user->profileReviews as $review)
+                        <div class="review-card border rounded p-3 mb-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="review-avatar">
+                                    @if($review->reviewer->avatar_url)
+                                        <img src="{{ asset('storage/' . $review->reviewer->avatar_url) }}" 
+                                             class="rounded-circle" 
+                                             width="50" 
+                                             height="50">
+                                    @else
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            {{ $review->reviewer->initials }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="review-content flex-grow-1">
+                                    <h6 class="mb-1">{{ $review->reviewer->name }}</h6>
+                                    <div class="text-warning mb-2">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <p class="text-muted small mb-2">{{ $review->created_at->diffForHumans() }}</p>
+                                    <p class="mb-0">{{ $review->comment }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -557,99 +1073,142 @@
         Livewire.dispatch('open-chat-sidebar', { userId: userId });
     }
     
-    // Profile Media Slider
-    let profileSliderPosition = 0;
+    // Media Carousel
+    let currentMediaIndex = 0;
+    let mediaItems = [];
     
-    function slideProfileMedia(direction) {
-        const track = document.getElementById('profileMediaTrack');
+    function slideMedia(direction) {
+        const track = document.getElementById('mediaCarouselTrack');
         if (!track) return;
         
-        const items = track.querySelectorAll('.media-gallery-item');
+        const items = track.querySelectorAll('.media-carousel-item');
         if (items.length === 0) return;
+        
+        currentMediaIndex += direction;
+        currentMediaIndex = Math.max(0, Math.min(currentMediaIndex, items.length - 1));
         
         const itemWidth = items[0].offsetWidth;
         const gap = 20;
-        const slideDistance = itemWidth + gap;
-        const containerWidth = track.parentElement.offsetWidth;
-        const totalWidth = (itemWidth + gap) * items.length - gap;
-        const maxScroll = Math.max(0, totalWidth - containerWidth);
+        const offset = currentMediaIndex * (itemWidth + gap);
         
-        profileSliderPosition += direction * slideDistance;
-        profileSliderPosition = Math.max(0, Math.min(profileSliderPosition, maxScroll));
-        
-        track.style.transform = `translateX(-${profileSliderPosition}px)`;
-        updateProfileSliderButtons();
+        track.style.transform = `translateX(-${offset}px)`;
+        updateCarouselButtons();
+        updateReactionDisplay();
     }
     
-    function updateProfileSliderButtons() {
-        const prevBtn = document.querySelector('.profile-slider-nav.prev');
-        const nextBtn = document.querySelector('.profile-slider-nav.next');
-        const track = document.getElementById('profileMediaTrack');
+    function updateReactionDisplay() {
+        // Hide all reaction containers
+        document.querySelectorAll('.media-reaction-container').forEach(container => {
+            container.style.display = 'none';
+        });
+        
+        // Show the reaction container for the current media
+        const currentReaction = document.getElementById(`reaction-${currentMediaIndex}`);
+        if (currentReaction) {
+            currentReaction.style.display = 'block';
+        }
+        
+        // Update thumbnail active states
+        updateThumbnailStates();
+    }
+    
+    function updateThumbnailStates() {
+        // Remove active class from all thumbnails
+        document.querySelectorAll('.media-thumbnail-card').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        
+        // Add active class to current thumbnail
+        const currentThumb = document.getElementById(`thumbnail-${currentMediaIndex}`);
+        if (currentThumb) {
+            currentThumb.classList.add('active');
+        }
+    }
+    
+    function goToMediaSlide(index) {
+        const track = document.getElementById('mediaCarouselTrack');
+        if (!track) return;
+        
+        const items = track.querySelectorAll('.media-carousel-item');
+        if (items.length === 0) return;
+        
+        currentMediaIndex = index;
+        
+        const itemWidth = items[0].offsetWidth;
+        const gap = 20;
+        const offset = currentMediaIndex * (itemWidth + gap);
+        
+        track.style.transform = `translateX(-${offset}px)`;
+        updateCarouselButtons();
+        updateReactionDisplay();
+    }
+    
+    function updateCarouselButtons() {
+        const prevBtn = document.querySelector('.carousel-nav-btn.prev');
+        const nextBtn = document.querySelector('.carousel-nav-btn.next');
+        const track = document.getElementById('mediaCarouselTrack');
         
         if (!prevBtn || !nextBtn || !track) return;
         
-        const items = track.querySelectorAll('.media-gallery-item');
+        const items = track.querySelectorAll('.media-carousel-item');
         if (items.length === 0) {
             prevBtn.disabled = true;
             nextBtn.disabled = true;
             return;
         }
         
-        const itemWidth = items[0].offsetWidth;
-        const gap = 20;
-        const containerWidth = track.parentElement.offsetWidth;
-        const totalWidth = (itemWidth + gap) * items.length - gap;
-        const maxScroll = Math.max(0, totalWidth - containerWidth);
-        
-        prevBtn.disabled = profileSliderPosition === 0;
-        nextBtn.disabled = profileSliderPosition >= maxScroll;
+        prevBtn.disabled = currentMediaIndex === 0;
+        nextBtn.disabled = currentMediaIndex >= items.length - 1;
     }
     
-    // Media Gallery Lightbox
-    let currentMediaIndex = 0;
-    let mediaItems = [];
+    // Media Lightbox
+    let lightboxMediaItems = [];
     
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize slider buttons
-        updateProfileSliderButtons();
+        // Initialize carousel buttons
+        updateCarouselButtons();
         
-        // Collect all media items
-        const galleryItems = document.querySelectorAll('.media-gallery-item');
-        mediaItems = Array.from(galleryItems).map(item => ({
-            type: item.dataset.mediaType,
-            url: item.dataset.mediaUrl
-        }));
-        
-        // Add click handlers
-        galleryItems.forEach((item, index) => {
-            item.addEventListener('click', function() {
-                openLightbox(index);
-            });
+        // Collect all media items for lightbox
+        const carouselItems = document.querySelectorAll('.media-carousel-item');
+        carouselItems.forEach((item, index) => {
+            const mediaContent = item.querySelector('.media-content');
+            const img = mediaContent.querySelector('img');
+            const video = mediaContent.querySelector('video');
             
-            // Auto-play video on hover
-            if (item.dataset.mediaType === 'video') {
-                const video = item.querySelector('video');
-                if (video) {
-                    item.addEventListener('mouseenter', () => video.play());
-                    item.addEventListener('mouseleave', () => {
-                        video.pause();
-                        video.currentTime = 0;
-                    });
-                }
+            if (img) {
+                lightboxMediaItems.push({
+                    type: 'image',
+                    url: img.src
+                });
+            } else if (video) {
+                lightboxMediaItems.push({
+                    type: 'video',
+                    url: video.src
+                });
+                
+                // Auto-play video on hover
+                mediaContent.addEventListener('mouseenter', () => video.play());
+                mediaContent.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
             }
         });
         
         // Close lightbox on background click
-        document.getElementById('mediaLightbox').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeLightbox();
-            }
-        });
+        const lightbox = document.getElementById('mediaLightbox');
+        if (lightbox) {
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLightbox();
+                }
+            });
+        }
         
         // Keyboard navigation
         document.addEventListener('keydown', function(e) {
             const lightbox = document.getElementById('mediaLightbox');
-            if (lightbox.classList.contains('active')) {
+            if (lightbox && lightbox.classList.contains('active')) {
                 if (e.key === 'Escape') {
                     closeLightbox();
                 } else if (e.key === 'ArrowLeft') {
@@ -660,26 +1219,32 @@
             }
         });
         
-        // Handle window resize for slider
+        // Handle window resize for carousel
         let resizeTimer;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function() {
-                profileSliderPosition = 0;
-                const track = document.getElementById('profileMediaTrack');
+                currentMediaIndex = 0;
+                const track = document.getElementById('mediaCarouselTrack');
                 if (track) {
                     track.style.transform = 'translateX(0)';
-                    updateProfileSliderButtons();
+                    updateCarouselButtons();
                 }
             }, 250);
         });
     });
     
-    function openLightbox(index) {
-        currentMediaIndex = index;
+    function openMediaLightbox(index) {
         const lightbox = document.getElementById('mediaLightbox');
+        if (!lightbox) return;
+        
         const mediaContainer = document.getElementById('lightboxMedia');
-        const media = mediaItems[currentMediaIndex];
+        const media = lightboxMediaItems[index];
+        
+        if (!media) return;
+        
+        // Update current index
+        currentMediaIndex = index;
         
         // Clear previous content
         mediaContainer.innerHTML = '';
@@ -705,12 +1270,15 @@
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        // Update nav button visibility
-        updateNavButtons();
+        // Update reaction display
+        updateReactionDisplay();
+        updateLightboxNavButtons();
     }
     
     function closeLightbox() {
         const lightbox = document.getElementById('mediaLightbox');
+        if (!lightbox) return;
+        
         const mediaContainer = document.getElementById('lightboxMedia');
         
         // Stop any playing video
@@ -728,19 +1296,34 @@
         
         // Loop around
         if (currentMediaIndex < 0) {
-            currentMediaIndex = mediaItems.length - 1;
-        } else if (currentMediaIndex >= mediaItems.length) {
+            currentMediaIndex = lightboxMediaItems.length - 1;
+        } else if (currentMediaIndex >= lightboxMediaItems.length) {
             currentMediaIndex = 0;
         }
         
-        openLightbox(currentMediaIndex);
+        // Update carousel position
+        const track = document.getElementById('mediaCarouselTrack');
+        if (track) {
+            const items = track.querySelectorAll('.media-carousel-item');
+            if (items.length > 0) {
+                const itemWidth = items[0].offsetWidth;
+                const gap = 20;
+                const offset = currentMediaIndex * (itemWidth + gap);
+                track.style.transform = `translateX(-${offset}px)`;
+            }
+        }
+        
+        updateCarouselButtons();
+        openMediaLightbox(currentMediaIndex);
     }
     
-    function updateNavButtons() {
+    function updateLightboxNavButtons() {
         const prevBtn = document.querySelector('.lightbox-nav.prev');
         const nextBtn = document.querySelector('.lightbox-nav.next');
         
-        if (mediaItems.length <= 1) {
+        if (!prevBtn || !nextBtn) return;
+        
+        if (lightboxMediaItems.length <= 1) {
             prevBtn.style.display = 'none';
             nextBtn.style.display = 'none';
         } else {

@@ -29,8 +29,10 @@ class Toolbar extends Component
     {
         $user = auth()->user();
         
-        // Load unread notifications count
-        $this->notificationsCount = $user->unreadNotifications()->count();
+        // Load unread notifications count (excluding message notifications)
+        $this->notificationsCount = $user->unreadNotifications()
+            ->where('type', '!=', 'new_message')
+            ->count();
         
         // Load unread messages count
         $this->messagesCount = $this->getUnreadMessagesCount();

@@ -24,4 +24,9 @@ class Category extends Model
     {
         return $this->hasManyThrough(Gig::class, Subcategory::class);
     }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 }

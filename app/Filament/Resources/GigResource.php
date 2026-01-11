@@ -22,11 +22,15 @@ class GigResource extends Resource
     protected static ?string $model = Gig::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
-    protected static ?string $navigationGroup = 'Marketplace';
+    protected static ?string $navigationGroup = 'Marketplace1';
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'title';
-    protected static ?string $modelLabel = 'Service';
-    protected static ?string $pluralModelLabel = 'Services';
+    protected static ?string $modelLabel = 'Gig';
+    protected static ?string $pluralModelLabel = 'Gigs';
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {

@@ -45,14 +45,6 @@
                             @if($notification['type'] === 'new_follower')
                                 <strong>{{ $notification['related_user']['name'] ?? 'Someone' }}</strong>
                                 <span class="text-muted">{{ $notification['data']['message'] ?? 'started following you' }}</span>
-                            @elseif($notification['type'] === 'new_message')
-                                <strong>{{ $notification['data']['sender_name'] ?? 'Someone' }}</strong>
-                                <span class="text-muted">sent you a message</span>
-                                @if(isset($notification['data']['message_preview']))
-                                    <div class="text-muted small mt-1">
-                                        "{{ $notification['data']['message_preview'] }}"
-                                    </div>
-                                @endif
                             @else
                                 <span>{{ $notification['data']['message'] ?? 'New notification' }}</span>
                             @endif

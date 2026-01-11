@@ -119,7 +119,7 @@
                                     <a class="list-item" href="{{ route('web.about') }}"><span class="title">About Us</span></a>
                                 </li>
                                 <li class="visible_list">
-                                    <a class="list-item" href="{{ route('web.services') }}"><span class="title">Services</span></a>
+                                    <a class="list-item" href="{{ route('web.services') }}"><span class="title">Professionals</span></a>
                                 </li>
                                 <li class="visible_list">
                                     <a class="list-item" href="{{ route('web.contact') }}"><span class="title">Contact Us</span></a>
@@ -268,7 +268,7 @@
                         <a href="{{ route('web.about') }}">About Us</a>
                     </li>
                     <li>
-                        <a href="{{ route('web.services') }}">Services</a>
+                        <a href="{{ route('web.services') }}">Professionals</a>
                     </li>
                     <li>
                         <a href="{{ route('web.contact') }}">Contact Us</a>
@@ -312,7 +312,7 @@
                                 <a href="{{ route('web.about') }}">About Us</a>
                                 <a href="{{ route('web.login') }}">Login</a>
                                 <a href="{{ route('web.register') }}">Subscribe</a>
-                                <a href="{{ route('web.services') }}">Services</a>
+                                <a href="{{ route('web.services') }}">Professionals</a>
                                 <a href="{{ route('web.contact') }}">Contact Us</a>
                             </div>
                         </div>

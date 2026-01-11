@@ -24,4 +24,9 @@ class Subcategory extends Model
     {
         return $this->hasMany(Gig::class);
     }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class, 'sub_category_id');
+    }
 }

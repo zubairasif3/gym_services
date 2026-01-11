@@ -19,6 +19,7 @@ class NotificationsDropdown extends Component
     {
         $this->notifications = auth()->user()
             ->notifications()
+            ->where('type', '!=', 'new_message') // Exclude message notifications
             ->with('relatedUser:id,name,surname,avatar_url')
             ->take(10)
             ->get()
@@ -39,7 +40,7 @@ class NotificationsDropdown extends Component
                 ];
             });
             
-        $this->unreadCount = auth()->user()->unreadNotifications()->count();
+        $this->unreadCount = auth()->user()->unreadNotifications()->where('type', '!=', 'new_message')->count();
     }
     
     public function markAsRead($notificationId)

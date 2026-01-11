@@ -88,6 +88,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/gigs/{gig}/save', [App\Http\Controllers\GigSaveController::class, 'toggle'])->name('gigs.save.toggle');
     Route::get('/api/gigs/{gig}/save/check', [App\Http\Controllers\GigSaveController::class, 'check'])->name('gigs.save.check');
     Route::get('/api/saved-gigs', [App\Http\Controllers\GigSaveController::class, 'savedGigs'])->name('gigs.saved');
+    
+    // Service Routes (Professional Users Only)
+    Route::resource('services', App\Http\Controllers\ServiceController::class);
+    Route::get('/api/services/subcategories/{categoryId}', [App\Http\Controllers\ServiceController::class, 'getSubcategories'])->name('services.subcategories');
 });
 
 // Public Professional Profile

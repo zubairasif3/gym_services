@@ -19,7 +19,7 @@ class GigReviewResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
     
-    protected static ?string $navigationGroup = 'Services';
+    protected static ?string $navigationGroup = 'Gig';
     
     protected static ?string $navigationLabel = 'Reviews';
     

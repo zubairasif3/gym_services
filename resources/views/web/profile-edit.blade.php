@@ -565,7 +565,7 @@
                         </h5>
                         <p class="text-muted mb-4">
                             <i class="far fa-info-circle me-1"></i> 
-                            Upload images and short videos (max 20 seconds) to showcase your work. Maximum 20 media items.
+                            Upload images and short videos (max 30 seconds) to showcase your work. Unlimited media items.
                         </p>
                         
                         <!-- Media Slider -->
@@ -625,7 +625,7 @@
                         <div class="text-center mb-3">
                             <small class="text-muted">
                                 <i class="far fa-images me-1"></i>
-                                <span id="media-count">{{ $user->activeProfileMedia->count() }}</span> / 20 media items
+                                <span id="media-count">{{ $user->activeProfileMedia->count() }}</span> media items
                             </small>
                         </div>
                         @endif
@@ -658,7 +658,7 @@
                                     <label for="media_videos" class="file-upload-label media-upload-label">
                                         <i class="far fa-video"></i>
                                         <span>Click to upload videos</span>
-                                        <small>MP4, MOV (Max 20 seconds, 20MB)</small>
+                                        <small>MP4, MOV (Max 30 seconds, 20MB)</small>
                                     </label>
                                     <input type="file" 
                                            class="file-upload-input" 
@@ -920,16 +920,8 @@
     async function handleMediaUpload(files, mediaType) {
         if (!files || files.length === 0) return;
         
-        // Check current media count
-        const currentCount = mediaGalleryGrid.querySelectorAll('.media-item').length;
-        const maxMedia = 20;
-        
-        if (currentCount >= maxMedia) {
-            showMessage('error', `Maximum ${maxMedia} media items allowed`);
-            return;
-        }
-        
-        const filesToUpload = Array.from(files).slice(0, maxMedia - currentCount);
+        // No limit on media count
+        const filesToUpload = Array.from(files);
         
         uploadProgress.style.display = 'block';
         uploadMessages.innerHTML = '';
@@ -948,8 +940,8 @@
             // For videos, check duration
             if (mediaType === 'video') {
                 const duration = await getVideoDuration(file);
-                if (duration > 20) {
-                    showMessage('error', `${file.name} is too long. Max 20 seconds.`);
+                if (duration > 30) {
+                    showMessage('error', `${file.name} is too long. Max 30 seconds.`);
                     continue;
                 }
             }

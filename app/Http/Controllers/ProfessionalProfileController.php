@@ -19,14 +19,19 @@ class ProfessionalProfileController extends Controller
             ->where('user_type', 3) // Only professionals
             ->with([
                 'profile',
-                'activeProfileMedia',
-                'gigs' => function($query) {
+                'activeProfileMedia.reactions',
+                'services' => function($query) {
                     $query->where('is_active', true)
-                          ->with(['images', 'packages'])
+                          ->with(['category', 'subcategory'])
                           ->latest();
                 },
-                'gigs.subcategory'
+                'profileReviews' => function($query) {
+                    $query->with('reviewer.profile')
+                        ->recent()
+                        ->limit(5);
+                }
             ])
+            ->withCount('profileReviews')
             ->firstOrFail();
             
         // Check if current user is following
@@ -35,7 +40,29 @@ class ProfessionalProfileController extends Controller
         // Get user's subcategories
         $subcategories = $user->subcategories()->where('is_active', true)->get();
         
-        return view('web.professional-profile', compact('user', 'isFollowing', 'subcategories'));
+        // Get reaction counts for each media
+        foreach ($user->activeProfileMedia as $media) {
+            $media->reactionCounts = $media->reactions()
+                ->selectRaw('emoji, COUNT(*) as count')
+                ->groupBy('emoji')
+                ->pluck('count', 'emoji')
+                ->toArray();
+        }
+        
+        // Calculate review stats
+        $reviewStats = [
+            'total' => $user->profileReviews()->count(),
+            'average' => round($user->profileReviews()->avg('rating'), 1),
+            'distribution' => [
+                5 => $user->profileReviews()->where('rating', 5)->count(),
+                4 => $user->profileReviews()->where('rating', 4)->count(),
+                3 => $user->profileReviews()->where('rating', 3)->count(),
+                2 => $user->profileReviews()->where('rating', 2)->count(),
+                1 => $user->profileReviews()->where('rating', 1)->count(),
+            ]
+        ];
+        
+        return view('web.professional-profile', compact('user', 'isFollowing', 'subcategories', 'reviewStats'));
     }
     
     /**
@@ -244,16 +271,13 @@ class ProfessionalProfileController extends Controller
         $user = auth()->user();
         $mediaType = $request->media_type;
 
-        // For videos, validate duration (max 10 seconds)
+        // For videos, validate duration (max 30 seconds)
         if ($mediaType === 'video') {
             // We'll check duration after upload
         }
 
-        // Count existing media
+        // Count existing media (no limit)
         $existingMediaCount = $user->profileMedia()->count();
-        if ($existingMediaCount >= 20) {
-            return response()->json(['error' => 'Maximum 20 media items allowed'], 400);
-        }
 
         // Ensure public storage directories exist
         $publicStoragePath = public_path('storage');

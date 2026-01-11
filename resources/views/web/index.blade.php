@@ -54,9 +54,8 @@
           <div class="row align-items-center wow fadeInUp">
             <div class="col-xl-7">
               <div class="main-title mb30-lg">
-                <h2 class="title">Discover the services most chosen by other
-                  users</h2>
-                <p class="paragraph">Top-rated fitness and wellness services from certified professionals</p>
+                <h2 class="title">Featured Professionals</h2>
+                <p class="paragraph">Top-rated fitness and wellness professionals ready to help you achieve your goals</p>
               </div>
             </div>
             <div class="col-xl-5">
@@ -87,51 +86,83 @@
                     @foreach($categories as $index => $category)
                         <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" id="pills-{{ $category->id }}" role="tabpanel" aria-labelledby="pills-{{ $category->id }}-tab">
                             <div class="row">
-                                @foreach($category->gigs->take(8) as $gig)
+                                @forelse($category->professionals as $professional)
                                     <div class="col-sm-6 col-xl-3">
                                         <div class="listing-style1 bdrs16">
-                                            <div class="list-thumb">
-                                                <img class="w-100" src="{{ asset($gig->thumbnail ?? 'storage/' . $gig->images->first()->image_path ?? 'web/images/listings/g-1.jpg') }}" alt="{{ $gig->title }}">
-                                                {{-- <a href="#" class="listing-fav fz12"><span class="far fa-heart"></span></a> --}}
-                                            </div>
+                                            <!-- Clickable Banner Image -->
+                                            <a href="{{ route('professional.profile', $professional->username) }}" class="list-thumb d-block">
+                                                @if($professional->profile && $professional->profile->wallpaper_image)
+                                                    <img class="w-100" 
+                                                         src="{{ asset('storage/' . $professional->profile->wallpaper_image) }}" 
+                                                         alt="{{ $professional->name }}"
+                                                         style="height: 200px; object-fit: cover;">
+                                                @else
+                                                    <img class="w-100" 
+                                                         src="{{ asset('web/images/listings/g-1.jpg') }}" 
+                                                         alt="{{ $professional->name }}"
+                                                         style="height: 200px; object-fit: cover;">
+                                                @endif
+                                            </a>
+                                            
                                             <div class="list-content">
-                                                <p class="list-text body-color fz14 mb-1">{{ $gig->subcategory->name ?? 'Subcategory' }}</p>
-                                                <h5 class="list-title">
-                                                    <a href="{{ route('gigs.show', $gig->slug) }}">{{ Str::limit($gig->title, 50) }}</a>
-                                                </h5>
-                                                {{-- <div class="review-meta d-flex align-items-center">
-                                                    <i class="fas fa-star fz10 review-color me-2"></i>
-                                                    <p class="mb-0 body-color fz14">
-                                                        <span class="dark-color me-2">{{ $gig->rating ?? '0.0' }}</span>
-                                                        {{ $gig->ratings_count }} reviews
-                                                    </p>
-                                                </div> --}}
-                                                <hr class="my-2">
-                                                <div class="list-meta d-flex justify-content-between align-items-center mt15">
-                                                    <a class="d-flex" href="{{ route('professional.profile', $gig->user->username) }}">
-                                                        <span class="position-relative mr10">
-                                                            <img class="rounded-circle wa" src="{{ asset($gig->user->avatar_url ? 'storage/' . $gig->user->avatar_url : 'web/images/team/fl-s-2.png') }}" alt="Freelancer Photo" style="width: 32px; height: 32px;">
+                                                <!-- Avatar and Professional Name -->
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <a href="{{ route('professional.profile', $professional->username) }}" class="d-flex align-items-center text-decoration-none w-100">
+                                                        <span class="position-relative me-2">
+                                                            <img class="rounded-circle" 
+                                                                 src="{{ asset($professional->avatar_url ? 'storage/' . $professional->avatar_url : 'web/images/team/fl-s-2.png') }}" 
+                                                                 alt="{{ $professional->name }}" 
+                                                                 style="width: 40px; height: 40px; object-fit: cover;">
                                                             <span class="online-badges"></span>
                                                         </span>
-                                                        <div>
-                                                          <div>
-                                                            <span class="fz14 notranslate" translate="no">{{ $gig->user->name }}</span>
-                                                          </div>
-                                                          <div class="budget">
-                                                              <p class="mb-0 body-color">Starting at<span class="fz17 fw500 dark-color ms-1">€{{ $gig->starting_price }}</span></p>
-                                                          </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="mb-0 fz14 fw500 dark-color notranslate" translate="no">
+                                                                {{ $professional->name }} {{ $professional->surname }}
+                                                            </h6>
                                                         </div>
                                                     </a>
+                                                </div>
+                                                
+                                                <!-- First Service Subcategory -->
+                                                @if($professional->first_service && $professional->first_service->subcategory)
+                                                    <p class="list-text body-color fz14 mb-2">
+                                                        {{ $professional->first_service->subcategory->name }}
+                                                    </p>
+                                                @endif
+                                                
+                                                <hr class="my-2">
+                                                
+                                                <!-- Price Range -->
+                                                <div class="list-meta mt15">
+                                                    <div class="budget">
+                                                        <p class="mb-0 body-color">
+                                                            Price range
+                                                            <span class="fz17 fw500 dark-color ms-1">
+                                                                @if($professional->min_price == $professional->max_price)
+                                                                    €{{ number_format($professional->min_price, 2) }}
+                                                                @else
+                                                                    €{{ number_format($professional->min_price, 2) }} - €{{ number_format($professional->max_price, 2) }}
+                                                                @endif
+                                                            </span>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div class="col-12">
+                                        <div class="text-center py-5">
+                                            <i class="far fa-user-slash text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-3 mb-0">No professionals available in this category</p>
+                                        </div>
+                                    </div>
+                                @endforelse
 
                                 <div class="col-lg-12">
                                     <div class="text-center mt30">
-                                        {{-- <a class="ud-btn btn-light-thm bdrs60" href="{{ route('category.show', $category->slug) }}">
-                                            All Services<i class="fal fa-arrow-right-long"></i>
+                                        {{-- <a class="ud-btn btn-light-thm bdrs60" href="#">
+                                            View All Professionals<i class="fal fa-arrow-right-long"></i>
                                         </a> --}}
                                     </div>
                                 </div>

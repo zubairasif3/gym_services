@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gig;
 use App\Models\User;
+use App\Models\Service;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\ChatRoom;
@@ -114,13 +115,43 @@ class HomeController extends Controller
 
     public function index(){
 
-        $categories = Category::with([
-            'gigs' => function ($query) {
-                $query->where('gigs.is_active', true); // 👈 specify table
-            }
-        ])
-        ->where('categories.is_active', true) // 👈 specify table
-        ->get();
+        // Get categories with professionals who have active services in that category
+        $categories = Category::where('categories.is_active', true)
+            ->with([
+                'subcategories' => function($query) {
+                    $query->where('is_active', true);
+                }
+            ])
+            ->get()
+            ->map(function($category) {
+                // Get professionals who have active services in this category
+                $professionals = User::where('user_type', 3)
+                    ->whereHas('services', function($query) use ($category) {
+                        $query->where('is_active', true)
+                              ->where('category_id', $category->id);
+                    })
+                    ->with([
+                        'profile',
+                        'services' => function($query) use ($category) {
+                            $query->where('is_active', true)
+                                  ->where('category_id', $category->id)
+                                  ->with('subcategory');
+                        }
+                    ])
+                    ->take(8)
+                    ->get()
+                    ->map(function($professional) {
+                        // Calculate price range for this professional's services
+                        $prices = $professional->services->pluck('price');
+                        $professional->min_price = $prices->min();
+                        $professional->max_price = $prices->max();
+                        $professional->first_service = $professional->services->first();
+                        return $professional;
+                    });
+                
+                $category->professionals = $professionals;
+                return $category;
+            });
 
         // Get subcategories with gig count for the carousel
         $subcategories = Subcategory::withCount([
@@ -151,20 +182,46 @@ class HomeController extends Controller
         $query = $request->input('search');
         $category_id = $request->input('category_id');
 
-        $services = Gig::where('title', 'like', "%{$query}%")
-            ->orWhereHas('subcategory', function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%");
-            })
-            ->where(function($query) use ($category_id) {
+        // Search for professionals based on service titles or subcategories
+        $professionals = User::where('user_type', 3)
+            ->whereHas('services', function($q) use ($query, $category_id) {
+                $q->where('is_active', true);
+                
+                // Search by service title or subcategory name
+                $q->where(function($subQuery) use ($query) {
+                    $subQuery->where('title', 'like', "%{$query}%")
+                             ->orWhereHas('subcategory', function($sq) use ($query) {
+                                 $sq->where('name', 'like', "%{$query}%");
+                             });
+                });
+                
+                // Filter by category if provided
                 if (filter_var($category_id, FILTER_VALIDATE_INT) !== false) {
-                    $query->whereHas('subcategory', function ($q) use ($category_id) {
-                        $q->where('category_id', $category_id);
-                    });
+                    $q->where('category_id', $category_id);
                 }
             })
-            ->with(['user.profile', 'subcategory', 'images'])
-            ->get();
-        return view('web.search', compact('services', 'query'));
+            ->with([
+                'profile',
+                'services' => function($q) use ($query, $category_id) {
+                    $q->where('is_active', true)
+                      ->with('subcategory');
+                    
+                    if (filter_var($category_id, FILTER_VALIDATE_INT) !== false) {
+                        $q->where('category_id', $category_id);
+                    }
+                }
+            ])
+            ->get()
+            ->map(function($professional) {
+                // Calculate price range
+                $prices = $professional->services->pluck('price');
+                $professional->min_price = $prices->min();
+                $professional->max_price = $prices->max();
+                $professional->first_service = $professional->services->first();
+                return $professional;
+            });
+            
+        return view('web.search', compact('professionals', 'query'));
     }
 
     public function gigShow($slug)
@@ -250,51 +307,85 @@ class HomeController extends Controller
 
     public function services(Request $request, $categoryId = null, $subcategoryId = null)
     {
-        $country = $request->get('country'); // Get the country filter from the request
+        $country = $request->get('country');
         $minPrice = $request->get('min_price');
         $maxPrice = $request->get('max_price');
 
-        $categories = Category::with([
-            'subcategories',
-            'gigs' => function ($query) use ($minPrice, $maxPrice) {
-                $query->where('gigs.is_active', true); // Specify table here
+        // Get categories with professionals who have active services
+        $categories = Category::where('categories.is_active', true)
+            ->with(['subcategories' => function($query) {
+                $query->where('is_active', true);
+            }])
+            ->get()
+            ->map(function($category) use ($minPrice, $maxPrice, $country, $categoryId, $subcategoryId) {
+                // Get professionals who have active services in this category
+                $professionalsQuery = User::where('user_type', 3)
+                    ->whereHas('services', function($query) use ($category, $minPrice, $maxPrice, $subcategoryId) {
+                        $query->where('is_active', true)
+                              ->where('category_id', $category->id);
+                        
+                        // Apply price range filter
+                        if ($minPrice !== null && $minPrice !== '') {
+                            $query->where('price', '>=', $minPrice);
+                        }
+                        if ($maxPrice !== null && $maxPrice !== '') {
+                            $query->where('price', '<=', $maxPrice);
+                        }
+                        
+                        // Filter by subcategory if provided
+                        if ($subcategoryId) {
+                            $query->where('sub_category_id', $subcategoryId);
+                        }
+                    })
+                    ->with([
+                        'profile',
+                        'services' => function($query) use ($category, $subcategoryId) {
+                            $query->where('is_active', true)
+                                  ->where('category_id', $category->id)
+                                  ->with('subcategory');
+                            
+                            if ($subcategoryId) {
+                                $query->where('sub_category_id', $subcategoryId);
+                            }
+                        }
+                    ]);
                 
-                // Apply price range filter
-                if ($minPrice !== null && $minPrice !== '') {
-                    $query->where('starting_price', '>=', $minPrice);
+                // Filter by country if provided
+                if ($country) {
+                    $professionalsQuery->whereHas('profile', function($query) use ($country) {
+                        $query->where('country', $country);
+                    });
                 }
-                if ($maxPrice !== null && $maxPrice !== '') {
-                    $query->where('starting_price', '<=', $maxPrice);
-                }
-            },
-            'gigs.user.profile',
-            'gigs.images',
-            'gigs.subcategory'
-        ])
-        ->when($country, function ($query) use ($country) {
-            // If a country is provided, filter by gigs' users' profile country
-            return $query->whereHas('gigs.user.profile', function ($query) use ($country) {
-                $query->where('country', $country); // Apply the country filter
+                
+                $professionals = $professionalsQuery->get()
+                    ->map(function($professional) {
+                        // Calculate price range for this professional's services
+                        $prices = $professional->services->pluck('price');
+                        $professional->min_price = $prices->min();
+                        $professional->max_price = $prices->max();
+                        $professional->first_service = $professional->services->first();
+                        return $professional;
+                    });
+                
+                $category->professionals = $professionals;
+                return $category;
             });
-        })
-        ->where('categories.is_active', true) // Optional: Specify if you're doing joins or to avoid ambiguity
-        ->get();
 
-        // Collect all countries
+        // Collect all countries from professionals
         $countries = $categories->flatMap(function ($category) {
-            return $category->gigs->map(function ($gig) {
-                return $gig->user->profile->country;
+            return $category->professionals->map(function ($professional) {
+                return $professional->profile->country ?? null;
             });
         })->filter();
 
         // Get unique countries
         $uniqueCountries = $countries->unique();
-
-        // If you want to return the result as an array, you can call ->toArray()
         $finalCountries = $uniqueCountries->toArray();
         
-        // Get price range for the filter
-        $priceRange = Gig::where('is_active', true)->selectRaw('MIN(starting_price) as min_price, MAX(starting_price) as max_price')->first();
+        // Get price range for the filter from services
+        $priceRange = \App\Models\Service::where('is_active', true)
+            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->first();
         
         return view('web.services', compact('categories', 'categoryId', 'subcategoryId', 'finalCountries', 'priceRange', 'minPrice', 'maxPrice'));
     }
