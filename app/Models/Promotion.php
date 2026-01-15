@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Promotion extends Model
 {
     protected $fillable = [
-        'gig_id',
+        'service_id',
         'rate_per_impression',
         'impressions',
         'is_active',
     ];
 
-    public function gig()
+    public function service()
     {
-        return $this->belongsTo(Gig::class);
+        return $this->belongsTo(Service::class);
     }
 }

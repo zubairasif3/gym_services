@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Gig;
+use App\Models\Service;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -41,9 +41,9 @@ class PromotionResource extends Resource
                         Grid::make(2)
                             ->schema([
                                 // Promotion Fields
-                                Select::make('gig_id')
-                                    ->label('Select Gig')
-                                    ->relationship('gig', 'title') // Assuming your `Gig` model has a `title` column
+                                Select::make('service_id')
+                                    ->label('Select Service')
+                                    ->relationship('service', 'title')
                                     ->required(),
 
                                 TextInput::make('rate_per_impression')
@@ -57,8 +57,9 @@ class PromotionResource extends Resource
                                     ->label('Impressions')
                                     ->numeric()
                                     ->default(0)
-                                    ->minValue(0)
-                                    ->helperText('Track the total number of impressions for this gig.'),
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->helperText('Automatically tracked when the promoted service is viewed. This field is read-only.'),
 
                                 Checkbox::make('is_active')
                                     ->label('Is Active')
@@ -73,8 +74,8 @@ class PromotionResource extends Resource
         return $table
             ->columns([
                 // Columns for the table to display promotion details
-                TextColumn::make('gig.title')
-                    ->label('Gig Title')
+                TextColumn::make('service.title')
+                    ->label('Service Title')
                     ->searchable()
                     ->sortable(),
 
@@ -86,7 +87,8 @@ class PromotionResource extends Resource
                 TextColumn::make('impressions')
                     ->label('Impressions')
                     ->sortable()
-                    ->default('0'),
+                    ->default(0)
+                    ->formatStateUsing(fn ($state) => number_format($state ?? 0)),
 
                 BooleanColumn::make('is_active')
                     ->label('Active')

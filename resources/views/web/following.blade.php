@@ -55,13 +55,13 @@
                                                 <!-- Name -->
                                                 <h5 class="mb-1">
                                                     <a href="{{ route('professional.profile', $user->username) }}" 
-                                                       class="text-dark text-decoration-none">
+                                                       class="text-dark text-decoration-none notranslate" translate="no">
                                                         {{ $user->name }} {{ $user->surname }}
                                                     </a>
                                                 </h5>
                                                 
                                                 <!-- Username -->
-                                                <p class="text-muted small mb-2">@<a href="{{ route('professional.profile', $user->username) }}" class="text-muted">{{ $user->username }}</a></p>
+                                                <p class="text-muted small mb-2 notranslate" translate="no">@<a href="{{ route('professional.profile', $user->username) }}" class="text-muted">{{ $user->username }}</a></p>
                                                 
                                                 <!-- Stats -->
                                                 <div class="d-flex justify-content-center gap-3 mb-3">

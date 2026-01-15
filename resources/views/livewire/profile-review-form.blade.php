@@ -93,6 +93,16 @@
         </div>
     @endif
     
+    <script>
+        document.addEventListener('livewire:init', function () {
+            Livewire.on('reload-page', () => {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            });
+        });
+    </script>
+    
     <style>
         .rating-input .btn:hover i {
             transform: scale(1.2);

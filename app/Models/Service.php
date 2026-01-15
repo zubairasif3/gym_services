@@ -49,6 +49,14 @@ class Service extends Model
     }
 
     /**
+     * Get the promotion for this service
+     */
+    public function promotion()
+    {
+        return $this->hasOne(Promotion::class);
+    }
+
+    /**
      * Scope to get active services only
      */
     public function scopeActive($query)

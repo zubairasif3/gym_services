@@ -74,7 +74,7 @@
                                             <div class="flex-grow-1">
                                                 <div class="notification-content mb-1">
                                                     @if($notification->type === 'new_follower')
-                                                        <strong>{{ $notification->relatedUser->name ?? 'Someone' }}</strong>
+                                                        <strong class="notranslate" translate="no">{{ $notification->relatedUser->name ?? 'Someone' }}</strong>
                                                         <span class="text-muted">{{ $notification->data['message'] ?? 'started following you' }}</span>
                                                     @elseif($notification->type === 'new_message')
                                                         <strong>{{ $notification->data['sender_name'] ?? 'Someone' }}</strong>

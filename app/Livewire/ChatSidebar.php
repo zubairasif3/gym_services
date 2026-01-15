@@ -92,6 +92,10 @@ class ChatSidebar extends Component
     
     public function loadMessages()
     {
+        if (!$this->activeRoomId) {
+            return;
+        }
+        
         $room = ChatRoom::findOrFail($this->activeRoomId);
         
         // Get other user info

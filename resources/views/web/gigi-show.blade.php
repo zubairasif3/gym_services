@@ -39,7 +39,7 @@
                                     
                                     <!-- Profile Name & Info -->
                                     <div class="profile-info text-white mb-3">
-                                        <h3 class="mb-2 text-white fw-bold">{{ $gig->user->name }} {{ $gig->user->surname ?? '' }}</h3>
+                                        <h3 class="mb-2 text-white fw-bold notranslate" translate="no">{{ $gig->user->name }} {{ $gig->user->surname ?? '' }}</h3>
                                         <p class="mb-1 text-white-50" style="font-size: 0.95rem;">
                                             <i class="flaticon-goal me-2"></i>
                                             <span>Lingua: {{ $gig->user->profile->languages ?? 'English' }}</span>
@@ -218,7 +218,7 @@
                                             @endif
                                         </div>
                                         <div class="review-content flex-grow-1">
-                                            <h6 class="mb-1">{{ $review->user->name }}</h6>
+                                            <h6 class="mb-1 notranslate" translate="no">{{ $review->user->name }}</h6>
                                             <div class="text-warning mb-2">
                                                 @for($i = 1; $i <= 5; $i++)
                                                     <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
@@ -356,8 +356,8 @@
                                         {{ $gig->user->initials }}
                                     </div>
                                 @endif
-                                <h6 class="mb-1">{{ $gig->user->name }} {{ $gig->user->surname ?? '' }}</h6>
-                                <p class="text-muted small mb-0">@<span>{{ $gig->user->username ?? strtolower($gig->user->name) }}</span></p>
+                                <h6 class="mb-1 notranslate" translate="no">{{ $gig->user->name }} {{ $gig->user->surname ?? '' }}</h6>
+                                <p class="text-muted small mb-0 notranslate" translate="no">@<span>{{ $gig->user->username ?? strtolower($gig->user->name) }}</span></p>
                             </div>
                             
                             <hr>
@@ -449,7 +449,7 @@
                                         {{ $relatedGig->user->initials }}
                                     </div>
                                 @endif
-                                <small>{{ $relatedGig->user->name }}</small>
+                                <small class="notranslate" translate="no">{{ $relatedGig->user->name }}</small>
                             </div>
                             <div class="text-end">
                                 <small class="text-muted">From</small>

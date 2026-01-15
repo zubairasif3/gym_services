@@ -26,14 +26,14 @@
             </button>
         </div>
         
-        <div class="d-flex flex-grow-1 overflow-hidden">
+        <div class="d-flex flex-grow-1 overflow-hidden" wire:poll.5s="loadRooms" wire:poll.keep-alive>
             <!-- Conversations List (Left Panel) -->
             <div class="conversations-list border-end" style="width: 300px; overflow-y: auto;">
                 <div class="p-2">
                     <h6 class="px-2 py-2 text-muted small fw-bold text-uppercase">Conversations</h6>
                     
                     @forelse($rooms as $room)
-                        <div class="conversation-item p-2 rounded mb-1 {{ $activeRoomId == $room['id'] ? 'bg-primary bg-opacity-10' : '' }}" 
+                        <div class="conversation-item p-2 rounded mb-1 {{ $activeRoomId == $room['id'] ? 'bg-primary' : '' }}" 
                              wire:click="selectRoom({{ $room['id'] }})"
                              style="cursor: pointer; transition: all 0.2s;">
                              
@@ -93,7 +93,9 @@
                     <!-- Messages Area -->
                     <div class="messages-area flex-grow-1 p-3" 
                          style="overflow-y: auto; background: #f8f9fa;"
-                         id="messages-container">
+                         id="messages-container"
+                         wire:poll.2s="loadMessages"
+                         wire:poll.keep-alive>
                         @forelse($messages as $item)
                             @if($item['type'] === 'date_separator')
                                 <div class="date-separator text-center my-3">
@@ -165,7 +167,7 @@
                                 </div>
                             @endif
                             
-                            <div class="input-group">
+                            <div class="input-group" x-data="{ messageText: '' }">
                                 <!-- Emoji Toggle -->
                                 <button type="button" 
                                         wire:click="toggleEmojiPicker" 
@@ -185,6 +187,7 @@
                                 <!-- Message Input -->
                                 <input type="text" 
                                        wire:model="message" 
+                                       x-on:input="messageText = $event.target.value"
                                        class="form-control" 
                                        placeholder="Type your message..."
                                        maxlength="2000">
@@ -192,7 +195,7 @@
                                 <!-- Send Button -->
                                 <button type="submit" 
                                         class="btn btn-primary"
-                                        {{ !$message && !$attachment ? 'disabled' : '' }}>
+                                        x-bind:disabled="!messageText || !messageText.trim()">
                                     <i class="far fa-paper-plane"></i>
                                 </button>
                             </div>

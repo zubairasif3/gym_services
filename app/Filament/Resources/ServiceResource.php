@@ -91,7 +91,7 @@ class ServiceResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Pricing & Delivery')
+                Forms\Components\Section::make('Pricing') //  & Delivery
                     ->schema([
                         Forms\Components\TextInput::make('price')
                             ->required()
@@ -101,20 +101,20 @@ class ServiceResource extends Resource
                             ->step(0.01)
                             ->helperText('Service price'),
 
-                        Forms\Components\TextInput::make('delivery')
-                            ->label('Delivery Time')
-                            ->required()
-                            ->numeric()
-                            ->suffix('days')
-                            ->minValue(1)
-                            ->helperText('Expected delivery time in days'),
+                        // Forms\Components\TextInput::make('delivery')
+                        //     ->label('Delivery Time')
+                        //     ->required()
+                        //     ->numeric()
+                        //     ->suffix('days')
+                        //     ->minValue(1)
+                        //     ->helperText('Expected delivery time in days'),
 
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
                             ->default(true)
                             ->helperText('Set whether this service is active and visible'),
                     ])
-                    ->columns(3),
+                    ->columns(2),
             ]);
     }
 
@@ -122,10 +122,36 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->sortable()
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('row_number')
+                    ->label('#')
+                    ->getStateUsing(function ($record, $livewire) {
+                        try {
+                            $records = $livewire->getTableRecords();
+                            $currentPage = $livewire->tablePage ?? 1;
+                            $perPage = $livewire->tableRecordsPerPage ?? 10;
+                            
+                            // Find the index of the current record
+                            $index = $records->search(function ($item) use ($record) {
+                                return $item->id === $record->id;
+                            });
+                            
+                            // Calculate row number based on page and index
+                            return (($currentPage - 1) * $perPage) + $index + 1;
+                        } catch (\Exception $e) {
+                            // Fallback: use a simple counter
+                            static $counter = 0;
+                            $currentPage = $livewire->tablePage ?? 1;
+                            $perPage = $livewire->tableRecordsPerPage ?? 10;
+                            static $lastPage = null;
+                            
+                            if ($lastPage !== $currentPage) {
+                                $counter = ($currentPage - 1) * $perPage;
+                                $lastPage = $currentPage;
+                            }
+                            
+                            return ++$counter;
+                        }
+                    }),
 
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Professional')
@@ -150,19 +176,19 @@ class ServiceResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                // Tables\Columns\TextColumn::make('subcategory.name')
-                //     ->label('Subcategory')
-                //     ->sortable()
-                //     ->searchable(),
+                Tables\Columns\TextColumn::make('subcategory.name')
+                    ->label('Subcategory')
+                    ->sortable()
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('price')
                     ->money('EUR')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('delivery')
-                    ->label('Delivery')
-                    ->sortable()
-                    ->suffix(' days'),
+                // Tables\Columns\TextColumn::make('delivery')
+                //     ->label('Delivery')
+                //     ->sortable()
+                //     ->suffix(' days'),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')

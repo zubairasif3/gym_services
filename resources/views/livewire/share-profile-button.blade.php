@@ -9,8 +9,9 @@
     </button>
     
     @if($showDropdown)
-        <div class="share-dropdown position-absolute bg-white shadow-lg rounded-3 p-3" 
-             style="top: 100%; right: 0; z-index: 1000; min-width: 220px; margin-top: 8px;">
+        <div class="share-dropdown position-fixed bg-white shadow-lg rounded-3 p-3" 
+             id="share-dropdown"
+             style="z-index: 10000; min-width: 220px;">
             <div class="d-flex flex-column gap-2">
                 <button wire:click="share('facebook')" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-primary">
                     <i class="fab fa-facebook text-primary"></i> <span class="notranslate">Facebook</span>
@@ -78,10 +79,34 @@
             });
         });
         
+        // Update dropdown position when it opens
+        function updateDropdownPosition() {
+            const dropdown = document.getElementById('share-dropdown');
+            const wrapper = document.querySelector('.share-button-wrapper');
+            if (dropdown && wrapper && dropdown.offsetParent !== null) {
+                const button = wrapper.querySelector('button');
+                if (button) {
+                    const rect = button.getBoundingClientRect();
+                    dropdown.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+                }
+            }
+        }
+        
+        // Update position on Livewire updates (when dropdown state changes)
+        document.addEventListener('livewire:update', () => {
+            setTimeout(updateDropdownPosition, 10);
+        });
+        
+        // Update position when window resizes or scrolls
+        window.addEventListener('resize', updateDropdownPosition);
+        window.addEventListener('scroll', updateDropdownPosition, true);
+        
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const wrapper = event.target.closest('.share-button-wrapper');
-            if (!wrapper) {
+            const dropdown = document.getElementById('share-dropdown');
+            if (!wrapper && dropdown && dropdown.offsetParent !== null) {
                 @this.set('showDropdown', false);
             }
         });

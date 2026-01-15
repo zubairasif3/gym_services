@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gig;
 use App\Models\User;
 use App\Models\Service;
+use App\Models\Promotion;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\ChatRoom;
@@ -153,14 +154,14 @@ class HomeController extends Controller
                 return $category;
             });
 
-        // Get subcategories with gig count for the carousel
+        // Get subcategories with service count for the carousel
         $subcategories = Subcategory::withCount([
-            'gigs' => function ($query) {
+            'services' => function ($query) {
                 $query->where('is_active', true);
             }
         ])
         ->where('is_active', true)
-        ->having('gigs_count', '>', 0) // Ensure at least 1 active gig
+        ->having('services_count', '>', 0) // Ensure at least 1 active service
         ->take(10) // Limit to 10 subcategories for the carousel
         ->get();
 
@@ -174,6 +175,10 @@ class HomeController extends Controller
         ];
 
         $testimonials = $this->getDummyTestimonials(4);
+
+        // Note: Impressions are NOT tracked here because only professional cards are shown,
+        // not individual services. Impressions are tracked when services are explicitly displayed
+        // (e.g., on the professional profile page).
 
         return view('web.index', compact('categories', 'subcategories', 'staticImages', 'testimonials'));
     }
@@ -220,6 +225,10 @@ class HomeController extends Controller
                 $professional->first_service = $professional->services->first();
                 return $professional;
             });
+        
+        // Note: Impressions are NOT tracked here because only professional cards are shown,
+        // not individual services. Impressions are tracked when services are explicitly displayed
+        // (e.g., on the professional profile page).
             
         return view('web.search', compact('professionals', 'query'));
     }
@@ -279,6 +288,22 @@ class HomeController extends Controller
             $breakdown[$i] = $gig->reviews()->where('rating', $i)->count();
         }
         return $breakdown;
+    }
+
+    /**
+     * Track impressions for promoted services
+     */
+    private function trackPromotedServiceImpressions($services)
+    {
+        foreach ($services as $service) {
+            $promotion = Promotion::where('service_id', $service->id)
+                ->where('is_active', true)
+                ->first();
+            
+            if ($promotion) {
+                $promotion->increment('impressions');
+            }
+        }
     }
 
     public function contact(){
@@ -386,6 +411,10 @@ class HomeController extends Controller
         $priceRange = \App\Models\Service::where('is_active', true)
             ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
             ->first();
+        
+        // Note: Impressions are NOT tracked here because only professional cards are shown,
+        // not individual services. Impressions are tracked when services are explicitly displayed
+        // (e.g., on the professional profile page).
         
         return view('web.services', compact('categories', 'categoryId', 'subcategoryId', 'finalCountries', 'priceRange', 'minPrice', 'maxPrice'));
     }

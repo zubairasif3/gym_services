@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Stripe\Stripe;
-use App\Models\Gig;
+use App\Models\Service;
 use App\Models\User;
 use Stripe\Customer;
 use Stripe\SetupIntent;
@@ -35,13 +35,14 @@ class StripeService
 
         return response()->json(['clientSecret' => $setupIntent->client_secret]);
     }
-    public function chargeSeller(Gig $gig)
+    
+    public function chargeSeller(Service $service)
     {
-        $seller = $gig->user;
+        $seller = $service->user;
 
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        $amount = $gig->promotion->rate_per_impression * 100; // in cents
+        $amount = $service->promotion->rate_per_impression * 100; // in cents
 
         $paymentIntent = PaymentIntent::create([
             'amount' => $amount,
@@ -50,7 +51,7 @@ class StripeService
             'payment_method' => $seller->default_payment_method,
             'off_session' => true,
             'confirm' => true,
-            'description' => "Promotion charge for gig ID: {$gig->id}",
+            'description' => "Promotion charge for Service: {$service->title} (ID: {$service->id})",
         ]);
 
         // You can now record the transaction in your DB...

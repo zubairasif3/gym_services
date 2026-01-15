@@ -82,13 +82,13 @@ class ProfileReviewForm extends Component
         $this->reset(['rating', 'comment']);
         $this->hasReviewed = true;
         
-        // Dispatch event to refresh reviews list
+        // Dispatch event to refresh reviews list and reload page
         $this->dispatch('profile-review-submitted');
         
         session()->flash('message', 'Thank you for your review!');
         
-        // Redirect to refresh the page and show new review
-        return redirect()->to(request()->url());
+        // Use JavaScript to reload the page to show the new review
+        $this->dispatch('reload-page');
     }
     
     public function render()

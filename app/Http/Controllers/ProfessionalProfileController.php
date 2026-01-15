@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Gig;
+use App\Models\Service;
+use App\Models\Promotion;
 use App\Models\ProfileMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
 
 class ProfessionalProfileController extends Controller
 {
@@ -61,6 +66,11 @@ class ProfessionalProfileController extends Controller
                 1 => $user->profileReviews()->where('rating', 1)->count(),
             ]
         ];
+        
+        // Track impressions for promoted services (only if viewing someone else's profile)
+        if (!auth()->check() || auth()->id() !== $user->id) {
+            $this->trackPromotedServiceImpressions($user->services);
+        }
         
         return view('web.professional-profile', compact('user', 'isFollowing', 'subcategories', 'reviewStats'));
     }
@@ -233,14 +243,41 @@ class ProfessionalProfileController extends Controller
         
         $user->load([
             'profile',
-            'activeProfileMedia',
-            'gigs' => function($query) {
+            'activeProfileMedia.reactions',
+            'services' => function($query) {
                 $query->where('is_active', true)
-                      ->with(['images', 'packages'])
+                      ->with(['category', 'subcategory'])
                       ->latest();
             },
-            'gigs.subcategory'
-        ]);
+            'profileReviews' => function($query) {
+                $query->with('reviewer.profile')
+                    ->recent()
+                    ->limit(5);
+            }
+        ])
+        ->loadCount('profileReviews');
+        
+        // Get reaction counts for each media
+        foreach ($user->activeProfileMedia as $media) {
+            $media->reactionCounts = $media->reactions()
+                ->selectRaw('emoji, COUNT(*) as count')
+                ->groupBy('emoji')
+                ->pluck('count', 'emoji')
+                ->toArray();
+        }
+        
+        // Calculate review stats
+        $reviewStats = [
+            'total' => $user->profileReviews()->count(),
+            'average' => round($user->profileReviews()->avg('rating'), 1),
+            'distribution' => [
+                5 => $user->profileReviews()->where('rating', 5)->count(),
+                4 => $user->profileReviews()->where('rating', 4)->count(),
+                3 => $user->profileReviews()->where('rating', 3)->count(),
+                2 => $user->profileReviews()->where('rating', 2)->count(),
+                1 => $user->profileReviews()->where('rating', 1)->count(),
+            ]
+        ];
         
         $isFollowing = false; // Preview mode, not following
         $subcategories = $user->subcategories()->where('is_active', true)->get();
@@ -249,6 +286,7 @@ class ProfessionalProfileController extends Controller
             'user' => $user,
             'isFollowing' => $isFollowing,
             'subcategories' => $subcategories,
+            'reviewStats' => $reviewStats,
             'isPreview' => true
         ]);
     }
@@ -386,5 +424,71 @@ class ProfessionalProfileController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Track impressions for promoted services and charge the professional
+     */
+    private function trackPromotedServiceImpressions($services)
+    {
+        foreach ($services as $service) {
+            $promotion = Promotion::where('service_id', $service->id)
+                ->where('is_active', true)
+                ->first();
+            
+            if ($promotion) {
+                // Increment impressions counter
+                $promotion->increment('impressions');
+                
+                // Charge the professional for this impression
+                $this->chargeProfessionalForImpression($promotion, $service);
+            }
+        }
+    }
+
+    /**
+     * Charge professional user for promotion impression
+     */
+    private function chargeProfessionalForImpression($promotion, $service)
+    {
+        try {
+            $professional = $service->user;
+            
+            // Check if professional has payment method set up
+            if (!$professional->stripe_customer_id || !$professional->default_payment_method) {
+                Log::warning("Professional {$professional->id} does not have payment method set up for promotion charges");
+                return;
+            }
+
+            // Calculate charge amount (rate_per_impression in dollars, convert to cents)
+            $amount = (int)($promotion->rate_per_impression * 100);
+            
+            if ($amount <= 0) {
+                Log::warning("Invalid promotion rate for service {$service->id}: {$promotion->rate_per_impression}");
+                return;
+            }
+
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            // Charge the professional
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $amount,
+                'currency' => 'usd',
+                'customer' => $professional->stripe_customer_id,
+                'payment_method' => $professional->default_payment_method,
+                'off_session' => true,
+                'confirm' => true,
+                'description' => "Promotion charge for Service: {$service->title} (ID: {$service->id}) - 1 impression",
+            ]);
+
+            Log::info("Charged professional {$professional->id} amount {$amount} cents for service {$service->id} impression");
+            
+        } catch (\Stripe\Exception\CardException $e) {
+            // Card was declined
+            Log::error("Card declined for professional {$professional->id} on service {$service->id}: " . $e->getMessage());
+        } catch (\Exception $e) {
+            // Other errors
+            Log::error("Error charging professional {$professional->id} for service {$service->id}: " . $e->getMessage());
+        }
     }
 }

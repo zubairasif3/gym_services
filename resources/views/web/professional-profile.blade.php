@@ -31,305 +31,310 @@
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
 
-.skill-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 5px;
-    background: #f0f2f5;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-}
+    .skill-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        margin: 5px;
+        background: #f0f2f5;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
 
-/* Info Box Styles */
-.info-box {
-    padding: 12px 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    border-left: 3px solid #00b3f1;
-    transition: all 0.3s ease;
-}
+    /* Info Box Styles */
+    .info-box {
+        padding: 12px 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        border-left: 3px solid #00b3f1;
+        transition: all 0.3s ease;
+    }
 
-.info-box:hover {
-    background: #e9ecef;
-    border-left-width: 4px;
-}
+    .info-box:hover {
+        background: #e9ecef;
+        border-left-width: 4px;
+    }
 
-.info-box i {
-    font-size: 1.2rem;
-}
+    .info-box i {
+        font-size: 1.2rem;
+    }
 
-/* Service Gallery / Media Carousel Styles */
-/* .service-gallery {
-    margin-bottom: 2rem;
-} */
+    /* Service Gallery / Media Carousel Styles */
+    /* .service-gallery {
+        margin-bottom: 2rem;
+    } */
 
-.media-carousel-wrapper {
-    position: relative;
-    padding: 0 50px;
-}
+    .media-carousel-wrapper {
+        position: relative;
+        padding: 0 50px;
+    }
 
-.media-carousel-container {
-    overflow: hidden;
-    border-radius: 12px;
-}
+    .media-carousel-container {
+        overflow: hidden;
+        border-radius: 12px;
+    }
 
-.media-carousel-track {
-    display: flex;
-    gap: 20px;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    .media-carousel-track {
+        display: flex;
+        gap: 20px;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-.media-carousel-item {
-    flex: 0 0 auto;
-    width: 100%;
-}
+    .media-carousel-item {
+        flex: 0 0 auto;
+        width: 100%;
+    }
 
-.media-content {
-    position: relative;
-    width: 100%;
-    max-height: 500px;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    background: #f8f9fa;
-}
+    .media-content {
+        position: relative;
+        width: 100%;
+        max-height: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        background: #f8f9fa;
+    }
 
-.media-content img,
-.media-content video {
-    width: 100%;
-    height: 100%;
-    max-height: 500px;
-    object-fit: cover;
-}
+    .media-content img,
+    .media-content video {
+        width: 100%;
+        height: 100%;
+        max-height: 500px;
+        object-fit: cover;
+    }
 
-.video-play-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
-    background: rgba(0, 179, 241, 0.9);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    pointer-events: none;
-}
+    .video-play-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 179, 241, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        pointer-events: none;
+    }
 
-.video-duration {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-}
+    .video-duration {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+    }
 
-.carousel-nav-btn {
-    position: absolute;
-    top: 40%;
-    transform: translateY(-50%);
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: white;
-    border: 2px solid #00b3f1;
-    color: #00b3f1;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-}
+    .carousel-nav-btn {
+        position: absolute;
+        top: 40%;
+        transform: translateY(-50%);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #00b3f1;
+        color: #00b3f1;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
 
-.carousel-nav-btn:hover:not(:disabled) {
-    background: #00b3f1;
-    color: white;
-    transform: translateY(-50%) scale(1.1);
-}
+    .carousel-nav-btn:hover:not(:disabled) {
+        background: #00b3f1;
+        color: white;
+        transform: translateY(-50%) scale(1.1);
+    }
 
-.carousel-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
+    .carousel-nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
 
-.carousel-nav-btn.prev {
-    left: 0;
-}
+    .carousel-nav-btn.prev {
+        left: 0;
+    }
 
-.carousel-nav-btn.next {
-    right: 0;
-}
+    .carousel-nav-btn.next {
+        right: 0;
+    }
 
-.service-reactions {
-    margin-bottom: 2rem;
-}
+    .service-reactions {
+        margin-bottom: 0;
+        margin-top: 2rem;
+    }
+    
+    .media-reaction-container {
+        margin-bottom: 2.5rem;
+    }
 
-/* Emoji Reaction Bar Styles */
-/* .reaction-emoji-bar {
-    background: white;
-    border-radius: 50px;
-    padding: 8px 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: inline-flex;
-    gap: 5px;
-} */
+    /* Emoji Reaction Bar Styles */
+    /* .reaction-emoji-bar {
+        background: white;
+        border-radius: 50px;
+        padding: 8px 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: inline-flex;
+        gap: 5px;
+    } */
 
-.emoji-bar-container {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
+    .emoji-bar-container {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
 
-.emoji-bar-item {
-    background: white;
-    border: 2px solid transparent;
-    border-radius: 30px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    /* flex-direction: column; */
-    align-items: center;
-    gap: 2px;
-    min-width: 50px;
-}
-
-.emoji-bar-item:hover {
-    transform: translateY(-3px);
-    border-color: #00b3f1;
-    background: #f0f9ff;
-}
-
-.emoji-bar-item.active {
-    border-color: #00b3f1;
-    background: linear-gradient(135deg, #e3f5ff 0%, #f0f9ff 100%);
-}
-
-.emoji-icon-bar {
-    font-size: 20px;
-    line-height: 1;
-}
-
-.emoji-count-bar {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #00b3f1;
-    line-height: 1;
-}
-
-@media (max-width: 768px) {
     .emoji-bar-item {
-        min-width: 45px;
-        padding: 6px 10px;
+        background: white;
+        border: 2px solid transparent;
+        border-radius: 30px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        /* flex-direction: column; */
+        align-items: center;
+        gap: 2px;
+        min-width: 50px;
     }
-    
+
+    .emoji-bar-item:hover {
+        transform: translateY(-3px);
+        border-color: #00b3f1;
+        background: #f0f9ff;
+    }
+
+    .emoji-bar-item.active {
+        border-color: #00b3f1;
+        background: linear-gradient(135deg, #e3f5ff 0%, #f0f9ff 100%);
+    }
+
     .emoji-icon-bar {
-        font-size: 1.3rem;
+        font-size: 20px;
+        line-height: 1;
     }
-    
+
     .emoji-count-bar {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #00b3f1;
+        line-height: 1;
     }
-}
 
-/* Media Thumbnails Styles */
-.media-thumbnails-container {
-    margin-top: 1.5rem;
-}
+    @media (max-width: 768px) {
+        .emoji-bar-item {
+            min-width: 45px;
+            padding: 6px 10px;
+        }
+        
+        .emoji-icon-bar {
+            font-size: 1.3rem;
+        }
+        
+        .emoji-count-bar {
+            font-size: 0.65rem;
+        }
+    }
 
-.media-thumbnails-grid {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+    /* Media Thumbnails Styles */
+    .media-thumbnails-container {
+        margin-top: 3rem;
+    }
 
-.media-thumbnail-card {
-    width: 80px;
-    height: 80px;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 3px solid transparent;
-    transition: all 0.3s ease;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+    .media-thumbnails-grid {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-.media-thumbnail-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    border-color: #00b3f1;
-}
-
-.media-thumbnail-card.active {
-    border-color: #00b3f1;
-    box-shadow: 0 4px 12px rgba(0, 179, 241, 0.4);
-}
-
-.media-thumbnail-card img,
-.media-thumbnail-card video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.thumbnail-video-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    background: rgba(0, 179, 241, 0.9);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 10px;
-    pointer-events: none;
-}
-
-@media (max-width: 768px) {
     .media-thumbnail-card {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    
+
+    .media-thumbnail-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        border-color: #00b3f1;
+    }
+
+    .media-thumbnail-card.active {
+        border-color: #00b3f1;
+        box-shadow: 0 4px 12px rgba(0, 179, 241, 0.4);
+    }
+
+    .media-thumbnail-card img,
+    .media-thumbnail-card video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
     .thumbnail-video-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 8px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        background: rgba(0, 179, 241, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        pointer-events: none;
     }
-}
 
-.hover-shadow {
-    transition: all 0.3s ease;
-}
+    @media (max-width: 768px) {
+        .media-thumbnail-card {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .thumbnail-video-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 8px;
+        }
+    }
 
-.hover-shadow:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    transform: translateY(-2px);
-}
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
 
-.service-card {
-    transition: all 0.3s ease;
-}
+    .hover-shadow:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-2px);
+    }
 
-.service-card:hover {
-    border-color: #00b3f1 !important;
-}
+    .service-card {
+        transition: all 0.3s ease;
+    }
+
+    .service-card:hover {
+        border-color: #00b3f1 !important;
+    }
 
     /* Media Gallery Styles */
     .profile-media-slider-wrapper {
@@ -586,24 +591,32 @@
         border-radius: 12px;
     }
 
-    .pricing-card .nav-pills .nav-link {
+    .service-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .service-item {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
         border-radius: 8px;
-        padding: 10px 15px;
+        padding: 12px 15px;
         font-weight: 500;
-        color: #6c757d;
+        color: #212529;
+        cursor: pointer;
         transition: all 0.3s ease;
-        border: 2px solid transparent;
+        position: relative;
     }
 
-    .pricing-card .nav-pills .nav-link:hover {
-        background-color: #f0f9ff;
-        color: #00b3f1;
+    .service-item:hover {
+        background-color: #e9ecef;
     }
 
-    .pricing-card .nav-pills .nav-link.active {
-        background-color: #00b3f1;
-        color: white;
-        border-color: #00b3f1;
+    .service-item.active {
+        background-color: #f8f9fa;
+        border-left: 4px solid #00b3f1;
+        padding-left: 13px;
     }
 
     .pricing-card h3 {
@@ -650,6 +663,32 @@
         border-color: #00b3f1;
         transform: translateY(-2px);
     }
+
+    /* Fix z-index for share dropdown to appear above services */
+    .share-button-wrapper {
+        position: relative;
+        z-index: 9999 !important;
+    }
+    
+    .share-dropdown {
+        z-index: 10000 !important;
+        position: fixed !important;
+    }
+    
+    .pricing-card.sticky-top {
+        z-index: 10;
+    }
+    
+    /* Ensure services section doesn't create stacking context */
+    .col-lg-4 {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .col-lg-8 {
+        position: relative;
+        z-index: 1;
+    }
 </style>
 
 <!-- Professional Header Section -->
@@ -668,7 +707,7 @@
                     <div class="container">
                         <div class="row align-items-end">
                             <div class="col-md-8">
-                                <div class="d-flex align-items-end gap-4">
+                                <div class="d-flex align-items-center gap-4">
                                     <!-- Profile Avatar -->
                                     <div class="profile-avatar-large">
                                         @if($user->avatar_url)
@@ -686,16 +725,16 @@
                                     </div>
                                     
                                     <!-- Profile Name & Info -->
-                                    <div class="profile-info text-white mb-3">
-                                        <h3 class="mb-2 text-white fw-bold">{{ $user->name }} {{ $user->surname ?? '' }}</h3>
-                                        <p class="mb-1 text-white-50" style="font-size: 0.95rem;">
+                                    <div class="profile-info text-white">
+                                        <h3 class="mb-2 text-white fw-bold notranslate" translate="no">{{ $user->name }} {{ $user->surname ?? '' }}</h3>
+                                        {{-- <p class="mb-1 text-white-50" style="font-size: 0.95rem;">
                                             <i class="flaticon-goal me-2"></i>
                                             <span>Lingua: {{ $user->profile->languages ?? 'English' }}</span>
                                         </p>
                                         <p class="mb-0 text-white-50" style="font-size: 0.95rem;">
                                             <i class="flaticon-tracking me-2"></i>
                                             <span>Posizione: {{ $user->profile->city ?? 'New York' }}</span>
-                                        </p>
+                                        </p> --}}
                                     </div>
                                 </div>
                             </div>
@@ -808,7 +847,7 @@
                         @endforeach
                         
                         <!-- Media Thumbnails -->
-                        <div class="media-thumbnails-container mt-4">
+                        <div class="media-thumbnails-container">
                             <div class="media-thumbnails-grid">
                                 @foreach($user->activeProfileMedia as $index => $media)
                                     <div class="media-thumbnail-card {{ $index === 0 ? 'active' : '' }}" 
@@ -845,6 +884,22 @@
                 </div>
                 @endif
                 
+                <!-- About Section -->
+                @if($user->profile && $user->profile->about)
+                <div class="mb-4">
+                    <h5 class="mb-3">
+                        <i class="far fa-align-left text-primary me-2"></i> About
+                    </h5>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <p class="mb-0 text-muted" style="font-size: 1rem; line-height: 1.6;"> {{-- white-space: pre-wrap;--}}
+                                {{ $user->profile->about }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
                 <!-- Reviews Section -->
                 <div class="reviews-section mb-5">
                     <h4 class="mb-4">
@@ -872,7 +927,7 @@
                                             @endif
                                         </div>
                                         <div class="review-content flex-grow-1">
-                                            <h6 class="mb-1">{{ $review->reviewer->name }}</h6>
+                                            <h6 class="mb-1 notranslate" translate="no">{{ $review->reviewer->name }}</h6>
                                             <div class="text-warning mb-2">
                                                 @for($i = 1; $i <= 5; $i++)
                                                     <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
@@ -928,20 +983,15 @@
                 @if($user->services && $user->services->count() > 0)
                 <div class="pricing-card card shadow-sm mb-4 sticky-top" style="top: 20px;">
                     <div class="card-body">
-                        <!-- Service Tabs -->
-                        <ul class="nav nav-pills nav-justified mb-3" role="tablist">
+                        <!-- Service List -->
+                        <div class="service-list mb-3">
                             @foreach($user->services as $index => $service)
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link {{ $index == 0 ? 'active' : '' }}" 
-                                            id="service-{{ $index }}-tab" 
-                                            data-bs-toggle="tab" 
-                                            data-bs-target="#service-{{ $index }}" 
-                                            type="button">
-                                        {{ $service->title }}
-                                    </button>
-                                </li>
+                                <div class="service-item {{ $index == 0 ? 'active' : '' }}" 
+                                     data-service-index="{{ $index }}">
+                                    {{ $service->title }}
+                                </div>
                             @endforeach
-                        </ul>
+                        </div>
                         
                         <!-- Service Content -->
                         <div class="tab-content">
@@ -951,12 +1001,12 @@
                                     <h3 class="text-primary mb-3">€{{ number_format($service->price, 2) }}</h3>
                                     <h6 class="mb-2">{{ $service->title }}</h6>
                                     <p class="text-muted small mb-3">{!! strip_tags($service->description) !!}</p>
-                                    <ul class="list-unstyled mb-3">
+                                    {{-- <ul class="list-unstyled mb-3">
                                         <li class="mb-2">
                                             <i class="flaticon-sandclock text-primary me-2"></i>
                                             {{ $service->delivery }} Days Delivery
                                         </li>
-                                    </ul>
+                                    </ul> --}}
                                 </div>
                             @endforeach
                         </div>
@@ -993,6 +1043,47 @@
                     <div class="card-body text-center py-5">
                         <i class="far fa-briefcase text-muted" style="font-size: 2.5rem;"></i>
                         <p class="text-muted mt-3 mb-0">No services available</p>
+                    </div>
+                </div>
+                @endif
+                
+                <!-- Skills Section -->
+                @if($user->profile && $user->profile->skills)
+                    @php
+                        $skills = is_string($user->profile->skills) 
+                            ? (json_decode($user->profile->skills, true) ?? explode(',', $user->profile->skills))
+                            : ($user->profile->skills ?? []);
+                        $skills = is_array($skills) ? $skills : [];
+                        $skills = array_filter(array_map('trim', $skills));
+                    @endphp
+                    @if(count($skills) > 0)
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="mb-3">
+                                <i class="far fa-star text-primary me-2"></i> Skills
+                            </h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach($skills as $skill)
+                                    <span class="skill-badge">
+                                        {{ trim($skill) }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                @endif
+                
+                <!-- Bio Section -->
+                @if($user->profile && $user->profile->bio)
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3">
+                            <i class="far fa-quote-left text-primary me-2"></i> Bio
+                        </h5>
+                        <p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">
+                            {{ $user->profile->bio }}
+                        </p>
                     </div>
                 </div>
                 @endif
@@ -1047,7 +1138,7 @@
                                     @endif
                                 </div>
                                 <div class="review-content flex-grow-1">
-                                    <h6 class="mb-1">{{ $review->reviewer->name }}</h6>
+                                    <h6 class="mb-1 notranslate" translate="no">{{ $review->reviewer->name }}</h6>
                                     <div class="text-warning mb-2">
                                         @for($i = 1; $i <= 5; $i++)
                                             <i class="fas fa-star{{ $i <= $review->rating ? '' : '-o' }}"></i>
@@ -1072,6 +1163,37 @@
     function openChatWith(userId) {
         Livewire.dispatch('open-chat-sidebar', { userId: userId });
     }
+    
+    // Service item click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const serviceItems = document.querySelectorAll('.service-item');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        serviceItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                const serviceIndex = this.getAttribute('data-service-index');
+                
+                // Remove active class from all service items
+                serviceItems.forEach(function(serviceItem) {
+                    serviceItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked service item
+                this.classList.add('active');
+                
+                // Hide all tab panes
+                tabPanes.forEach(function(pane) {
+                    pane.classList.remove('show', 'active');
+                });
+                
+                // Show the corresponding tab pane
+                const targetPane = document.getElementById('service-' + serviceIndex);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
     
     // Media Carousel
     let currentMediaIndex = 0;

@@ -89,7 +89,7 @@
                             <div class="col-md-2 ">
                                 <div style="margin-top: 34px;">
                                     <button type="submit" class="btn btn-primary rounded-pill shadow-sm fw-semibold w-100" style="height: 38px;">
-                                        <i class="fas fa-search me-1"></i>Apply
+                                        <i class="fas fa-search me-1"></i>Search
                                     </button>
                                 </div>
                             </div>
