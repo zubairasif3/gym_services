@@ -112,6 +112,31 @@
                                             <div class="message-text">{{ $item['message'] }}</div>
                                         @endif
                                         
+                                        @if(isset($item['button_data']) && $item['button_data'] && isset($item['button_data']['buttons']))
+                                            <div class="message-buttons mt-3 d-flex gap-2 flex-wrap">
+                                                @foreach($item['button_data']['buttons'] as $button)
+                                                    @php
+                                                        $buttonClass = match($button['style'] ?? 'primary') {
+                                                            'primary' => 'btn-primary',
+                                                            'danger' => 'btn-danger',
+                                                            'success' => 'btn-success',
+                                                            'warning' => 'btn-warning',
+                                                            default => 'btn-secondary'
+                                                        };
+                                                    @endphp
+                                                    <button 
+                                                        wire:click="handleButtonAction({{ $item['id'] }}, '{{ $button['action'] }}')"
+                                                        class="btn btn-sm {{ $buttonClass }}"
+                                                        @if($button['action'] === 'appointment_cancel' && isset($item['button_data']['appointment_id']))
+                                                            onclick="checkCancellationTime({{ $item['button_data']['appointment_id'] }})"
+                                                        @endif
+                                                    >
+                                                        {{ $button['label'] }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        
                                         @if($item['attachment_path'])
                                             <div class="attachment mt-2">
                                                 @if($item['attachment_type'] === 'image')
@@ -338,7 +363,66 @@ body.chat-open {
                 }
             }, 100);
         });
+        
+        // Handle cancellation modal
+        Livewire.on('show-cancel-modal', (event) => {
+            const appointmentId = event[0];
+            const reason = prompt('Please provide a cancellation reason (optional):');
+            
+            if (reason !== null) {
+                fetch(`/appointments/${appointmentId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cancellation_reason: reason || null
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Appointment cancelled successfully!');
+                        Livewire.dispatch('message-sent');
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to cancel appointment'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }
+        });
     });
+    
+    function checkCancellationTime(appointmentId) {
+        // This will be handled by the backend, but we can add a visual check here
+        return true;
+    }
 </script>
+
+<!-- Cancellation Modal -->
+<div id="cancel-modal" class="modal fade" tabindex="-1" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this appointment?</p>
+                <label class="form-label">Cancellation Reason (Optional):</label>
+                <textarea id="cancel-reason" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="confirm-cancel-btn">Cancel Appointment</button>
+            </div>
+        </div>
+    </div>
+</div>
     @endif
 </div>

@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/room/{chatRoom}/send', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
     Route::post('/chat/upload-attachment', [App\Http\Controllers\ChatController::class, 'uploadAttachment'])->name('chat.upload');
     Route::get('/api/chat/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('chat.unread-count');
+    Route::post('/chat/message/{messageId}/button-action', [App\Http\Controllers\ChatController::class, 'handleButtonAction'])->name('chat.button-action');
     
     // Professional Profile Routes
     Route::get('/profile/edit', [App\Http\Controllers\ProfessionalProfileController::class, 'edit'])->name('profile.edit');
@@ -92,10 +93,36 @@ Route::middleware('auth')->group(function () {
     // Service Routes (Professional Users Only)
     Route::resource('services', App\Http\Controllers\ServiceController::class);
     Route::get('/api/services/subcategories/{categoryId}', [App\Http\Controllers\ServiceController::class, 'getSubcategories'])->name('services.subcategories');
+    
+    // Appointment Routes
+    Route::post('/appointments', [App\Http\Controllers\AppointmentController::class, 'store'])->name('appointments.store');
+    Route::get('/appointments/available-slots', [App\Http\Controllers\AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
+    
+    // Client appointment routes
+    Route::post('/appointments/{appointment}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancelByClient'])->name('appointments.cancel.client');
+    
+    // Professional appointment routes
+    Route::post('/appointments/{appointment}/confirm', [App\Http\Controllers\AppointmentController::class, 'confirm'])->name('appointments.confirm');
+    Route::post('/appointments/{appointment}/cancel-professional', [App\Http\Controllers\AppointmentController::class, 'cancelByProfessional'])->name('appointments.cancel.professional');
+    Route::post('/appointments/external', [App\Http\Controllers\AppointmentController::class, 'storeExternal'])->name('appointments.store.external');
+    Route::get('/appointments/calendar-data', [App\Http\Controllers\AppointmentController::class, 'calendarData'])->name('appointments.calendar.data');
+    
+    // Service Availability Routes
+    Route::get('/api/service-availabilities', [App\Http\Controllers\ServiceAvailabilityController::class, 'index'])->name('service-availabilities.index');
+    Route::post('/api/service-availabilities', [App\Http\Controllers\ServiceAvailabilityController::class, 'store'])->name('service-availabilities.store');
+    Route::put('/api/service-availabilities/{serviceAvailability}', [App\Http\Controllers\ServiceAvailabilityController::class, 'update'])->name('service-availabilities.update');
+    Route::delete('/api/service-availabilities/{serviceAvailability}', [App\Http\Controllers\ServiceAvailabilityController::class, 'destroy'])->name('service-availabilities.destroy');
+    Route::post('/api/service-availabilities/replicate', [App\Http\Controllers\ServiceAvailabilityController::class, 'replicate'])->name('service-availabilities.replicate');
+    Route::post('/api/service-availabilities/bulk-create', [App\Http\Controllers\ServiceAvailabilityController::class, 'bulkCreate'])->name('service-availabilities.bulk-create');
 });
 
 // Public Professional Profile
 Route::get('/@{username}', [App\Http\Controllers\ProfessionalProfileController::class, 'show'])->name('professional.profile');
+
+// Public Appointment Routes
+Route::get('/appointments/book/{username}', [App\Http\Controllers\AppointmentController::class, 'book'])->name('appointments.book');
+Route::get('/appointments/book/{username}/calendar-data', [App\Http\Controllers\AppointmentController::class, 'publicCalendarData'])->name('appointments.book.calendar-data');
+Route::get('/appointments/book/{username}/available-slots', [App\Http\Controllers\AppointmentController::class, 'publicAvailableSlots'])->name('appointments.book.available-slots');
 
 // Public Gig Review Routes
 Route::get('/api/gigs/{gig}/reviews', [App\Http\Controllers\GigReviewController::class, 'index'])->name('gigs.reviews.index');

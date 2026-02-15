@@ -283,4 +283,52 @@ class ChatController extends Controller
         
         return response()->json(['count' => $count]);
     }
+    
+    /**
+     * Handle button action from chat message
+     */
+    public function handleButtonAction(Request $request, $messageId)
+    {
+        $request->validate([
+            'action' => 'required|string',
+        ]);
+        
+        $message = ChatMessage::findOrFail($messageId);
+        
+        if (!$message->button_data || !isset($message->button_data['appointment_id'])) {
+            return response()->json(['error' => 'Invalid message action.'], 422);
+        }
+
+        $appointmentId = $message->button_data['appointment_id'];
+        $appointment = \App\Models\Appointment::findOrFail($appointmentId);
+
+        // Verify user has permission
+        if ($appointment->client_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized.'], 403);
+        }
+
+        switch ($request->action) {
+            case 'appointment_confirm':
+                // Appointment is already confirmed, this is just acknowledgment
+                return response()->json(['success' => true, 'message' => 'Appointment confirmed.']);
+                
+            case 'appointment_cancel':
+                // Check if can be cancelled
+                if (!$appointment->canBeCancelled()) {
+                    return response()->json([
+                        'error' => 'Appointments can only be cancelled at least 24 hours in advance.'
+                    ], 422);
+                }
+                
+                // Return success - actual cancellation will be handled by AppointmentController
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Please provide a cancellation reason.',
+                    'requires_reason' => true,
+                    'appointment_id' => $appointmentId,
+                ]);
+        }
+
+        return response()->json(['error' => 'Unknown action.'], 422);
+    }
 }

@@ -1015,9 +1015,9 @@
                         <div class="d-grid gap-2 mt-4">
                             @auth
                                 @if(auth()->id() !== $user->id)
-                                    <button class="btn btn-primary btn-lg">
+                                    <a href="{{ route('appointments.book', $user->username) }}" target="_blank" class="btn btn-primary btn-lg">
                                         <i class="far fa-calendar-check me-2"></i> Book now
-                                    </button>
+                                    </a>
                                     <button class="btn btn-outline-primary" 
                                             onclick="Livewire.dispatch('open-chat-sidebar', { userId: {{ $user->id }} })">
                                         <i class="far fa-paper-plane me-2"></i> Contact me
@@ -1028,9 +1028,9 @@
                                     </a>
                                 @endif
                             @else
-                                <button class="btn btn-primary btn-lg">
+                                <a href="{{ route('web.login') }}" class="btn btn-primary btn-lg">
                                     <i class="far fa-calendar-check me-2"></i> Book now
-                                </button>
+                                </a>
                                 <a href="{{ route('web.login') }}" class="btn btn-outline-primary">
                                     <i class="far fa-paper-plane me-2"></i> Contact me
                                 </a>

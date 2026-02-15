@@ -149,7 +149,8 @@ class ChatSidebar extends Component
                 'is_own' => $message->sender_id === auth()->id(),
                 'sender_name' => $message->sender->name,
                 'created_at' => $message->created_at->format('g:i A'),
-                'full_date' => $message->created_at
+                'full_date' => $message->created_at,
+                'button_data' => $message->button_data
             ];
         }
         
@@ -276,6 +277,45 @@ class ChatSidebar extends Component
     public function toggleEmojiPicker()
     {
         $this->showEmojiPicker = !$this->showEmojiPicker;
+    }
+    
+    public function handleButtonAction($messageId, $action)
+    {
+        $message = ChatMessage::findOrFail($messageId);
+        
+        if (!$message->button_data || !isset($message->button_data['appointment_id'])) {
+            session()->flash('error', 'Invalid message action.');
+            return;
+        }
+
+        $appointmentId = $message->button_data['appointment_id'];
+        $appointment = \App\Models\Appointment::findOrFail($appointmentId);
+
+        // Verify user has permission
+        if ($appointment->client_id !== auth()->id()) {
+            session()->flash('error', 'Unauthorized.');
+            return;
+        }
+
+        switch ($action) {
+            case 'appointment_confirm':
+                // Appointment is already confirmed, this is just acknowledgment
+                session()->flash('success', 'Appointment confirmed.');
+                break;
+                
+            case 'appointment_cancel':
+                // Check if can be cancelled
+                if (!$appointment->canBeCancelled()) {
+                    session()->flash('error', 'Appointments can only be cancelled at least 24 hours in advance.');
+                    return;
+                }
+                
+                // Dispatch event to show cancellation modal
+                $this->dispatch('show-cancel-modal', appointmentId: $appointmentId);
+                break;
+        }
+        
+        $this->loadMessages();
     }
     
     private function formatDateLabel($date)

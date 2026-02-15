@@ -17,6 +17,11 @@ class ChatMessage extends Model
         'attachment_type',
         'attachment_original_name',
         'is_active',
+        'button_data',
+    ];
+
+    protected $casts = [
+        'button_data' => 'array',
     ];
 
     /**

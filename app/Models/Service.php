@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
@@ -54,6 +55,22 @@ class Service extends Model
     public function promotion()
     {
         return $this->hasOne(Promotion::class);
+    }
+
+    /**
+     * Get availabilities for this service
+     */
+    public function availabilities(): HasMany
+    {
+        return $this->hasMany(ServiceAvailability::class);
+    }
+
+    /**
+     * Get appointments for this service
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 
     /**

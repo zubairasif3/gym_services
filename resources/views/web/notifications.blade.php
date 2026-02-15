@@ -3,7 +3,7 @@
 @section('title', 'Notifications')
 
 @section('content')
-<section class="our-dashbord dashbord bgc-f7 pb50">
+<section class="our-dashbord dashbord bgc-f7 pt-4">
     <div class="container-fluid ovh">
         <div class="row">
             <div class="col-lg-12">
@@ -126,8 +126,8 @@
                             
                             <!-- Pagination -->
                             @if($notifications->hasPages())
-                                <div class="mt-4">
-                                    {{ $notifications->links() }}
+                                <div class="notifications-pagination-wrapper">
+                                    {{ $notifications->links('vendor.pagination.bootstrap-5') }}
                                 </div>
                             @endif
                         </div>
@@ -137,5 +137,93 @@
         </div>
     </div>
 </section>
+
+<style>
+
+    /* Pagination - Custom CSS */
+    .notifications-pagination-wrapper {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+    .notifications-pagination-wrapper nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .notifications-pagination-wrapper nav > div {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+    }
+    .notifications-pagination-wrapper nav > div:first-child {
+        display: none; /* Mobile: hide by default */
+    }
+    @media (max-width: 575.98px) {
+        .notifications-pagination-wrapper nav > div:first-child {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+        }
+        .notifications-pagination-wrapper nav > div:last-child {
+            display: none;
+        }
+    }
+    @media (min-width: 576px) {
+        .notifications-pagination-wrapper nav > div:last-child {
+            display: flex;
+            flex: 1;
+            justify-content: space-between;
+        }
+    }
+    .notifications-pagination-wrapper nav .small {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    .notifications-pagination-wrapper nav .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        gap: 0.25rem;
+    }
+    .notifications-pagination-wrapper nav .pagination .page-item {
+        list-style: none;
+    }
+    .notifications-pagination-wrapper nav .pagination .page-item .page-link {
+        display: block;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: #00b3f1;
+        text-decoration: none;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        min-width: 2.5rem;
+        text-align: center;
+        transition: background-color 0.15s, border-color 0.15s;
+    }
+    .notifications-pagination-wrapper nav .pagination .page-item .page-link:hover {
+        background-color: rgba(0, 179, 241, 0.1);
+        border-color: #00b3f1;
+    }
+    .notifications-pagination-wrapper nav .pagination .page-item.active .page-link {
+        background-color: #00b3f1;
+        border-color: #00b3f1;
+        color: #fff;
+    }
+    .notifications-pagination-wrapper nav .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+    }
+</style>
 @endsection
 

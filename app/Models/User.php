@@ -210,6 +210,22 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return $this->hasMany(ChatMessage::class, 'sender_id');
     }
 
+    // Appointment Relationships
+    public function clientAppointments()
+    {
+        return $this->hasMany(Appointment::class, 'client_id');
+    }
+
+    public function professionalAppointments()
+    {
+        return $this->hasMany(Appointment::class, 'professional_id');
+    }
+
+    public function cancellationTracking()
+    {
+        return $this->hasMany(ClientCancellationTracking::class, 'client_id');
+    }
+
     // Helper Methods
     public function getInitialsAttribute()
     {
