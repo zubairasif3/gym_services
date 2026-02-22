@@ -606,6 +606,15 @@
     min-height: 0;
 }
 
+.text-white p {
+    color: #fff;
+}
+.modal-footer .booking-btn {
+    margin-left: 10px;
+}
+.booking-calendar-error {
+    display: none;
+}
 @media (max-width: 768px) {
     .booking-wrapper {
         flex-direction: column;
