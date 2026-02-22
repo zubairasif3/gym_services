@@ -11,6 +11,43 @@ use Illuminate\Support\Facades\DB;
 class ChatService
 {
     /**
+     * Send new booking request message to the professional (in chat) with Confirm/Cancel buttons.
+     */
+    public function sendNewBookingRequestMessage(Appointment $appointment): void
+    {
+        $professional = $appointment->professional;
+        $client = $appointment->client;
+
+        $chatRoom = $this->getOrCreateChatRoom($professional->id, $client->id);
+
+        ChatMessage::create([
+            'chat_room_id' => $chatRoom->id,
+            'sender_id' => $client->id,
+            'message' => 'New booking request for ' . $appointment->service->title . ' on ' . $appointment->appointment_date->format('F d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. Please confirm or cancel.',
+            'is_active' => true,
+            'button_data' => [
+                'type' => 'new_booking_request',
+                'appointment_id' => $appointment->id,
+                'service_title' => $appointment->service->title,
+                'appointment_date' => $appointment->appointment_date->format('F d, Y'),
+                'appointment_time' => $appointment->appointment_time->format('h:i A'),
+                'buttons' => [
+                    [
+                        'label' => 'Confirm',
+                        'action' => 'appointment_request_confirm',
+                        'style' => 'success',
+                    ],
+                    [
+                        'label' => 'Cancel',
+                        'action' => 'appointment_request_cancel',
+                        'style' => 'danger',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * Send appointment confirmation message with buttons
      */
     public function sendAppointmentConfirmationMessage(Appointment $appointment): void
@@ -22,7 +59,7 @@ class ChatService
         $chatRoom = $this->getOrCreateChatRoom($professional->id, $client->id);
 
         // Create message with button data
-        $message = ChatMessage::create([
+        ChatMessage::create([
             'chat_room_id' => $chatRoom->id,
             'sender_id' => $professional->id,
             'message' => "Your appointment for {$appointment->service->title} on {$appointment->appointment_date->format('F d, Y')} at {$appointment->appointment_time->format('h:i A')} has been confirmed.",
@@ -30,11 +67,14 @@ class ChatService
             'button_data' => [
                 'type' => 'appointment_confirmation',
                 'appointment_id' => $appointment->id,
+                'service_title' => $appointment->service->title,
+                'appointment_date' => $appointment->appointment_date->format('F d, Y'),
+                'appointment_time' => $appointment->appointment_time->format('h:i A'),
                 'buttons' => [
                     [
                         'label' => 'Confirm',
                         'action' => 'appointment_confirm',
-                        'style' => 'primary',
+                        'style' => 'success',
                     ],
                     [
                         'label' => 'Cancel',

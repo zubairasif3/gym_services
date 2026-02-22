@@ -10,6 +10,13 @@ use App\Models\ChatMessage;
 use App\Models\ChatRoomParticipant;
 use App\Models\User;
 use App\Models\Notification;
+use App\Models\Appointment;
+use App\Notifications\AppointmentConfirmed;
+use App\Notifications\AppointmentCancelledByProfessional;
+use App\Notifications\AppointmentCancelledByClient;
+use App\Services\ChatService;
+use App\Services\CancellationTrackingService;
+use Illuminate\Support\Facades\DB;
 
 class ChatSidebar extends Component
 {
@@ -138,7 +145,26 @@ class ChatSidebar extends Component
                     $attachmentPath = asset('storage/' . $message->attachment_path);
                 }
             }
-            
+
+            // Enrich button_data: display fields for UI + cancellation lock + cancelled status
+            $buttonData = $message->button_data;
+            if ($buttonData && isset($buttonData['appointment_id'])) {
+                $appointment = Appointment::find($buttonData['appointment_id']);
+                $messageType = $buttonData['type'] ?? null;
+                $buttonData['appointment_cancelled'] = $appointment && $appointment->status === 'cancelled';
+                $buttonData['appointment_confirmed'] = $appointment && $appointment->status === 'confirmed';
+                // Hydrate display fields for booking/confirmation messages (for existing messages that don't have them)
+                if ($appointment && empty($buttonData['service_title'])) {
+                    $buttonData['service_title'] = $appointment->service->title ?? '';
+                    $buttonData['appointment_date'] = $appointment->appointment_date->format('F d, Y');
+                    $buttonData['appointment_time'] = $appointment->appointment_time->format('h:i A');
+                }
+                $hasCancelAction = isset($buttonData['buttons']) && collect($buttonData['buttons'])->contains('action', 'appointment_cancel');
+                if ($hasCancelAction && $messageType !== 'new_booking_request') {
+                    $buttonData['appointment_can_be_cancelled'] = $appointment ? $appointment->canBeCancelled() : false;
+                }
+            }
+
             $groupedMessages[] = [
                 'type' => 'message',
                 'id' => $message->id,
@@ -150,7 +176,7 @@ class ChatSidebar extends Component
                 'sender_name' => $message->sender->name,
                 'created_at' => $message->created_at->format('g:i A'),
                 'full_date' => $message->created_at,
-                'button_data' => $message->button_data
+                'button_data' => $buttonData
             ];
         }
         
@@ -289,9 +315,33 @@ class ChatSidebar extends Component
         }
 
         $appointmentId = $message->button_data['appointment_id'];
-        $appointment = \App\Models\Appointment::findOrFail($appointmentId);
+        $appointment = Appointment::findOrFail($appointmentId);
+        $messageType = $message->button_data['type'] ?? null;
 
-        // Verify user has permission
+        // New booking request: professional can confirm or cancel; client can only cancel (withdraw)
+        if ($messageType === 'new_booking_request') {
+            $isProfessional = $appointment->professional_id === auth()->id();
+            $isClient = $appointment->client_id === auth()->id();
+            if ($isProfessional) {
+                $this->handleNewBookingRequestAction($action, $appointment);
+                $this->loadMessages();
+                return;
+            }
+            if ($isClient && $action === 'appointment_request_cancel') {
+                $this->handleClientWithdrawRequest($appointment);
+                $this->loadMessages();
+                return;
+            }
+            if (!$isClient && !$isProfessional) {
+                session()->flash('error', 'Unauthorized.');
+                return;
+            }
+            session()->flash('error', 'Only the professional can confirm this request. You may cancel to withdraw.');
+            $this->loadMessages();
+            return;
+        }
+
+        // Existing flow: only client can act
         if ($appointment->client_id !== auth()->id()) {
             session()->flash('error', 'Unauthorized.');
             return;
@@ -299,22 +349,98 @@ class ChatSidebar extends Component
 
         switch ($action) {
             case 'appointment_confirm':
-                // Appointment is already confirmed, this is just acknowledgment
                 session()->flash('success', 'Appointment confirmed.');
                 break;
                 
             case 'appointment_cancel':
-                // Check if can be cancelled
                 if (!$appointment->canBeCancelled()) {
                     session()->flash('error', 'Appointments can only be cancelled at least 24 hours in advance.');
                     return;
                 }
-                
-                // Dispatch event to show cancellation modal
                 $this->dispatch('show-cancel-modal', appointmentId: $appointmentId);
                 break;
         }
         
+        $this->loadMessages();
+    }
+
+    protected function handleNewBookingRequestAction(string $action, Appointment $appointment): void
+    {
+        $chatService = app(ChatService::class);
+
+        if ($action === 'appointment_request_confirm') {
+            if ($appointment->status !== 'pending') {
+                session()->flash('error', 'Only pending appointments can be confirmed.');
+                return;
+            }
+            try {
+                DB::transaction(function () use ($appointment, $chatService) {
+                    $appointment->update(['status' => 'confirmed']);
+                    $appointment->client->notify(new AppointmentConfirmed($appointment));
+                    $chatService->sendAppointmentConfirmationMessage($appointment);
+                });
+                session()->flash('success', 'Appointment confirmed successfully.');
+            } catch (\Throwable $e) {
+                session()->flash('error', 'Failed to confirm appointment.');
+            }
+            return;
+        }
+
+        if ($action === 'appointment_request_cancel') {
+            if ($appointment->status === 'cancelled') {
+                session()->flash('error', 'Appointment is already cancelled.');
+                return;
+            }
+            try {
+                DB::transaction(function () use ($appointment, $chatService) {
+                    $appointment->update([
+                        'status' => 'cancelled',
+                        'cancelled_by' => 'professional',
+                        'cancelled_at' => now(),
+                        'cancellation_reason' => $appointment->cancellation_reason,
+                    ]);
+                    $appointment->client->notify(new AppointmentCancelledByProfessional($appointment));
+                    $chatService->sendAppointmentCancellationMessage($appointment);
+                });
+                session()->flash('success', 'Appointment cancelled.');
+            } catch (\Throwable $e) {
+                session()->flash('error', 'Failed to cancel appointment.');
+            }
+        }
+    }
+
+    /**
+     * Client withdraws their own booking request (cancel pending request from chat).
+     */
+    protected function handleClientWithdrawRequest(Appointment $appointment): void
+    {
+        if ($appointment->status === 'cancelled') {
+            session()->flash('error', 'Appointment is already cancelled.');
+            return;
+        }
+        try {
+            $chatService = app(ChatService::class);
+            $trackingService = app(CancellationTrackingService::class);
+            DB::transaction(function () use ($appointment, $chatService, $trackingService) {
+                $appointment->update([
+                    'status' => 'cancelled',
+                    'cancelled_by' => 'client',
+                    'cancelled_at' => now(),
+                    'cancellation_reason' => 'Withdrawn by client from chat',
+                ]);
+                $trackingService->trackCancellation($appointment->client_id);
+                $appointment->professional->notify(new AppointmentCancelledByClient($appointment));
+                $chatService->sendAppointmentCancellationMessage($appointment);
+            });
+            session()->flash('success', 'Booking request withdrawn.');
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Failed to withdraw request.');
+        }
+    }
+
+    #[On('cancel-complete')]
+    public function refreshMessagesAfterCancel(): void
+    {
         $this->loadMessages();
     }
     

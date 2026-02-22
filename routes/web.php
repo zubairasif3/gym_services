@@ -110,6 +110,7 @@ Route::middleware('auth')->group(function () {
     // Service Availability Routes
     Route::get('/api/service-availabilities', [App\Http\Controllers\ServiceAvailabilityController::class, 'index'])->name('service-availabilities.index');
     Route::post('/api/service-availabilities', [App\Http\Controllers\ServiceAvailabilityController::class, 'store'])->name('service-availabilities.store');
+    Route::post('/api/service-availabilities/store-with-repeat', [App\Http\Controllers\ServiceAvailabilityController::class, 'storeWithRepeat'])->name('service-availabilities.store-with-repeat');
     Route::put('/api/service-availabilities/{serviceAvailability}', [App\Http\Controllers\ServiceAvailabilityController::class, 'update'])->name('service-availabilities.update');
     Route::delete('/api/service-availabilities/{serviceAvailability}', [App\Http\Controllers\ServiceAvailabilityController::class, 'destroy'])->name('service-availabilities.destroy');
     Route::post('/api/service-availabilities/replicate', [App\Http\Controllers\ServiceAvailabilityController::class, 'replicate'])->name('service-availabilities.replicate');

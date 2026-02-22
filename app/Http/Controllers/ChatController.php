@@ -7,11 +7,20 @@ use App\Models\ChatMessage;
 use App\Models\ChatRoomParticipant;
 use App\Models\User;
 use App\Models\Notification;
+use App\Models\Appointment;
+use App\Notifications\AppointmentConfirmed;
+use App\Notifications\AppointmentCancelledByProfessional;
+use App\Services\ChatService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
+    public function __construct(
+        protected ChatService $chatService
+    ) {}
+
     /**
      * Display chat interface
      */
@@ -300,33 +309,85 @@ class ChatController extends Controller
         }
 
         $appointmentId = $message->button_data['appointment_id'];
-        $appointment = \App\Models\Appointment::findOrFail($appointmentId);
+        $appointment = Appointment::findOrFail($appointmentId);
+        $messageType = $message->button_data['type'] ?? null;
 
-        // Verify user has permission
+        // New booking request: professional can confirm or cancel
+        if ($messageType === 'new_booking_request') {
+            if ($appointment->professional_id !== auth()->id()) {
+                return response()->json(['error' => 'Unauthorized.'], 403);
+            }
+            return $this->handleNewBookingRequestAction($request->action, $appointment);
+        }
+
+        // Existing flow: only client can act
         if ($appointment->client_id !== auth()->id()) {
             return response()->json(['error' => 'Unauthorized.'], 403);
         }
 
         switch ($request->action) {
             case 'appointment_confirm':
-                // Appointment is already confirmed, this is just acknowledgment
                 return response()->json(['success' => true, 'message' => 'Appointment confirmed.']);
                 
             case 'appointment_cancel':
-                // Check if can be cancelled
                 if (!$appointment->canBeCancelled()) {
                     return response()->json([
                         'error' => 'Appointments can only be cancelled at least 24 hours in advance.'
                     ], 422);
                 }
-                
-                // Return success - actual cancellation will be handled by AppointmentController
                 return response()->json([
                     'success' => true,
                     'message' => 'Please provide a cancellation reason.',
                     'requires_reason' => true,
                     'appointment_id' => $appointmentId,
                 ]);
+        }
+
+        return response()->json(['error' => 'Unknown action.'], 422);
+    }
+
+    /**
+     * Handle Confirm/Cancel for new_booking_request (professional only).
+     */
+    protected function handleNewBookingRequestAction(string $action, Appointment $appointment)
+    {
+        if ($action === 'appointment_request_confirm') {
+            if ($appointment->status !== 'pending') {
+                return response()->json(['error' => 'Only pending appointments can be confirmed.'], 422);
+            }
+            DB::beginTransaction();
+            try {
+                $appointment->update(['status' => 'confirmed']);
+                $appointment->client->notify(new AppointmentConfirmed($appointment));
+                $this->chatService->sendAppointmentConfirmationMessage($appointment);
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Appointment confirmed successfully.']);
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return response()->json(['error' => 'Failed to confirm appointment.'], 500);
+            }
+        }
+
+        if ($action === 'appointment_request_cancel') {
+            if ($appointment->status === 'cancelled') {
+                return response()->json(['error' => 'Appointment is already cancelled.'], 422);
+            }
+            DB::beginTransaction();
+            try {
+                $appointment->update([
+                    'status' => 'cancelled',
+                    'cancelled_by' => 'professional',
+                    'cancelled_at' => now(),
+                    'cancellation_reason' => $appointment->cancellation_reason,
+                ]);
+                $appointment->client->notify(new AppointmentCancelledByProfessional($appointment));
+                $this->chatService->sendAppointmentCancellationMessage($appointment);
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Appointment cancelled.']);
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return response()->json(['error' => 'Failed to cancel appointment.'], 500);
+            }
         }
 
         return response()->json(['error' => 'Unknown action.'], 422);

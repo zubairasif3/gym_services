@@ -105,36 +105,142 @@
                                 </div>
                             @else
                                 <div class="message-bubble mb-3 {{ $item['is_own'] ? 'text-end' : '' }}">
-                                    <div class="d-inline-block {{ $item['is_own'] ? 'bg-primary text-white' : 'bg-white' }} rounded p-3 shadow-sm" 
-                                         style="max-width: 70%;">
+                                    @php
+                                        $bd = $item['button_data'] ?? null;
+                                        $cardType = $bd['type'] ?? null;
+                                        // Confirmation messages that are confirmed: show as plain text bubble (like cancellation), not as card
+                                        $isConfirmedPlainMessage = $cardType === 'appointment_confirmation' && !empty($bd['appointment_confirmed']);
+                                        $isBookingCard = $bd && !empty($bd['service_title']) && isset($bd['buttons']) && !$isConfirmedPlainMessage;
+                                    @endphp
+                                    <div class="d-inline-block {{ $isBookingCard ? 'chat-booking-card rounded-3 overflow-hidden shadow-sm border' : '' }} {{ $item['is_own'] ? 'bg-primary text-white' : 'bg-white' }} {{ $isBookingCard ? ($item['is_own'] ? 'border-primary' : 'border-light') : 'rounded p-3' }} shadow-sm" 
+                                         style="max-width: 70%; {{ $isBookingCard ? 'min-width: 260px;' : '' }}">
                                          
-                                        @if($item['message'])
-                                            <div class="message-text">{{ $item['message'] }}</div>
-                                        @endif
-                                        
-                                        @if(isset($item['button_data']) && $item['button_data'] && isset($item['button_data']['buttons']))
-                                            <div class="message-buttons mt-3 d-flex gap-2 flex-wrap">
-                                                @foreach($item['button_data']['buttons'] as $button)
-                                                    @php
-                                                        $buttonClass = match($button['style'] ?? 'primary') {
-                                                            'primary' => 'btn-primary',
-                                                            'danger' => 'btn-danger',
-                                                            'success' => 'btn-success',
-                                                            'warning' => 'btn-warning',
-                                                            default => 'btn-secondary'
-                                                        };
-                                                    @endphp
-                                                    <button 
-                                                        wire:click="handleButtonAction({{ $item['id'] }}, '{{ $button['action'] }}')"
-                                                        class="btn btn-sm {{ $buttonClass }}"
-                                                        @if($button['action'] === 'appointment_cancel' && isset($item['button_data']['appointment_id']))
-                                                            onclick="checkCancellationTime({{ $item['button_data']['appointment_id'] }})"
+                                        @if($isBookingCard)
+                                            {{-- Enhanced booking/confirmation message card --}}
+                                            <div class="p-3 {{ $item['is_own'] ? 'bg-primary text-white' : 'bg-light text-dark' }}">
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <span class="rounded-circle d-flex align-items-center justify-content-center {{ $item['is_own'] ? 'bg-white bg-opacity-25' : 'bg-primary bg-opacity-10' }}" style="width: 36px; height: 36px;">
+                                                        <i class="far fa-calendar-alt {{ $item['is_own'] ? 'text-white' : 'text-primary' }}"></i>
+                                                    </span>
+                                                    <span class="small fw-semibold {{ $item['is_own'] ? 'text-white' : 'text-muted' }}">
+                                                        @if($cardType === 'new_booking_request')
+                                                            New booking request
+                                                        @else
+                                                            Appointment confirmed
                                                         @endif
-                                                    >
-                                                        {{ $button['label'] }}
-                                                    </button>
-                                                @endforeach
+                                                    </span>
+                                                </div>
+                                                <div class="mb-3 {{ $item['is_own'] ? 'text-white' : 'text-body' }}">
+                                                    <div class="fw-bold mb-1">{{ $bd['service_title'] }}</div>
+                                                    <div class="small d-flex align-items-center gap-2 mt-1 opacity-90">
+                                                        <i class="far fa-calendar {{ $item['is_own'] ? 'text-white-50' : 'text-muted' }}"></i>
+                                                        <span>{{ $bd['appointment_date'] }}</span>
+                                                    </div>
+                                                    <div class="small d-flex align-items-center gap-2 opacity-90">
+                                                        <i class="far fa-clock {{ $item['is_own'] ? 'text-white-50' : 'text-muted' }}"></i>
+                                                        <span>{{ $bd['appointment_time'] }}</span>
+                                                    </div>
+                                                </div>
+                                                @if(!empty($bd['appointment_cancelled']))
+                                                    <div class="message-buttons mt-2">
+                                                        <span class="badge bg-secondary text-white px-2 py-1 rounded"><i class="far fa-ban me-1"></i>Cancelled</span>
+                                                    </div>
+                                                @elseif(!empty($bd['appointment_confirmed']))
+                                                    <div class="message-buttons mt-2">
+                                                        <span class="badge bg-success text-white px-2 py-1 rounded"><i class="far fa-check-circle me-1"></i>Confirmed</span>
+                                                    </div>
+                                                @else
+                                                <div class="message-buttons d-flex gap-2 flex-wrap">
+                                                    @php
+                                                        $isProfessional = auth()->user()->user_type == 3;
+                                                        $visibleButtons = $isProfessional
+                                                            ? $bd['buttons']
+                                                            : collect($bd['buttons'])->filter(fn($b) => in_array($b['action'], ['appointment_request_cancel', 'appointment_cancel']))->values()->all();
+                                                    @endphp
+                                                    @foreach($visibleButtons as $button)
+                                                        @php
+                                                            $isConfirm = in_array($button['action'], ['appointment_request_confirm', 'appointment_confirm']);
+                                                            $buttonClass = $isConfirm ? 'btn-success' : (match($button['style'] ?? 'primary') {
+                                                                'primary' => 'btn-primary',
+                                                                'danger' => 'btn-danger',
+                                                                'success' => 'btn-success',
+                                                                'warning' => 'btn-warning',
+                                                                default => 'btn-secondary'
+                                                            });
+                                                            $isCancelDisabled = ($button['action'] === 'appointment_cancel' && isset($bd['appointment_can_be_cancelled']) && !$bd['appointment_can_be_cancelled']);
+                                                            $confirmIcon = $isConfirm ? 'fa-check' : null;
+                                                            $cancelIcon = in_array($button['action'], ['appointment_request_cancel', 'appointment_cancel']) ? 'fa-times' : null;
+                                                        @endphp
+                                                        <button type="button"
+                                                            wire:click="handleButtonAction({{ $item['id'] }}, '{{ $button['action'] }}')"
+                                                            wire:loading.attr="disabled"
+                                                            class="btn btn-sm {{ $buttonClass }} {{ $isCancelDisabled ? 'disabled' : '' }} d-inline-flex align-items-center gap-1"
+                                                            @if($isCancelDisabled)
+                                                                disabled
+                                                                title="Cancellation is only allowed at least 24 hours before the appointment."
+                                                            @endif
+                                                        >
+                                                            <span wire:loading.remove wire:target="handleButtonAction">
+                                                                @if($confirmIcon)<i class="far {{ $confirmIcon }}"></i>@endif
+                                                                @if($cancelIcon)<i class="far {{ $cancelIcon }}"></i>@endif
+                                                                {{ $button['label'] }}
+                                                            </span>
+                                                            <span wire:loading wire:target="handleButtonAction">...</span>
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                                @endif
                                             </div>
+                                        @else
+                                            @if($item['message'])
+                                                <div class="message-text p-3">{{ $item['message'] }}</div>
+                                            @endif
+                                            @if(!$isConfirmedPlainMessage && isset($item['button_data']['buttons']) && is_array($item['button_data']['buttons']))
+                                                @if(!empty($item['button_data']['appointment_cancelled']))
+                                                    <div class="message-buttons px-3 pb-3">
+                                                        <span class="badge bg-secondary text-white px-2 py-1 rounded"><i class="far fa-ban me-1"></i>Cancelled</span>
+                                                    </div>
+                                                @elseif(!empty($item['button_data']['appointment_confirmed']))
+                                                    <div class="message-buttons px-3 pb-3">
+                                                        <span class="badge bg-success text-white px-2 py-1 rounded"><i class="far fa-check-circle me-1"></i>Confirmed</span>
+                                                    </div>
+                                                @else
+                                                @php
+                                                    $isProfessional = auth()->user()->user_type == 3;
+                                                    $allBtns = $item['button_data']['buttons'];
+                                                    $fallbackButtons = $isProfessional ? $allBtns : array_values(array_filter($allBtns, function ($b) {
+                                                        return in_array($b['action'] ?? '', ['appointment_request_cancel', 'appointment_cancel']);
+                                                    }));
+                                                @endphp
+                                                <div class="message-buttons px-3 pb-3 d-flex gap-2 flex-wrap">
+                                                    @foreach($fallbackButtons as $button)
+                                                        @php
+                                                            $isConfirm = in_array($button['action'], ['appointment_request_confirm', 'appointment_confirm']);
+                                                            $buttonClass = $isConfirm ? 'btn-success' : (match($button['style'] ?? 'primary') {
+                                                                'primary' => 'btn-primary',
+                                                                'danger' => 'btn-danger',
+                                                                'success' => 'btn-success',
+                                                                'warning' => 'btn-warning',
+                                                                default => 'btn-secondary'
+                                                            });
+                                                            $isCancelDisabled = ($button['action'] === 'appointment_cancel' && isset($item['button_data']['appointment_can_be_cancelled']) && !$item['button_data']['appointment_can_be_cancelled']);
+                                                        @endphp
+                                                        <button type="button"
+                                                            wire:click="handleButtonAction({{ $item['id'] }}, '{{ $button['action'] }}')"
+                                                            wire:loading.attr="disabled"
+                                                            class="btn btn-sm {{ $buttonClass }} {{ $isCancelDisabled ? 'disabled' : '' }}"
+                                                            @if($isCancelDisabled)
+                                                                disabled
+                                                                title="Cancellation is only allowed at least 24 hours before the appointment."
+                                                            @endif
+                                                        >
+                                                            <span wire:loading.remove wire:target="handleButtonAction">{{ $button['label'] }}</span>
+                                                            <span wire:loading wire:target="handleButtonAction">...</span>
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                                @endif
+                                            @endif
                                         @endif
                                         
                                         @if($item['attachment_path'])
@@ -162,7 +268,7 @@
                                             </div>
                                         @endif
                                         
-                                        <div class="message-time small {{ $item['is_own'] ? 'text-white-50' : 'text-muted' }} mt-1">
+                                        <div class="message-time small {{ $item['is_own'] ? 'text-white-50' : 'text-muted' }} mt-1 {{ $isBookingCard ? 'px-3 pb-2' : '' }}">
                                             {{ $item['created_at'] }}
                                         </div>
                                     </div>
@@ -364,16 +470,17 @@ body.chat-open {
             }, 100);
         });
         
-        // Handle cancellation modal
+        // Handle cancellation modal (client cancelling confirmed appointment)
         Livewire.on('show-cancel-modal', (event) => {
-            const appointmentId = event[0];
+            const appointmentId = event?.appointmentId ?? event?.[0];
+            if (!appointmentId) return;
             const reason = prompt('Please provide a cancellation reason (optional):');
             
             if (reason !== null) {
                 fetch(`/appointments/${appointmentId}/cancel`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
@@ -385,7 +492,7 @@ body.chat-open {
                 .then(data => {
                     if (data.success) {
                         alert('Appointment cancelled successfully!');
-                        Livewire.dispatch('message-sent');
+                        Livewire.dispatch('cancel-complete');
                     } else {
                         alert('Error: ' + (data.error || 'Failed to cancel appointment'));
                     }

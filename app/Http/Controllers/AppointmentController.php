@@ -17,6 +17,7 @@ use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class AppointmentController extends Controller
@@ -42,12 +43,28 @@ class AppointmentController extends Controller
             }])
             ->firstOrFail();
 
-        // Check if user is authenticated and is a client
-        if (Auth::check() && Auth::user()->user_type !== 2) {
+        // Allow clients to book, or the professional owner to manage their calendar
+        if (Auth::check() && Auth::user()->user_type !== 2 && Auth::id() != $professional->id) {
             return redirect()->back()->with('error', 'Only clients can book appointments.');
         }
 
-        return view('web.appointments.book', compact('professional'));
+        // Show + add-slot button when the logged-in user is this professional (by id or username)
+        $isServiceOwner = Auth::check() && (
+            (int) Auth::id() === (int) $professional->id
+            || (Auth::user()->username && Auth::user()->username === $professional->username)
+        );
+
+        Log::info('[Booking] book()', [
+            'url_username' => $username,
+            'professional_id' => $professional->id,
+            'professional_username' => $professional->username,
+            'auth_id' => Auth::check() ? Auth::id() : null,
+            'auth_username' => Auth::check() ? (Auth::user()->username ?? null) : null,
+            'auth_email' => Auth::check() ? Auth::user()->email : null,
+            'isServiceOwner' => $isServiceOwner,
+        ]);
+
+        return view('web.appointments.book', compact('professional', 'isServiceOwner'));
     }
 
     /**
@@ -95,13 +112,14 @@ class AppointmentController extends Controller
             ], 403);
         }
 
-        // Check if time slot is available (1-hour slot; availability must cover full hour)
-        $appointmentEnd = Carbon::createFromFormat('H:i', $request->appointment_time)->addHour()->format('H:i:s');
+        // Check if time slot is available (30-minute slot; must be covered by at least one ServiceAvailability)
+        $slotStart = $request->appointment_time;
+        $slotEnd = Carbon::createFromFormat('H:i', $slotStart)->addMinutes(30)->format('H:i:s');
         $isAvailable = ServiceAvailability::where('service_id', $service->id)
             ->where('availability_date', $request->appointment_date)
             ->where('is_active', true)
-            ->where('start_time', '<=', $request->appointment_time)
-            ->where('end_time', '>=', $appointmentEnd)
+            ->where('start_time', '<=', $slotStart)
+            ->where('end_time', '>=', $slotEnd)
             ->exists();
 
         if (!$isAvailable) {
@@ -138,6 +156,9 @@ class AppointmentController extends Controller
             // Send notifications
             $user->notify(new AppointmentRequestReceived($appointment));
             $professional->notify(new NewBookingRequest($appointment));
+
+            // Send chat message to professional with Confirm/Cancel buttons
+            $this->chatService->sendNewBookingRequestMessage($appointment);
 
             DB::commit();
 
@@ -519,9 +540,16 @@ class AppointmentController extends Controller
             $dateStr = $availability->availability_date->format('Y-m-d');
             $slotStart = Carbon::parse($dateStr . ' ' . $availability->start_time->format('H:i:s'));
             $slotEnd = Carbon::parse($dateStr . ' ' . $availability->end_time->format('H:i:s'));
-            $slot = $slotStart->copy();
-            while ($slot->copy()->addMinutes(60)->lte($slotEnd)) {
-                $slotTime = $slot->format('H:i');
+
+            // Split into 30-minute segments so calendar shows 01:00, 01:30, 02:00, 02:30 etc.
+            $current = $slotStart->copy();
+            while ($current->lt($slotEnd)) {
+                $segmentEnd = $current->copy()->addMinutes(30);
+                if ($segmentEnd->gt($slotEnd)) {
+                    break;
+                }
+                $slotTime = $current->format('H:i');
+
                 $appointment = Appointment::where('service_id', $service->id)
                     ->where('appointment_date', $dateStr)
                     ->where('appointment_time', $slotTime)
@@ -546,8 +574,8 @@ class AppointmentController extends Controller
 
                 $events[] = [
                     'title' => $title,
-                    'start' => $dateStr . 'T' . $slot->format('H:i:s'),
-                    'end' => $dateStr . 'T' . $slot->copy()->addMinutes(60)->format('H:i:s'),
+                    'start' => $dateStr . 'T' . $current->format('H:i:s'),
+                    'end' => $dateStr . 'T' . $segmentEnd->format('H:i:s'),
                     'color' => $color,
                     'extendedProps' => [
                         'time' => $slotTime,
@@ -555,7 +583,8 @@ class AppointmentController extends Controller
                         'bookable' => $bookable,
                     ],
                 ];
-                $slot->addMinutes(60);
+
+                $current->addMinutes(30);
             }
         }
 
@@ -564,6 +593,7 @@ class AppointmentController extends Controller
 
     /**
      * Public available slots for a single date (client booking flow).
+     * Returns 30-minute slots (01:00, 01:30, 02:00, 02:30, ...) when availability spans hours.
      */
     public function publicAvailableSlots(Request $request, string $username)
     {
@@ -595,7 +625,7 @@ class AppointmentController extends Controller
             $start = Carbon::parse($dateStr . ' ' . $availability->start_time->format('H:i:s'));
             $end = Carbon::parse($dateStr . ' ' . $availability->end_time->format('H:i:s'));
             $current = $start->copy();
-            while ($current->copy()->addMinutes(60)->lte($end)) {
+            while ($current->copy()->addMinutes(30)->lte($end)) {
                 $slotTime = $current->format('H:i');
                 $isBooked = Appointment::where('service_id', $service->id)
                     ->where('appointment_date', $dateStr)
@@ -608,7 +638,7 @@ class AppointmentController extends Controller
                         'display' => $current->format('h:i A'),
                     ];
                 }
-                $current->addMinutes(60);
+                $current->addMinutes(30);
             }
         }
 

@@ -9,11 +9,13 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn\TextColumnSize;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\ActionSize;
 
 class AppointmentResource extends Resource
 {
@@ -70,28 +72,34 @@ class AppointmentResource extends Resource
                     ->columns(3),
                     
                 Forms\Components\Section::make('Client Information')
+                    ->description(fn ($record) => $record ? 'Client details are read-only and cannot be changed.' : 'Enter the client details for this appointment.')
                     ->schema([
                         Forms\Components\TextInput::make('client_name')
                             ->label('First Name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TextInput::make('client_surname')
                             ->label('Last Name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TextInput::make('client_email')
                             ->label('Email')
                             ->email()
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TextInput::make('client_phone')
                             ->label('Phone')
                             ->tel()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->disabled(fn ($record) => $record !== null),
                         Forms\Components\DatePicker::make('client_date_of_birth')
                             ->label('Date of Birth')
                             ->required()
-                            ->maxDate(now()->subDay()),
+                            ->maxDate(now()->subDay())
+                            ->disabled(fn ($record) => $record !== null),
                     ])
                     ->columns(2),
                     
@@ -125,23 +133,29 @@ class AppointmentResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('service.title')
                     ->label('Service')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('client_name')
                     ->label('Client Name')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->formatStateUsing(fn ($record) => $record->client_name . ' ' . $record->client_surname)
                     ->searchable(['client_name', 'client_surname']),
                 Tables\Columns\TextColumn::make('client_email')
                     ->label('Email')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('appointment_date')
                     ->label('Date')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->date('M d, Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('appointment_time')
                     ->label('Time')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->time('h:i A'),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'confirmed',
@@ -151,6 +165,7 @@ class AppointmentResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Requested At')
+                    ->size(TextColumnSize::ExtraSmall)
                     ->dateTime('M d, Y h:i A')
                     ->sortable()
                     ->toggleable(),
@@ -187,6 +202,7 @@ class AppointmentResource extends Resource
                     ->label('Confirm')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
+                    ->size(ActionSize::Small)
                     ->visible(fn ($record) => $record->status === 'pending')
                     ->requiresConfirmation()
                     ->action(function ($record) {
@@ -202,6 +218,7 @@ class AppointmentResource extends Resource
                     ->label('Cancel')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
+                    ->size(ActionSize::Small)
                     ->visible(fn ($record) => in_array($record->status, ['pending', 'confirmed']))
                     ->form([
                         Forms\Components\Textarea::make('cancellation_reason')
@@ -223,8 +240,10 @@ class AppointmentResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->size(ActionSize::Small),
+                Tables\Actions\EditAction::make()
+                    ->size(ActionSize::Small),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

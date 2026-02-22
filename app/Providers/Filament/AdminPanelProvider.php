@@ -40,6 +40,14 @@ class AdminPanelProvider extends PanelProvider
                 ->url('/')
                     ->icon('heroicon-o-globe-alt')
                     ->sort(999),
+                NavigationItem::make('Service calendar')
+                    ->url(fn (): string => route('appointments.book', ['username' => auth()->user()->username]))
+                    ->icon('heroicon-o-calendar-days')
+                    ->sort(1)
+                    ->group('Appointments')
+                    ->visible(fn (): bool => auth()->check()
+                        && auth()->user()->user_type === 3
+                        && ! empty(auth()->user()->username ?? '')),
             ])
             ->default()
             ->id('admin')

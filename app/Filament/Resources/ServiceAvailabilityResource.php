@@ -75,6 +75,43 @@ class ServiceAvailabilityResource extends Resource
                     ->label('Active')
                     ->default(true)
                     ->required(),
+                Forms\Components\Section::make('Repeat')
+                    ->description('Create the same slot on multiple dates (create only).')
+                    ->schema([
+                        Forms\Components\Select::make('repeat_type')
+                            ->label('Repeat')
+                            ->options([
+                                'none' => 'No repeat',
+                                'daily' => 'Daily',
+                                'weekly' => 'Weekly',
+                            ])
+                            ->default('none')
+                            ->required()
+                            ->native(false)
+                            ->live(),
+                        Forms\Components\DatePicker::make('repeat_end_date')
+                            ->label('Repeat until date')
+                            ->required(fn (Forms\Get $get) => in_array($get('repeat_type'), ['daily', 'weekly'], true))
+                            ->native(false)
+                            ->displayFormat('M d, Y')
+                            ->minDate(fn (Forms\Get $get) => $get('availability_date') ? \Carbon\Carbon::parse($get('availability_date')) : null)
+                            ->maxDate(now()->addMonths(6))
+                            ->visible(fn (Forms\Get $get) => in_array($get('repeat_type'), ['daily', 'weekly'], true))
+                            ->rules([
+                                fn (Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                    $repeatType = $get('repeat_type');
+                                    if (! in_array($repeatType, ['daily', 'weekly'], true)) {
+                                        return;
+                                    }
+                                    $start = $get('availability_date');
+                                    if ($start && $value && \Carbon\Carbon::parse($value)->lt(\Carbon\Carbon::parse($start))) {
+                                        $fail('Repeat until date must be on or after the start date.');
+                                    }
+                                },
+                            ]),
+                    ])
+                    ->columns(2)
+                    ->visibleOn('create'),
             ]);
     }
 

@@ -45,6 +45,15 @@
                             @if($notification['type'] === 'new_follower')
                                 <strong>{{ $notification['related_user']['name'] ?? 'Someone' }}</strong>
                                 <span class="text-muted">{{ $notification['data']['message'] ?? 'started following you' }}</span>
+                            @elseif(($notification['type'] ?? '') === 'new_booking_request' || ($notification['data']['type'] ?? '') === 'new_booking_request')
+                                @php
+                                    $appointmentId = $notification['data']['appointment_id'] ?? null;
+                                    $bookingRequestUrl = $appointmentId ? url('/admin/appointments/' . $appointmentId . '/edit') : route('notifications');
+                                @endphp
+                                <a href="{{ $bookingRequestUrl }}" class="text-decoration-none text-dark">
+                                    <span>{{ $notification['data']['message'] ?? 'New booking request' }}</span>
+                                    <span class="d-block small text-primary mt-1">View appointment →</span>
+                                </a>
                             @else
                                 <span>{{ $notification['data']['message'] ?? 'New notification' }}</span>
                             @endif
