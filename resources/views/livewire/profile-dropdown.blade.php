@@ -52,6 +52,14 @@
             </a>
         @endif
         
+        @if($user->user_type == 2)
+            <a href="{{ route('appointments.index') }}"
+               class="dropdown-item d-flex align-items-center py-2">
+                <i class="far fa-calendar-alt me-3 text-primary" style="width: 20px;"></i>
+                <span>My Appointments</span>
+            </a>
+        @endif
+
         <a href="{{ route('following') }}" 
            class="dropdown-item d-flex align-items-center py-2">
             <i class="far fa-heart me-3 text-danger" style="width: 20px;"></i>

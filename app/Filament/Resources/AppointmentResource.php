@@ -208,6 +208,7 @@ class AppointmentResource extends Resource
                     ->action(function ($record) {
                         $record->update(['status' => 'confirmed']);
                         $record->client->notify(new \App\Notifications\AppointmentConfirmed($record));
+                        app(\App\Services\ChatService::class)->sendAppointmentConfirmationMessage($record);
                         
                         Notification::make()
                             ->title('Appointment confirmed successfully')

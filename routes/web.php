@@ -94,7 +94,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('services', App\Http\Controllers\ServiceController::class);
     Route::get('/api/services/subcategories/{categoryId}', [App\Http\Controllers\ServiceController::class, 'getSubcategories'])->name('services.subcategories');
     
-    // Appointment Routes
+    // Appointment Routes (GET index first so it is not shadowed)
+    Route::get('/appointments', [App\Http\Controllers\AppointmentController::class, 'index'])->name('appointments.index');
     Route::post('/appointments', [App\Http\Controllers\AppointmentController::class, 'store'])->name('appointments.store');
     Route::get('/appointments/available-slots', [App\Http\Controllers\AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
     

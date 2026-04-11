@@ -15,10 +15,10 @@ class NotificationController extends Controller
         $notifications = auth()->user()->notifications()
             ->with('relatedUser')
             ->paginate(20);
-            
+
         return view('web.notifications', compact('notifications'));
     }
-    
+
     /**
      * Mark a specific notification as read
      */

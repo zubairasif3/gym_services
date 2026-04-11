@@ -12,6 +12,7 @@ class ServiceAvailability extends Model
         'availability_date',
         'start_time',
         'end_time',
+        'slot_duration_minutes',
         'is_active',
     ];
 
@@ -19,6 +20,7 @@ class ServiceAvailability extends Model
         'availability_date' => 'date',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
+        'slot_duration_minutes' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -68,37 +70,47 @@ class ServiceAvailability extends Model
     }
 
     /**
-     * Check if a slot can be created (no overlap, max 2 per hour for this service/date).
+     * Check if a slot can be created (no overlap; allow 1×60 min OR 2×30 min per hour, not mixed).
      */
     public static function canCreateSlot(int $serviceId, string $dateStr, string $startTime, string $endTime): bool
     {
+        /* Overlap: ranges overlap only if newStart < existingEnd AND newEnd > existingStart (touching at boundary = no overlap) */
         $overlapping = static::where('service_id', $serviceId)
             ->where('availability_date', $dateStr)
             ->where('is_active', true)
-            ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($q) use ($startTime, $endTime) {
-                        $q->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                    });
-            })
+            ->whereRaw('start_time < ? AND end_time > ?', [$endTime, $startTime])
             ->exists();
 
         if ($overlapping) {
             return false;
         }
 
+        $startM = (int) substr($startTime, 0, 2) * 60 + (int) substr($startTime, 3, 2);
+        $endM = (int) substr($endTime, 0, 2) * 60 + (int) substr($endTime, 3, 2);
+        $durationM = $endM - $startM;
         $startHour = (int) substr($startTime, 0, 2);
         $hourStart = sprintf('%02d:00', $startHour);
         $hourEnd = $startHour < 23 ? sprintf('%02d:00', $startHour + 1) : '23:59';
-        $countInHour = static::where('service_id', $serviceId)
+
+        $slotsInHour = static::where('service_id', $serviceId)
             ->where('availability_date', $dateStr)
             ->where('is_active', true)
             ->where('start_time', '<', $hourEnd)
             ->where('end_time', '>', $hourStart)
-            ->count();
+            ->get();
 
-        return $countInHour < 2;
+        $has60InHour = $slotsInHour->contains(function ($s) {
+            $sm = (int) $s->start_time->format('H') * 60 + (int) $s->start_time->format('i');
+            $em = (int) $s->end_time->format('H') * 60 + (int) $s->end_time->format('i');
+            return ($em - $sm) >= 60;
+        });
+
+        if ($durationM >= 60) {
+            return $slotsInHour->isEmpty();
+        }
+        if ($has60InHour) {
+            return false;
+        }
+        return $slotsInHour->count() < 2;
     }
 }

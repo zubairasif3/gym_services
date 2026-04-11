@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Gig;
 use App\Models\GigReview;
+use App\Models\Notification;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -77,13 +78,33 @@ class ReviewForm extends Component
         }
         
         // Create review
-        GigReview::create([
+        $review = GigReview::create([
             'gig_id' => $this->gigId,
             'user_id' => Auth::id(),
             'rating' => $this->rating,
             'comment' => $this->comment,
             'is_verified' => false, // Can be set based on order history
         ]);
+
+        // Notify the professional (gig owner)
+        try {
+            $reviewerName = Auth::user()->name . ' ' . (Auth::user()->surname ?? '');
+            Notification::create([
+                'user_id' => $gig->user_id,
+                'type' => 'new_gig_review',
+                'related_user_id' => Auth::id(),
+                'related_model_type' => GigReview::class,
+                'related_model_id' => $review->id,
+                'data' => json_encode([
+                    'message' => $reviewerName . ' left a ' . $this->rating . '-star review on your service "' . $gig->title . '"',
+                    'rating' => $this->rating,
+                    'gig_title' => $gig->title,
+                    'gig_slug' => $gig->slug,
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Review notification error: ' . $e->getMessage());
+        }
         
         // Update gig rating
         $this->updateGigRating();

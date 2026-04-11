@@ -15,6 +15,9 @@
                             <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>Following</a></li>
                             <li><a href="{{ route('notifications') }}" class="active"><span class="flaticon-bell mr10"></span>Notifications</a></li>
                             <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>Messages</a></li>
+                            @if(auth()->user()->user_type === 2)
+                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>My Appointments</a></li>
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -92,6 +95,31 @@
                                                         <a href="{{ $bookingRequestUrl }}" class="text-decoration-none text-dark d-block">
                                                             <span>{{ $notification->data['message'] ?? 'New booking request' }}</span>
                                                             <span class="d-block small text-primary mt-1">View appointment →</span>
+                                                        </a>
+                                                    @elseif($notification->type === 'new_gig_reaction')
+                                                        @php
+                                                            $reactorName = $notification->relatedUser ? trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')) : 'Someone';
+                                                        @endphp
+                                                        <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark d-block">
+                                                            <span><strong>{{ $reactorName }}</strong> reacted {{ $notification->data['emoji'] ?? '' }} to your service</span>
+                                                            <span class="d-block small text-primary mt-1">View profile →</span>
+                                                        </a>
+                                                    @elseif($notification->type === 'new_media_reaction')
+                                                        @php
+                                                            $reactorName = $notification->relatedUser ? trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')) : 'Someone';
+                                                        @endphp
+                                                        <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark d-block">
+                                                            <span><strong>{{ $reactorName }}</strong> reacted {{ $notification->data['emoji'] ?? '' }} to your photo/video</span>
+                                                            <span class="d-block small text-primary mt-1">View profile →</span>
+                                                        </a>
+                                                    @elseif($notification->type === 'new_gig_review')
+                                                        @php
+                                                            $reviewerName = $notification->relatedUser ? trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')) : 'Someone';
+                                                            $rating = $notification->data['rating'] ?? null;
+                                                        @endphp
+                                                        <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark d-block">
+                                                            <span><strong>{{ $reviewerName }}</strong> left a {{ $rating ? $rating . '-star ' : '' }}review on your service</span>
+                                                            <span class="d-block small text-primary mt-1">View profile →</span>
                                                         </a>
                                                     @else
                                                         <span>{{ $notification->data['message'] ?? 'New notification' }}</span>

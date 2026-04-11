@@ -40,7 +40,7 @@ class AppointmentRequestReceived extends Notification
             ->line('**Time:** ' . $this->appointment->appointment_time->format('h:i A'))
             ->line('**Professional:** ' . $this->appointment->professional->name . ' ' . $this->appointment->professional->surname)
             ->line('Your request is pending confirmation from the professional. You will receive a notification once it is confirmed.')
-            ->action('View Appointment', url('/appointments'))
+            ->action('View Appointment', route('appointments.index'))
             ->line('Thank you for using FitScout!');
     }
 

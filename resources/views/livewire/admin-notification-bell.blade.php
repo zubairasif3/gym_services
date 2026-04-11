@@ -63,6 +63,18 @@
                                         <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3.293 3.293 3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
                                     </svg>
                                 </div>
+                            @elseif($notification->type === 'new_gig_reaction' || $notification->type === 'new_media_reaction')
+                                <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.348-.785l.075-.075A2 2 0 0015 16.458v-1.916a2 2 0 00.581-1.414V5.25a2 2 0 00-2-2H2.581a2 2 0 00-1.414.581L1.65 5.175A2 2 0 001 6.827v4.506a2 2 0 001.106 1.79l.05.025A4 4 0 003.057 18H8.5"/>
+                                    </svg>
+                                </div>
+                            @elseif($notification->type === 'new_gig_review')
+                                <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
                             @else
                                 <div class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
                                     <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -73,7 +85,18 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm text-gray-900 dark:text-gray-100">
-                                {{ $notification->data['message'] ?? 'New notification' }}
+                                @if(in_array($notification->type, ['new_gig_reaction', 'new_media_reaction', 'new_gig_review']))
+                                    @php
+                                        $userName = $notification->relatedUser ? trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')) : 'Someone';
+                                    @endphp
+                                    @if($notification->type === 'new_gig_review')
+                                        {{ $userName }} left a {{ ($notification->data['rating'] ?? null) ? $notification->data['rating'] . '-star ' : '' }}review on your service
+                                    @else
+                                        {{ $userName }} reacted {{ $notification->data['emoji'] ?? '' }} to your {{ $notification->type === 'new_media_reaction' ? 'photo/video' : 'service' }}
+                                    @endif
+                                @else
+                                    {{ $notification->data['message'] ?? 'New notification' }}
+                                @endif
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 {{ $notification->created_at->diffForHumans() }}

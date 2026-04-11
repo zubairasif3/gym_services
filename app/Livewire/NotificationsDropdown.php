@@ -19,27 +19,28 @@ class NotificationsDropdown extends Component
     {
         $this->notifications = auth()->user()
             ->notifications()
-            ->where('type', '!=', 'new_message') // Exclude message notifications
+            ->where('type', '!=', 'new_message')
             ->with('relatedUser:id,name,surname,avatar_url')
             ->take(10)
             ->get()
-            ->map(function($notification) {
+            ->map(function ($notification) {
                 return [
                     'id' => $notification->id,
                     'type' => $notification->type,
                     'data' => $notification->data,
-                    'is_read' => !is_null($notification->read_at),
+                    'is_read' => ! is_null($notification->read_at),
                     'created_at' => $notification->created_at->diffForHumans(),
                     'related_user' => $notification->relatedUser ? [
-                        'name' => $notification->relatedUser->name . ' ' . $notification->relatedUser->surname,
-                        'avatar' => $notification->relatedUser->avatar_url 
-                            ? asset('storage/' . $notification->relatedUser->avatar_url) 
+                        'name' => trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')),
+                        'avatar' => $notification->relatedUser->avatar_url
+                            ? asset('storage/' . $notification->relatedUser->avatar_url)
                             : null,
                         'initials' => $notification->relatedUser->initials
                     ] : null
                 ];
-            });
-            
+            })
+            ->all();
+
         $this->unreadCount = auth()->user()->unreadNotifications()->where('type', '!=', 'new_message')->count();
     }
     

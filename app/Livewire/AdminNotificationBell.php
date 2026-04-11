@@ -27,6 +27,7 @@ class AdminNotificationBell extends Component
                 ->count();
 
             $this->notifications = Notification::where('user_id', Auth::id())
+                ->with('relatedUser:id,name,surname')
                 ->latest()
                 ->take(5)
                 ->get();

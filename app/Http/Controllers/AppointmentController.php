@@ -68,6 +68,27 @@ class AppointmentController extends Controller
     }
 
     /**
+     * List client's appointments (clients only) — Point 8
+     */
+    public function index()
+    {
+        if (! Auth::check() || Auth::user()->user_type !== 2) {
+            return redirect()->route('web.index')->with('error', 'Only clients can view this page.');
+        }
+
+        $appointments = Appointment::where('client_id', Auth::id())
+            ->with(['service', 'professional'])
+            ->orderByDesc('appointment_date')
+            ->orderByDesc('appointment_time')
+            ->get();
+
+        $tracking = ClientCancellationTracking::getOrCreateForCurrentMonth(Auth::id());
+        $canBook = ClientCancellationTracking::canClientBook(Auth::id());
+
+        return view('web.appointments.index', compact('appointments', 'tracking', 'canBook'));
+    }
+
+    /**
      * Store a new appointment booking request
      */
     public function store(Request $request)
@@ -81,6 +102,7 @@ class AppointmentController extends Controller
             'service_id' => 'required|exists:services,id',
             'appointment_date' => 'required|date|after:today',
             'appointment_time' => 'required|date_format:H:i',
+            'duration_minutes' => 'nullable|in:30,60',
         ]);
 
         $service = Service::findOrFail($request->service_id);
@@ -112,9 +134,12 @@ class AppointmentController extends Controller
             ], 403);
         }
 
-        // Check if time slot is available (30-minute slot; must be covered by at least one ServiceAvailability)
+        $durationMinutes = (int) ($request->duration_minutes ?? 30);
+
+        // Check if time slot is available (must be covered by at least one ServiceAvailability)
         $slotStart = $request->appointment_time;
-        $slotEnd = Carbon::createFromFormat('H:i', $slotStart)->addMinutes(30)->format('H:i:s');
+        $slotEndCarbon = Carbon::createFromFormat('H:i', $slotStart)->addMinutes($durationMinutes);
+        $slotEnd = $slotEndCarbon->format('H:i:s');
         $isAvailable = ServiceAvailability::where('service_id', $service->id)
             ->where('availability_date', $request->appointment_date)
             ->where('is_active', true)
@@ -126,14 +151,23 @@ class AppointmentController extends Controller
             return response()->json(['error' => 'The selected time slot is not available.'], 422);
         }
 
-        // Check if slot is already booked
-        $isBooked = Appointment::where('service_id', $service->id)
-            ->where('appointment_date', $request->appointment_date)
-            ->where('appointment_time', $request->appointment_time)
+        // Check if slot overlaps any existing appointment (consider duration)
+        $dateStr = $request->appointment_date;
+        $slotStartCarbon = Carbon::createFromFormat('H:i', $slotStart);
+        $ourStartM = (int) $slotStartCarbon->format('H') * 60 + (int) $slotStartCarbon->format('i');
+        $ourEndM = $ourStartM + $durationMinutes;
+        $overlaps = Appointment::where('service_id', $service->id)
+            ->where('appointment_date', $dateStr)
             ->whereIn('status', ['pending', 'confirmed'])
-            ->exists();
+            ->get()
+            ->contains(function ($apt) use ($ourStartM, $ourEndM) {
+                $dur = (int) ($apt->duration_minutes ?? 30);
+                $exStartM = (int) $apt->appointment_time->format('H') * 60 + (int) $apt->appointment_time->format('i');
+                $exEndM = $exStartM + $dur;
+                return $exStartM < $ourEndM && $exEndM > $ourStartM;
+            });
 
-        if ($isBooked) {
+        if ($overlaps) {
             return response()->json(['error' => 'This time slot is already booked.'], 422);
         }
 
@@ -145,6 +179,7 @@ class AppointmentController extends Controller
                 'professional_id' => $professional->id,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $request->appointment_time,
+                'duration_minutes' => $durationMinutes,
                 'status' => 'pending',
                 'client_name' => $clientName,
                 'client_surname' => $clientSurname,
@@ -153,24 +188,29 @@ class AppointmentController extends Controller
                 'client_date_of_birth' => $clientDateOfBirth,
             ]);
 
-            // Send notifications
-            $user->notify(new AppointmentRequestReceived($appointment));
-            $professional->notify(new NewBookingRequest($appointment));
-
-            // Send chat message to professional with Confirm/Cancel buttons
-            $this->chatService->sendNewBookingRequestMessage($appointment);
-
             DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment request submitted successfully.',
-                'appointment_id' => $appointment->id,
-            ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Appointment store: create failed', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Failed to create appointment. Please try again.'], 500);
         }
+
+        // Send notifications and chat message after commit.
+        // Professional email is queued with 10s delay to avoid Mailtrap "too many emails per second" (client email sends now).
+        try {
+            $user->notify(new AppointmentRequestReceived($appointment));
+            $professional->notify((new NewBookingRequest($appointment))->delay(now()->addSeconds(10)));
+            $this->chatService->sendNewBookingRequestMessage($appointment);
+        } catch (\Exception $e) {
+            Log::error('Appointment store: notifications/chat failed after create', ['appointment_id' => $appointment->id, 'exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // Appointment is already saved; still return success
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment request submitted successfully.',
+            'appointment_id' => $appointment->id,
+        ]);
     }
 
     /**
@@ -400,9 +440,10 @@ class AppointmentController extends Controller
                     default => '#00b3f1',    // Primary
                 };
 
+                $durationMinutes = (int) ($appointment->duration_minutes ?? 30);
                 $startCarbon = Carbon::parse($appointment->appointment_date->format('Y-m-d') . ' ' . $appointment->appointment_time->format('H:i:s'));
                 $startStr = $startCarbon->format('Y-m-d\TH:i:s');
-                $endStr = $startCarbon->copy()->addHour()->format('Y-m-d\TH:i:s');
+                $endStr = $startCarbon->copy()->addMinutes($durationMinutes)->format('Y-m-d\TH:i:s');
 
                 return [
                     'id' => $appointment->id,
@@ -514,6 +555,7 @@ class AppointmentController extends Controller
             'service_id' => 'required|exists:services,id',
             'start' => 'required|date',
             'end' => 'required|date',
+            'as_owner' => 'nullable|boolean',
         ]);
 
         $service = Service::where('id', $request->service_id)
@@ -540,25 +582,65 @@ class AppointmentController extends Controller
             $dateStr = $availability->availability_date->format('Y-m-d');
             $slotStart = Carbon::parse($dateStr . ' ' . $availability->start_time->format('H:i:s'));
             $slotEnd = Carbon::parse($dateStr . ' ' . $availability->end_time->format('H:i:s'));
+            $availabilityDurationM = $slotStart->diffInMinutes($slotEnd);
 
-            // Split into 30-minute segments so calendar shows 01:00, 01:30, 02:00, 02:30 etc.
+            $appointmentsForDate = Appointment::where('service_id', $service->id)
+                ->where('appointment_date', $dateStr)
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->get();
+
             $current = $slotStart->copy();
             while ($current->lt($slotEnd)) {
-                $segmentEnd = $current->copy()->addMinutes(30);
-                if ($segmentEnd->gt($slotEnd)) {
-                    break;
-                }
+                $segmentEnd30 = $current->copy()->addMinutes(30);
+                $segmentEnd60 = $current->copy()->addMinutes(60);
                 $slotTime = $current->format('H:i');
 
-                $appointment = Appointment::where('service_id', $service->id)
-                    ->where('appointment_date', $dateStr)
-                    ->where('appointment_time', $slotTime)
-                    ->whereIn('status', ['pending', 'confirmed'])
-                    ->first();
+                $overlapsSegment = function ($segStart, $segEnd) use ($appointmentsForDate) {
+                    $segStartM = (int) $segStart->format('H') * 60 + (int) $segStart->format('i');
+                    $segEndM = (int) $segEnd->format('H') * 60 + (int) $segEnd->format('i');
+                    foreach ($appointmentsForDate as $apt) {
+                        $dur = (int) ($apt->duration_minutes ?? 30);
+                        $aptStartM = (int) $apt->appointment_time->format('H') * 60 + (int) $apt->appointment_time->format('i');
+                        $aptEndM = $aptStartM + $dur;
+                        if ($aptStartM < $segEndM && $aptEndM > $segStartM) {
+                            return $apt;
+                        }
+                    }
+                    return null;
+                };
+
+                $appointment = $overlapsSegment($current->copy(), $segmentEnd30->copy());
+                $slotDurationPref = (int) ($availability->slot_duration_minutes ?? 60);
+                $fullHourFree = $slotDurationPref === 60 && $availabilityDurationM >= 60 && $segmentEnd60->lte($slotEnd) && ! $appointment && ! $overlapsSegment($segmentEnd30->copy(), $segmentEnd60->copy());
+
+                /* Respect slot_duration_minutes: 30 = always 30-min events; 60 = 1h when full hour free */
+                if ($fullHourFree) {
+                    $events[] = [
+                        'title' => 'Available (1h)',
+                        'start' => $dateStr . 'T' . $current->format('H:i:s'),
+                        'end' => $dateStr . 'T' . $segmentEnd60->format('H:i:s'),
+                        'color' => '#00b3f1',
+                        'extendedProps' => [
+                            'time' => $slotTime,
+                            'date' => $dateStr,
+                            'bookable' => true,
+                            'duration_minutes' => 60,
+                        ],
+                    ];
+                    $current->addMinutes(60);
+                    continue;
+                }
+                $segmentEnd = $segmentEnd30->copy();
 
                 $title = 'Available';
                 $color = '#00b3f1';
                 $bookable = true;
+                $extendedProps = [
+                    'time' => $slotTime,
+                    'date' => $dateStr,
+                    'bookable' => $bookable,
+                    'duration_minutes' => 30,
+                ];
 
                 if ($appointment) {
                     if ($appointment->status === 'pending') {
@@ -570,6 +652,13 @@ class AppointmentController extends Controller
                         $color = '#28a745';
                         $bookable = false;
                     }
+                    if ($request->boolean('as_owner') && Auth::check() && (int) Auth::id() === (int) $professional->id) {
+                        $extendedProps['service_title'] = $appointment->service->title ?? '';
+                        $extendedProps['client_name'] = trim(($appointment->client_name ?? '') . ' ' . ($appointment->client_surname ?? ''));
+                        $extendedProps['client_email'] = $appointment->client_email ?? '';
+                        $extendedProps['client_phone'] = $appointment->client_phone ?? '';
+                        $extendedProps['status'] = $appointment->status;
+                    }
                 }
 
                 $events[] = [
@@ -577,11 +666,7 @@ class AppointmentController extends Controller
                     'start' => $dateStr . 'T' . $current->format('H:i:s'),
                     'end' => $dateStr . 'T' . $segmentEnd->format('H:i:s'),
                     'color' => $color,
-                    'extendedProps' => [
-                        'time' => $slotTime,
-                        'date' => $dateStr,
-                        'bookable' => $bookable,
-                    ],
+                    'extendedProps' => $extendedProps,
                 ];
 
                 $current->addMinutes(30);
@@ -620,22 +705,64 @@ class AppointmentController extends Controller
             ->orderBy('start_time')
             ->get();
 
+        $appointmentsForDate = Appointment::where('service_id', $service->id)
+            ->where('appointment_date', $dateStr)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->get();
+
+        $overlaps = function ($segStartM, $segEndM) use ($appointmentsForDate) {
+            foreach ($appointmentsForDate as $apt) {
+                $dur = (int) ($apt->duration_minutes ?? 30);
+                $aptStartM = (int) $apt->appointment_time->format('H') * 60 + (int) $apt->appointment_time->format('i');
+                $aptEndM = $aptStartM + $dur;
+                if ($aptStartM < $segEndM && $aptEndM > $segStartM) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         $slots = [];
         foreach ($availabilities as $availability) {
             $start = Carbon::parse($dateStr . ' ' . $availability->start_time->format('H:i:s'));
             $end = Carbon::parse($dateStr . ' ' . $availability->end_time->format('H:i:s'));
             $current = $start->copy();
-            while ($current->copy()->addMinutes(30)->lte($end)) {
+            $availabilityDurationM = $start->diffInMinutes($end);
+            $slotDurationPref = (int) ($availability->slot_duration_minutes ?? 60);
+
+            /* Respect slot_duration_minutes: 30 = only 30-min slots; 60 = 1h when full hour free */
+            while ($current->lt($end)) {
                 $slotTime = $current->format('H:i');
-                $isBooked = Appointment::where('service_id', $service->id)
-                    ->where('appointment_date', $dateStr)
-                    ->where('appointment_time', $slotTime)
-                    ->whereIn('status', ['pending', 'confirmed'])
-                    ->exists();
-                if (!$isBooked) {
+                $startM = (int) $current->format('H') * 60 + (int) $current->format('i');
+                $end30M = $startM + 30;
+                $end60M = $startM + 60;
+
+                $booked30 = $overlaps($startM, $end30M);
+                $secondHalfFree = ! $overlaps($startM + 30, $end60M);
+                $booked60 = $slotDurationPref === 60 && $availabilityDurationM >= 60 && $current->copy()->addMinutes(60)->lte($end) && ! $overlaps($startM, $end60M);
+
+                if ($booked60) {
+                    $slots[] = [
+                        'time' => $slotTime,
+                        'display' => $current->format('h:i A') . ' (1 hour)',
+                        'duration_minutes' => 60,
+                    ];
+                    $current->addMinutes(60);
+                    continue;
+                }
+                if (! $booked30) {
                     $slots[] = [
                         'time' => $slotTime,
                         'display' => $current->format('h:i A'),
+                        'duration_minutes' => 30,
+                    ];
+                }
+                if ($booked30 && $secondHalfFree && $current->copy()->addMinutes(30)->lt($end)) {
+                    $slotTime30 = $current->copy()->addMinutes(30)->format('H:i');
+                    $slots[] = [
+                        'time' => $slotTime30,
+                        'display' => $current->copy()->addMinutes(30)->format('h:i A'),
+                        'duration_minutes' => 30,
                     ];
                 }
                 $current->addMinutes(30);

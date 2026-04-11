@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Gig;
 use App\Models\GigReaction;
+use App\Models\Notification;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -74,6 +75,26 @@ class ReactionButton extends Component
                 'emoji' => $emoji,
             ]);
             $this->userReaction = $emoji;
+
+            // Notify the professional (gig owner)
+            try {
+                $reactorName = Auth::user()->name . ' ' . (Auth::user()->surname ?? '');
+                Notification::create([
+                    'user_id' => $this->gig->user_id,
+                    'type' => 'new_gig_reaction',
+                    'related_user_id' => Auth::id(),
+                    'related_model_type' => Gig::class,
+                    'related_model_id' => $this->gig->id,
+                    'data' => json_encode([
+                        'message' => $reactorName . ' reacted ' . $emoji . ' to your service "' . $this->gig->title . '"',
+                        'emoji' => $emoji,
+                        'gig_title' => $this->gig->title,
+                        'gig_slug' => $this->gig->slug,
+                    ]),
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Reaction notification error: ' . $e->getMessage());
+            }
         }
         
         $this->showEmojiPicker = false;

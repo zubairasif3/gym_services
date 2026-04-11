@@ -379,8 +379,8 @@
                             
                             <hr>
                             
-                            @if($gig->user->isProfessional())
-                                <a href="{{ route('professional.profile', $gig->user->username ?? $gig->user->id) }}" 
+                            @if($gig->user->isProfessional() && $gig->user->username)
+                                <a href="{{ route('professional.profile', $gig->user->username) }}" 
                                    class="btn btn-outline-dark w-100">
                                     <i class="far fa-user me-2"></i> View Full Profile
                                 </a>

@@ -3,7 +3,7 @@
 @section('title', 'Messages')
 
 @section('content')
-<section class="our-dashbord dashbord bgc-f7 pb50">
+<section class="our-dashbord dashbord bgc-f7 pb50 pt-4">
     <div class="container-fluid ovh">
         <div class="row">
             <div class="col-lg-12">
@@ -15,6 +15,9 @@
                             <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>Following</a></li>
                             <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>Notifications</a></li>
                             <li><a href="{{ route('messages') }}" class="active"><span class="flaticon-chat mr10"></span>Messages</a></li>
+                            @if(auth()->user()->user_type === 2)
+                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>My Appointments</a></li>
+                            @endif
                         </ul>
                     </div>
                 </div>

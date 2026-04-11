@@ -23,7 +23,7 @@ class CreateServiceAvailability extends CreateRecord
         $repeatType = $data['repeat_type'] ?? 'none';
         $repeatEndDate = $data['repeat_end_date'] ?? null;
 
-        $payload = collect($data)->only(['service_id', 'availability_date', 'start_time', 'end_time', 'is_active'])->all();
+        $payload = collect($data)->only(['service_id', 'availability_date', 'start_time', 'end_time', 'slot_duration_minutes', 'is_active'])->all();
         $payload['is_active'] = $payload['is_active'] ?? true;
         $startTime = $payload['start_time'] instanceof \Carbon\Carbon
             ? $payload['start_time']->format('H:i')
@@ -60,6 +60,7 @@ class CreateServiceAvailability extends CreateRecord
                     'availability_date' => $dateStr,
                     'start_time' => $startTime,
                     'end_time' => $endTime,
+                    'slot_duration_minutes' => $payload['slot_duration_minutes'] ?? null,
                     'is_active' => $payload['is_active'],
                 ]);
                 $created++;

@@ -54,6 +54,31 @@
                                     <span>{{ $notification['data']['message'] ?? 'New booking request' }}</span>
                                     <span class="d-block small text-primary mt-1">View appointment →</span>
                                 </a>
+                            @elseif(($notification['type'] ?? '') === 'new_gig_reaction')
+                                @php
+                                    $reactorName = $notification['related_user']['name'] ?? 'Someone';
+                                @endphp
+                                <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
+                                    <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your service</span>
+                                    <span class="d-block small text-primary mt-1">View profile →</span>
+                                </a>
+                            @elseif(($notification['type'] ?? '') === 'new_media_reaction')
+                                @php
+                                    $reactorName = $notification['related_user']['name'] ?? 'Someone';
+                                @endphp
+                                <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
+                                    <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your photo/video</span>
+                                    <span class="d-block small text-primary mt-1">View profile →</span>
+                                </a>
+                            @elseif(($notification['type'] ?? '') === 'new_gig_review')
+                                @php
+                                    $reviewerName = $notification['related_user']['name'] ?? 'Someone';
+                                    $rating = $notification['data']['rating'] ?? null;
+                                @endphp
+                                <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
+                                    <span><strong>{{ $reviewerName }}</strong> left a {{ $rating ? $rating . '-star ' : '' }}review on your service</span>
+                                    <span class="d-block small text-primary mt-1">View profile →</span>
+                                </a>
                             @else
                                 <span>{{ $notification['data']['message'] ?? 'New notification' }}</span>
                             @endif

@@ -40,7 +40,7 @@ class AppointmentConfirmed extends Notification
             ->line('**Time:** ' . $this->appointment->appointment_time->format('h:i A'))
             ->line('**Professional:** ' . $this->appointment->professional->name . ' ' . $this->appointment->professional->surname)
             ->line('Please make sure to arrive on time. You will receive a reminder 24 hours before your appointment.')
-            ->action('View Appointment', url('/appointments'))
+            ->action('View Appointment', route('appointments.index'))
             ->line('Thank you for using FitScout!');
     }
 

@@ -54,43 +54,29 @@ class ServiceAvailabilityController extends Controller
             return response()->json(['error' => 'Unauthorized.'], 403);
         }
 
+        /* Overlap: ranges overlap only if newStart < existingEnd AND newEnd > existingStart (touching at boundary = no overlap) */
         $overlapping = ServiceAvailability::where('service_id', $service->id)
             ->where('availability_date', $request->availability_date)
             ->where('is_active', true)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('start_time', [$request->start_time, $request->end_time])
-                    ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                    ->orWhere(function ($q) use ($request) {
-                        $q->where('start_time', '<=', $request->start_time)
-                            ->where('end_time', '>=', $request->end_time);
-                    });
-            })
+            ->whereRaw('start_time < ? AND end_time > ?', [$request->end_time, $request->start_time])
             ->exists();
 
         if ($overlapping) {
             return response()->json(['error' => 'This time slot overlaps with existing availability for this date.'], 422);
         }
 
-        // Max 2 slots per hour (two 30-minute slots per hour)
-        $startHour = (int) substr($request->start_time, 0, 2);
-        $hourStart = sprintf('%02d:00', $startHour);
-        $hourEnd = $startHour < 23 ? sprintf('%02d:00', $startHour + 1) : '23:59';
-        $countInHour = ServiceAvailability::where('service_id', $service->id)
-            ->where('availability_date', $request->availability_date)
-            ->where('is_active', true)
-            ->where('start_time', '<', $hourEnd)
-            ->where('end_time', '>', $hourStart)
-            ->count();
-
-        if ($countInHour >= 2) {
-            return response()->json(['error' => 'Maximum two 30-minute slots per hour for this service and date.'], 422);
+        if (! ServiceAvailability::canCreateSlot($service->id, $request->availability_date, $request->start_time, $request->end_time)) {
+            return response()->json(['error' => 'Maximum one 1-hour slot or two 30-minute slots per hour for this service and date.'], 422);
         }
+
+        $slotDurationMinutes = Carbon::parse('1970-01-01 ' . $request->start_time)->diffInMinutes(Carbon::parse('1970-01-01 ' . $request->end_time));
 
         $availability = ServiceAvailability::create([
             'service_id' => $service->id,
             'availability_date' => $request->availability_date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
+            'slot_duration_minutes' => $slotDurationMinutes,
             'is_active' => $request->is_active ?? true,
         ]);
 
@@ -138,14 +124,7 @@ class ServiceAvailabilityController extends Controller
             $overlapping = ServiceAvailability::where('service_id', $service->id)
                 ->where('availability_date', $request->availability_date)
                 ->where('is_active', true)
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('start_time', [$request->start_time, $request->end_time])
-                        ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                        ->orWhere(function ($q) use ($request) {
-                            $q->where('start_time', '<=', $request->start_time)
-                                ->where('end_time', '>=', $request->end_time);
-                        });
-                })
+                ->whereRaw('start_time < ? AND end_time > ?', [$request->end_time, $request->start_time])
                 ->exists();
 
             if ($overlapping) {
@@ -189,11 +168,13 @@ class ServiceAvailabilityController extends Controller
                 if (! ServiceAvailability::canCreateSlot($service->id, $dateStr, $request->start_time, $request->end_time)) {
                     continue;
                 }
+                $slotDurationMinutes = Carbon::parse('1970-01-01 ' . $request->start_time)->diffInMinutes(Carbon::parse('1970-01-01 ' . $request->end_time));
                 ServiceAvailability::create([
                     'service_id' => $service->id,
                     'availability_date' => $dateStr,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
+                    'slot_duration_minutes' => $slotDurationMinutes,
                     'is_active' => $request->is_active ?? true,
                 ]);
                 $created++;
@@ -255,7 +236,13 @@ class ServiceAvailabilityController extends Controller
             }
         }
 
-        $serviceAvailability->update($request->only(['availability_date', 'start_time', 'end_time', 'is_active']));
+        $updateData = $request->only(['availability_date', 'start_time', 'end_time', 'is_active']);
+        if ($request->has('start_time') || $request->has('end_time')) {
+            $startTime = $request->start_time ?? $serviceAvailability->start_time->format('H:i');
+            $endTime = $request->end_time ?? $serviceAvailability->end_time->format('H:i');
+            $updateData['slot_duration_minutes'] = Carbon::parse('1970-01-01 ' . $startTime)->diffInMinutes(Carbon::parse('1970-01-01 ' . $endTime));
+        }
+        $serviceAvailability->update($updateData);
 
         return response()->json([
             'success' => true,

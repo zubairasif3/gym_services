@@ -88,6 +88,32 @@
             </div>
             @endif
 
+            @if($isServiceOwner)
+            <!-- Appointment details modal (when pro clicks a booked/waiting slot) -->
+            <div id="appointment-details-modal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" style="display: none;">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background: #2d2d2d; border: 1px solid #404040;">
+                        <div class="modal-header" style="border-color: #404040;">
+                            <h5 class="modal-title text-white">Appointment Details</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-white">
+                            <p><strong>Service:</strong> <span id="slot-modal-service"></span></p>
+                            <p><strong>Client:</strong> <span id="slot-modal-client"></span></p>
+                            <p><strong>Email:</strong> <span id="slot-modal-email"></span></p>
+                            <p><strong>Phone:</strong> <span id="slot-modal-phone"></span></p>
+                            <p><strong>Date:</strong> <span id="slot-modal-date"></span></p>
+                            <p><strong>Time:</strong> <span id="slot-modal-time"></span></p>
+                            <p><strong>Status:</strong> <span id="slot-modal-status" class="badge"></span></p>
+                        </div>
+                        <div class="modal-footer" style="border-color: #404040;">
+                            <button type="button" class="booking-btn booking-btn-outline" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <div id="booking-messages" class="booking-messages"></div>
         </main>
     </div>
@@ -480,6 +506,10 @@
     background: #333;
     color: #06a7e1;
 }
+.booking-slot-plus-1h {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
 .booking-slot-placeholder {
     display: flex;
     align-items: center;
@@ -689,8 +719,13 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('[Booking] Debug:', bookingDebug);
     console.log('[Booking] isServiceOwner =', isServiceOwner, '(plus button should', isServiceOwner ? 'show)' : 'be hidden)');
 
-    // Detect current Google Translate language (defaults to English)
+    // Detect current language: localStorage first, then cookie, then default 'en'
     function getCurrentGoogleLanguage() {
+        const STORAGE_KEY = window.FITSCOUT_LANG_KEY || 'fitScoutPreferredLanguage';
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored === 'it' || stored === 'en') return stored;
+        } catch (e) {}
         const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
         return match ? match[1] : 'en';
     }
@@ -719,6 +754,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedDate = null;
     let selectedTime = null;
     let selectedTimeDisplay = null;
+    let selectedDurationMinutes = 30;
     let calendar = null;
 
     const serviceSelect = document.getElementById('service-select');
@@ -775,6 +811,69 @@ document.addEventListener('DOMContentLoaded', function() {
         setBookingCalendarLocale(getCalendarLocale());
         console.log('[Booking] initCalendar: selectedServiceId =', selectedServiceId, 'isServiceOwner =', isServiceOwner);
         var calendarHeaderPlaceholder = document.getElementById('calendar-header-placeholder');
+
+        /* Event-aware plus buttons: hide invalid options based on existing availability */
+        function updateSlotLaneCells() {
+            if (!calendar || !isServiceOwner || !calendarContainer) return;
+            var view = calendar.view;
+            if (!view || !view.activeStart) return;
+            var weekStart = new Date(view.activeStart.getFullYear(), view.activeStart.getMonth(), view.activeStart.getDate());
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var rangeStart = new Date(weekStart);
+            var rangeEnd = new Date(weekStart);
+            rangeEnd.setDate(rangeEnd.getDate() + 7);
+            var events = calendar.getEvents();
+            var rows = calendarContainer.querySelectorAll('.booking-slot-plus-row');
+            for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+                var hour = rowIdx + 1;
+                if (hour > 24) break;
+                var timeFirst = String(hour).padStart(2, '0') + ':00';
+                var timeSecond = String(hour).padStart(2, '0') + ':30';
+                var endHour = hour + 1;
+                var endTime1h = (endHour >= 24 ? '23:59' : String(endHour).padStart(2, '0') + ':00');
+                var cells = rows[rowIdx].querySelectorAll('.booking-slot-plus-cell');
+                for (var c = 0; c < cells.length && c < 7; c++) {
+                    var cellDay = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + c);
+                    cellDay.setHours(0, 0, 0, 0);
+                    var dateStr = cellDay.getFullYear() + '-' + String(cellDay.getMonth() + 1).padStart(2, '0') + '-' + String(cellDay.getDate()).padStart(2, '0');
+                    var seg1Start = new Date(dateStr + 'T' + timeFirst);
+                    var seg1End = new Date(dateStr + 'T' + timeSecond);
+                    var seg2Start = new Date(dateStr + 'T' + timeSecond);
+                    var seg2End = (endHour >= 24) ? new Date(dateStr + 'T23:59:59') : new Date(dateStr + 'T' + endTime1h);
+                    var firstCovered = false, secondCovered = false, fullCovered = false;
+                    for (var e = 0; e < events.length; e++) {
+                        var ev = events[e];
+                        var es = ev.start, ee = ev.end;
+                        if (es.getFullYear() !== cellDay.getFullYear() || es.getMonth() !== cellDay.getMonth() || es.getDate() !== cellDay.getDate()) continue;
+                        var durMs = ee - es;
+                        if (durMs >= 55 * 60 * 1000) {
+                            if (es <= seg1Start && ee >= seg2End) fullCovered = true;
+                        }
+                        if (es < seg1End && ee > seg1Start) firstCovered = true;
+                        if (es < seg2End && ee > seg2Start) secondCovered = true;
+                    }
+                    var html = '';
+                    if (cellDay < today) {
+                        html = '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
+                    } else if (fullCovered || (firstCovered && secondCovered)) {
+                        html = '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
+                    } else if (firstCovered) {
+                        html = '<span class="booking-slot-placeholder"></span>';
+                        html += '<span class="booking-slot-plus" data-slot-time="' + timeSecond + '" data-column="' + c + '" data-half="second" role="button" tabindex="0">+</span>';
+                    } else if (secondCovered) {
+                        html = '<span class="booking-slot-plus" data-slot-time="' + timeFirst + '" data-column="' + c + '" data-half="first" role="button" tabindex="0">+</span>';
+                        html += '<span class="booking-slot-placeholder"></span>';
+                        html += '<span class="booking-slot-placeholder"></span>';
+                    } else {
+                        html = '<span class="booking-slot-plus" data-slot-time="' + timeFirst + '" data-column="' + c + '" data-half="first" role="button" tabindex="0">+</span>';
+                        html += '<span class="booking-slot-plus" data-slot-time="' + timeSecond + '" data-column="' + c + '" data-half="second" role="button" tabindex="0">+</span>';
+                        html += '<span class="booking-slot-plus booking-slot-plus-1h" data-slot-time="' + timeFirst + '" data-slot-end="' + endTime1h + '" data-column="' + c + '" data-duration-minutes="60" role="button" tabindex="0" title="Add 1 hour">+1h</span>';
+                    }
+                    cells[c].innerHTML = html;
+                }
+            }
+        }
         calendar = new FullCalendar.Calendar(calendarContainer, {
             initialView: 'timeGridWeek',
             locale: getCalendarLocale(),
@@ -824,10 +923,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     var isPast = cellDay < today;
                     html += '<div class="booking-slot-plus-cell">';
                     if (isPast) {
-                        html += '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
+                        html += '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
                     } else {
+                        var endHour = (hour + 1);
+                        var endTime1h = (endHour >= 24 ? '23:59' : String(endHour).padStart(2, '0') + ':00');
                         html += '<span class="booking-slot-plus" data-slot-time="' + timeFirst + '" data-column="' + c + '" data-half="first" role="button" tabindex="0">+</span>';
                         html += '<span class="booking-slot-plus" data-slot-time="' + timeSecond + '" data-column="' + c + '" data-half="second" role="button" tabindex="0">+</span>';
+                        html += '<span class="booking-slot-plus booking-slot-plus-1h" data-slot-time="' + timeFirst + '" data-slot-end="' + endTime1h + '" data-column="' + c + '" data-duration-minutes="60" role="button" tabindex="0" title="Add 1 hour">+1h</span>';
                     }
                     html += '</div>';
                 }
@@ -853,17 +955,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 var endStr = arg.end ? (arg.end.getFullYear() + '-' + String(arg.end.getMonth() + 1).padStart(2, '0') + '-' + String(arg.end.getDate()).padStart(2, '0')) : '';
                 var viewStart = (calendar && calendar.view && calendar.view.activeStart) ? (calendar.view.activeStart.getFullYear() + '-' + String(calendar.view.activeStart.getMonth() + 1).padStart(2, '0') + '-' + String(calendar.view.activeStart.getDate()).padStart(2, '0')) : 'n/a';
                 console.log('[Booking] datesSet (week switched): visible start =', startStr, 'end =', endStr, 'view.activeStart =', viewStart, 'isServiceOwner =', isServiceOwner);
-                /* After week navigation, re-render so slot lanes (plus buttons) use the new week */
+                /* After week navigation, re-render so slot lanes (plus buttons) use the new week.
+                 * Note: Removed explicit calendar.render() to fix Point 9 duplication - changeView
+                 * and FullCalendar's internal flow already trigger re-render; extra render caused
+                 * slotLabelContent/dayHeaderContent/eventContent to duplicate (e.g. "01:0001:00").
+                 * If plus buttons misalign after week switch, consider a targeted update instead. */
                 if (calendar && isServiceOwner && !window._bookingDatesSetRendering) {
                     window._bookingDatesSetRendering = true;
                     setTimeout(function() {
                         try {
-                            if (calendar.view) calendar.render();
-                            setTimeout(function() {
-                                var plusCount = calendarContainer.querySelectorAll('.booking-slot-plus').length;
-                                var placeholderCount = calendarContainer.querySelectorAll('.booking-slot-placeholder').length;
-                                console.log('[Booking] After week switch render: .booking-slot-plus =', plusCount, '.booking-slot-placeholder =', placeholderCount);
-                            }, 150);
+                            if (typeof updateSlotLaneCells === 'function') {
+                                updateSlotLaneCells();
+                            }
                         } finally {
                             window._bookingDatesSetRendering = false;
                         }
@@ -929,6 +1032,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             },
             allDaySlot: false,
+            eventOrder: 'eventOrder',
             validRange: {
                 start: (function() {
                     const d = new Date();
@@ -949,6 +1053,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 var url = getCalendarDataUrl() + '?service_id=' + encodeURIComponent(selectedServiceId) + '&start=' + encodeURIComponent(fetchInfo.startStr) + '&end=' + encodeURIComponent(fetchInfo.endStr);
+                if (isServiceOwner) url += '&as_owner=1';
                 fetch(url, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function(response) {
                         return response.json().then(function(data) {
@@ -970,13 +1075,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                 return;
                             }
                             var events = (data.events || []).map(function(ev) {
+                                var props = ev.extendedProps || {};
+                                var dur = props.duration_minutes || 30;
                                 return {
                                     title: ev.title || 'Available',
                                     start: ev.start,
                                     end: ev.end,
                                     backgroundColor: ev.color || '#00b3f1',
                                     borderColor: ev.color || '#00b3f1',
-                                    extendedProps: ev.extendedProps || {}
+                                    extendedProps: props,
+                                    eventOrder: dur === 60 ? 0 : 1
                                 };
                             });
                             if (events.length === 0 && errEl) {
@@ -987,6 +1095,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 errEl.style.borderColor = '#6b7280';
                             }
                             successCallback(events);
+                            if (isServiceOwner && typeof updateSlotLaneCells === 'function') {
+                                setTimeout(updateSlotLaneCells, 50);
+                            }
                         });
                     })
                     .catch(function(err) {
@@ -1001,17 +1112,38 @@ document.addEventListener('DOMContentLoaded', function() {
             eventClick: function(info) {
                 info.jsEvent.preventDefault();
                 const props = info.event.extendedProps || {};
-                if (props.bookable === false) {
-                    bookingSwal.fire({
-                        icon: 'info',
-                        title: 'Slot Unavailable',
-                        text: 'This slot is ' + info.event.title.toLowerCase() + '. Please select an available slot.',
-                        confirmButtonColor: '#00b3f1'
-                    });
+                var isBookedOrWaiting = (props.bookable === false) || (info.event.title === 'Booked' || info.event.title === 'Waiting') || (props.status === 'confirmed' || props.status === 'pending');
+                if (isBookedOrWaiting) {
+                    if (isServiceOwner) {
+                        var modalEl = document.getElementById('appointment-details-modal');
+                        if (modalEl) {
+                            document.getElementById('slot-modal-service').textContent = props.service_title || '—';
+                            document.getElementById('slot-modal-client').textContent = props.client_name || '—';
+                            document.getElementById('slot-modal-email').textContent = props.client_email || '—';
+                            document.getElementById('slot-modal-phone').textContent = props.client_phone || '—';
+                            document.getElementById('slot-modal-date').textContent = props.date ? new Date(props.date + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : (info.event.start ? info.event.start.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '—');
+                            document.getElementById('slot-modal-time').textContent = props.time || (info.event.start ? info.event.start.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false }) : '—');
+                            var statusEl = document.getElementById('slot-modal-status');
+                            statusEl.textContent = props.status || info.event.title || '—';
+                            statusEl.className = 'badge ' + (props.status === 'confirmed' ? 'bg-success' : (props.status === 'pending' || info.event.title === 'Waiting') ? 'bg-warning text-dark' : 'bg-secondary');
+                            var modal = new bootstrap.Modal(modalEl);
+                            modal.show();
+                        }
+                    } else {
+                        bookingSwal.fire({
+                            icon: 'info',
+                            title: 'Slot Unavailable',
+                            text: 'This slot is ' + (info.event.title || 'booked').toLowerCase() + '. Please select an available slot.',
+                            confirmButtonColor: '#00b3f1'
+                        });
+                    }
                     return;
                 }
                 const slotStart = info.event.start;
                 if (slotStart < new Date()) {
+                    if (isServiceOwner) {
+                        return;
+                    }
                     bookingSwal.fire({
                         icon: 'error',
                         title: 'Invalid Selection',
@@ -1022,13 +1154,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 selectedDate = props.date || info.event.startStr.slice(0, 10);
                 selectedTime = props.time || info.event.startStr.slice(11, 16);
+                selectedDurationMinutes = props.duration_minutes || 30;
                 selectedTimeDisplay = (function() {
                     const d = info.event.start;
-                    return d.toLocaleTimeString('it-IT', {
+                    var t = d.toLocaleTimeString('it-IT', {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false
                     });
+                    return (selectedDurationMinutes === 60) ? (t + ' (1 hour)') : t;
                 })();
                 if (selectedDatetimeBar) {
                     var dateDisp = document.getElementById('selected-date-display');
@@ -1128,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bookingSwal.fire({ icon: 'info', title: 'Select a service', text: 'Please select a service from the sidebar first.', confirmButtonColor: '#00b3f1' });
             return;
         }
+        var is1h = plus.classList.contains('booking-slot-plus-1h') || plus.getAttribute('data-duration-minutes') === '60';
         var viewStart = calendar.view.activeStart;
         var d = new Date(viewStart.getFullYear(), viewStart.getMonth(), viewStart.getDate());
         d.setDate(d.getDate() + col);
@@ -1137,11 +1272,17 @@ document.addEventListener('DOMContentLoaded', function() {
         d.setHours(hour, min, 0, 0);
         var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         var start1 = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-        var endD = new Date(d.getTime());
-        endD.setMinutes(endD.getMinutes() + 30);
-        var end1 = endD.getHours() === 0 && endD.getMinutes() === 0 ? '23:59' : (String(endD.getHours()).padStart(2, '0') + ':' + String(endD.getMinutes()).padStart(2, '0'));
-        var start2 = end1 === '23:59' ? null : end1;
-        var end2 = start2 ? (function() { var h = parseInt(start2.slice(0,2), 10); var m = parseInt(start2.slice(3), 10); m += 30; if (m >= 60) { h++; m = 0; } return h >= 24 ? '23:59' : (String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')); })() : null;
+        var end1;
+        var start2 = null, end2 = null;
+        if (is1h && plus.getAttribute('data-slot-end')) {
+            end1 = plus.getAttribute('data-slot-end');
+        } else {
+            var endD = new Date(d.getTime());
+            endD.setMinutes(endD.getMinutes() + 30);
+            end1 = endD.getHours() === 0 && endD.getMinutes() === 0 ? '23:59' : (String(endD.getHours()).padStart(2, '0') + ':' + String(endD.getMinutes()).padStart(2, '0'));
+            start2 = end1 === '23:59' ? null : end1;
+            end2 = start2 ? (function() { var h = parseInt(start2.slice(0,2), 10); var m = parseInt(start2.slice(3), 10); m += 30; if (m >= 60) { h++; m = 0; } return h >= 24 ? '23:59' : (String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')); })() : null;
+        }
         var displayDate = d.toLocaleDateString(getCalendarLocale() === 'it' ? 'it-IT' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
         var displayTime = start1 + ' – ' + (end1 === '23:59' ? '24:00' : end1);
         var maxEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -1158,7 +1299,7 @@ document.addEventListener('DOMContentLoaded', function() {
             '</div></div>';
         bookingSwal.fire({
             title: 'Add availability',
-            html: 'Add a 30-minute slot on <strong>' + displayDate + '</strong> at <strong>' + displayTime + '</strong>?' + repeatHtml,
+            html: 'Add a ' + (is1h ? '1-hour' : '30-minute') + ' slot on <strong>' + displayDate + '</strong> at <strong>' + displayTime + '</strong>?' + repeatHtml,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#00b3f1',
@@ -1232,6 +1373,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Keep calendar language in sync with header language toggle
+    // Avoid changeView to prevent datesSet->render() duplication bug (Point 9)
     const languageToggle = document.getElementById('language-toggle');
     if (languageToggle) {
         languageToggle.addEventListener('change', function () {
@@ -1239,7 +1381,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const newLocale = this.checked ? 'it' : 'en';
             setBookingCalendarLocale(newLocale);
             calendar.setOption('locale', newLocale);
-            calendar.changeView('timeGridWeek', calendar.getDate());
         });
     }
 
@@ -1287,6 +1428,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('service_id', selectedServiceId);
         formData.append('appointment_date', selectedDate);
         formData.append('appointment_time', selectedTime);
+        formData.append('duration_minutes', selectedDurationMinutes || 30);
         formData.append('client_name', bookingUser.name);
         formData.append('client_surname', bookingUser.surname);
         formData.append('client_email', bookingUser.email);

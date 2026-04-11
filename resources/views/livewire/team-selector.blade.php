@@ -134,6 +134,9 @@
     <div id="google_translate_element" style="display: none;"></div>
 
     <script type="text/javascript">
+        // Use same storage key as app layout for consistent preference
+        window.FITSCOUT_LANG_KEY = window.FITSCOUT_LANG_KEY || 'fitScoutPreferredLanguage';
+
         function googleTranslateElementInit() {
           new google.translate.TranslateElement({
             pageLanguage: 'en',
@@ -142,25 +145,38 @@
           }, 'google_translate_element');
         }
 
+        // 🧠 Get current language: localStorage first, then cookie, then default 'en'
+        function getCurrentGoogleLanguage() {
+          try {
+            const stored = localStorage.getItem(window.FITSCOUT_LANG_KEY);
+            if (stored === 'it' || stored === 'en') return stored;
+          } catch (e) {}
+          const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
+          return match ? match[1] : 'en';
+        }
+
         // Wait for DOM to load
         document.addEventListener('DOMContentLoaded', function () {
           const toggle = document.getElementById('language-toggle');
+          if (!toggle) return;
 
-          // 🔁 Sync toggle switch with current language
-          function syncToggleWithLanguage() {
-            const currentLang = getCurrentGoogleLanguage();
-            toggle.checked = (currentLang === 'it');
+          // 🔁 Restore language from localStorage and apply to Translate widget
+          function restoreAndApplyLanguage() {
+            const preferredLang = getCurrentGoogleLanguage();
+            const select = document.querySelector("select.goog-te-combo");
+            if (select) {
+              select.value = preferredLang;
+              select.dispatchEvent(new Event("change"));
+            }
+            toggle.checked = (preferredLang === 'it');
           }
 
-          // 🧠 Detect language from Google Translate cookie
-          function getCurrentGoogleLanguage() {
-            const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
-            return match ? match[1] : 'en';
-          }
-
-          // 📌 Change language when toggle is flipped
+          // 📌 Change language when toggle is flipped + persist to localStorage
           toggle.addEventListener('change', function () {
             const selectedLang = this.checked ? 'it' : 'en';
+            try {
+              localStorage.setItem(window.FITSCOUT_LANG_KEY, selectedLang);
+            } catch (e) {}
             const select = document.querySelector("select.goog-te-combo");
             if (select) {
               select.value = selectedLang;
@@ -168,8 +184,8 @@
             }
           });
 
-          // 🔄 Sync the toggle with the language after a short delay
-          setTimeout(syncToggleWithLanguage, 500); // Small delay to ensure Translate loads
+          // 🔄 Restore from localStorage when Translate widget is ready
+          setTimeout(restoreAndApplyLanguage, 500);
         });
     </script>
 

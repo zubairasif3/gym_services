@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewBookingRequest extends Notification
+class NewBookingRequest extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -41,7 +41,7 @@ class NewBookingRequest extends Notification
             ->line('**Client:** ' . $this->appointment->client_name . ' ' . $this->appointment->client_surname)
             ->line('**Client Email:** ' . $this->appointment->client_email)
             ->line('Please review and confirm or cancel this appointment request.')
-            ->action('View Request', url('/admin/appointments/' . $this->appointment->id))
+            ->action('View Request', url('/admin/appointments/' . $this->appointment->id . '/edit'))
             ->line('Thank you for using FitScout!');
     }
 

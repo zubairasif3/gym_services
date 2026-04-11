@@ -44,29 +44,42 @@ class ServiceAvailabilityResource extends Resource
                     ->required()
                     ->native(false)
                     ->displayFormat('M d, Y'),
+                Forms\Components\Select::make('slot_duration_minutes')
+                    ->label('Slot duration')
+                    ->options([
+                        30 => '30 minutes',
+                        60 => '1 hour',
+                    ])
+                    ->default(30)
+                    ->required()
+                    ->helperText('How each slot appears in the calendar: 30-min slots (e.g. 10:00, 10:30, 11:00…) or 1-hour slots (e.g. 11:00, 12:00, 13:00…).'),
                 Forms\Components\TimePicker::make('start_time')
                     ->label('Start Time')
                     ->required()
                     ->seconds(false)
-                    ->minutesStep(60)
+                    ->minutesStep(30)
                     ->default('07:00')
                     ->native(false)
                     ->displayFormat('g:i A')
-                    ->helperText('Whole hours only (e.g. 7:00 AM)'),
+                    ->helperText('Start of your availability range (e.g. 10:00 AM).'),
                 Forms\Components\TimePicker::make('end_time')
                     ->label('End Time')
                     ->required()
                     ->seconds(false)
-                    ->minutesStep(60)
-                    ->default('08:00')
+                    ->minutesStep(30)
+                    ->default('18:00')
                     ->native(false)
                     ->displayFormat('g:i A')
-                    ->after('start_time')
-                    ->helperText('Must be after start time (e.g. 8:00 AM)')
+                    ->helperText('End of your availability range (e.g. 6:00 PM). Calendar will show slots of the chosen duration within this range.')
                     ->rules([
                         fn (Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                             $start = $get('start_time');
-                            if ($start && $value && \Carbon\Carbon::parse($value)->lte(\Carbon\Carbon::parse($start))) {
+                            if (! $start || ! $value) {
+                                return;
+                            }
+                            $startC = \Carbon\Carbon::parse($start);
+                            $endC = \Carbon\Carbon::parse($value);
+                            if ($endC->lte($startC)) {
                                 $fail('End time must be after start time.');
                             }
                         },
@@ -127,6 +140,9 @@ class ServiceAvailabilityResource extends Resource
                     ->label('Date')
                     ->date('M d, Y (l)')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('slot_duration_minutes')
+                    ->label('Slot')
+                    ->formatStateUsing(fn ($state) => $state == 60 ? '1 hour' : ($state == 30 ? '30 min' : '—')),
                 Tables\Columns\TextColumn::make('start_time')
                     ->label('Start Time')
                     ->time('h:i A'),

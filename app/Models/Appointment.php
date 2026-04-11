@@ -15,6 +15,7 @@ class Appointment extends Model
         'professional_id',
         'appointment_date',
         'appointment_time',
+        'duration_minutes',
         'status',
         'client_name',
         'client_surname',
@@ -31,6 +32,7 @@ class Appointment extends Model
     protected $casts = [
         'appointment_date' => 'date',
         'appointment_time' => 'datetime:H:i',
+        'duration_minutes' => 'integer',
         'client_date_of_birth' => 'date',
         'cancelled_at' => 'datetime',
         'is_external' => 'boolean',

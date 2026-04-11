@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\ProfileMedia;
 use App\Models\ProfileMediaReaction;
+use App\Models\Notification;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -100,6 +101,29 @@ class ProfileMediaReactions extends Component
                 'ip_address' => request()->ip(),
             ]);
             $this->userReactions[$emoji] = true;
+
+            // Notify the professional (profile owner) - only if not reacting to own content
+            if (Auth::id() !== $media->user_id) {
+                try {
+                    $reactorName = Auth::user()->name . ' ' . (Auth::user()->surname ?? '');
+                    $profileUser = $media->user;
+                    $profileUsername = $profileUser && $profileUser->username ? $profileUser->username : null;
+                    Notification::create([
+                        'user_id' => $media->user_id,
+                        'type' => 'new_media_reaction',
+                        'related_user_id' => Auth::id(),
+                        'related_model_type' => ProfileMedia::class,
+                        'related_model_id' => $media->id,
+                        'data' => json_encode([
+                            'message' => $reactorName . ' reacted ' . $emoji . ' to your photo/video',
+                            'emoji' => $emoji,
+                            'profile_username' => $profileUsername,
+                        ]),
+                    ]);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Media reaction notification error: ' . $e->getMessage());
+                }
+            }
         }
         
         $this->loadReactions();

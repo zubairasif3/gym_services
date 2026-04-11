@@ -6,7 +6,8 @@
      wire:click="closeChat">
 </div>
 
-<div class="chat-sidebar position-fixed top-0 end-0 h-100 bg-white shadow-lg" 
+<div class="chat-sidebar position-fixed top-0 end-0 h-100 bg-white shadow-lg notranslate" 
+     translate="no"
      style="width: 900px; max-width: 95vw; z-index: 10500; animation: slideIn 0.3s ease;">
      
     <div class="d-flex flex-column h-100">
@@ -26,7 +27,7 @@
             </button>
         </div>
         
-        <div class="d-flex flex-grow-1 overflow-hidden" wire:poll.5s="loadRooms" wire:poll.keep-alive>
+        <div class="d-flex flex-grow-1 overflow-hidden notranslate" translate="no" wire:poll.5s="loadRooms" wire:poll.keep-alive>
             <!-- Conversations List (Left Panel) -->
             <div class="conversations-list border-end" style="width: 300px; overflow-y: auto;">
                 <div class="p-2">
@@ -91,7 +92,8 @@
                     </div>
                     
                     <!-- Messages Area -->
-                    <div class="messages-area flex-grow-1 p-3" 
+                    <div class="messages-area flex-grow-1 p-3 notranslate" 
+                         translate="no"
                          style="overflow-y: auto; background: #f8f9fa;"
                          id="messages-container"
                          wire:poll.2s="loadMessages"

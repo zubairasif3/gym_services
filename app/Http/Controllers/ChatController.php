@@ -36,7 +36,7 @@ class ChatController extends Controller
                   ->orWhere('receiver_id', auth()->id());
         })->count();
         
-        $unreadCount = $this->getUnreadCount();
+        $unreadCount = $this->getUnreadCountValue();
         
         return view('web.messages', compact('totalRooms', 'totalMessages', 'unreadCount'));
     }
@@ -270,17 +270,17 @@ class ChatController extends Controller
     }
     
     /**
-     * API: Get unread message count
+     * Return unread chat count (for use in views).
      */
-    public function getUnreadCount()
+    protected function getUnreadCountValue(): int
     {
-        $count = ChatRoom::where(function($query) {
+        return ChatRoom::where(function ($query) {
             $query->where('sender_id', auth()->id())
                   ->orWhere('receiver_id', auth()->id());
         })
-        ->whereHas('messages', function($query) {
+        ->whereHas('messages', function ($query) {
             $query->where('sender_id', '!=', auth()->id())
-                  ->where('created_at', '>', function($subQuery) {
+                  ->where('created_at', '>', function ($subQuery) {
                       $subQuery->select('last_read_at')
                                ->from('chat_room_participants')
                                ->whereColumn('chat_room_id', 'chat_messages.chat_room_id')
@@ -289,8 +289,14 @@ class ChatController extends Controller
                   });
         })
         ->count();
-        
-        return response()->json(['count' => $count]);
+    }
+
+    /**
+     * API: Get unread message count (JSON response for API consumers).
+     */
+    public function getUnreadCount()
+    {
+        return response()->json(['count' => $this->getUnreadCountValue()]);
     }
     
     /**
