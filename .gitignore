@@ -26,3 +26,5 @@ yarn-error.log
 *.md
 
 *.zip
+docs/
+
