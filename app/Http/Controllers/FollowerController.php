@@ -105,8 +105,8 @@ class FollowerController extends Controller
     public function getCount()
     {
         return response()->json([
-            'followers_count' => auth()->user()->followers_count,
-            'following_count' => auth()->user()->following_count
+            'followers_count' => \App\Models\User::followersCount(),
+            'following_count' => \App\Models\User::followingCount(),
         ]);
     }
     

@@ -2,12 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Mail\RegistrationVerificationMail;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
-use Carbon\Carbon;
 
 class VerifyEmailCustomer extends Notification
 {
@@ -34,16 +33,14 @@ class VerifyEmailCustomer extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(object $notifiable): RegistrationVerificationMail
     {
-        $verificationUrl = $this->verificationUrl($notifiable);
-        
-        return (new MailMessage)
-            ->subject('Conferma il tuo account FitScout - Customer')
-            ->view('emails.verify-customer', [
-                'user' => $notifiable,
-                'verificationUrl' => $verificationUrl,
-            ]);
+        return new RegistrationVerificationMail(
+            user: $notifiable,
+            verificationUrl: $this->verificationUrl($notifiable),
+            mailView: 'emails.verify-customer',
+            subjectLine: 'Conferma il tuo account FitScout - Customer',
+        );
     }
 
     /**

@@ -775,7 +775,7 @@
                     <div class="col-md-4">
                         <div class="info-box">
                             <i class="fas fa-user-friends text-primary me-2"></i>
-                            <strong>Followers:</strong> {{ $user->followers_count }}
+                            <strong>Followers:</strong> {{ \App\Models\User::followersCount($user->id) }}
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -961,11 +961,6 @@
                         @if(auth()->id() !== $user->id)
                             <div class="mt-4">
                                 @livewire('profile-review-form', ['profileUserId' => $user->id], key('profile-review-form-' . $user->id))
-                            </div>
-                        @else
-                            <div class="alert alert-info mt-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                You cannot review your own profile.
                             </div>
                         @endif
                     @else

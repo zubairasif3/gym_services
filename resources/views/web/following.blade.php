@@ -69,11 +69,11 @@
                                                 <!-- Stats -->
                                                 <div class="d-flex justify-content-center gap-3 mb-3">
                                                     <div>
-                                                        <strong>{{ $user->followers_count }}</strong>
+                                                        <strong>{{ \App\Models\User::followersCount($user->id) }}</strong>
                                                         <small class="text-muted d-block">Followers</small>
                                                     </div>
                                                     <div>
-                                                        <strong>{{ $user->gigs_count }}</strong>
+                                                        <strong>{{ $user->services->count() }}</strong>
                                                         <small class="text-muted d-block">Services</small>
                                                     </div>
                                                 </div>

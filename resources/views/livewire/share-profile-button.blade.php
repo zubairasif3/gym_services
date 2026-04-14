@@ -68,12 +68,13 @@
     <script>
         document.addEventListener('livewire:init', () => {
             Livewire.on('open-share-url', (event) => {
-                window.open(event.url, '_blank', 'width=600,height=400');
+                const url = event.detail?.url ?? event.url;
+                window.open(url, '_blank', 'width=600,height=400');
             });
-            
+
             Livewire.on('copy-to-clipboard', (event) => {
-                navigator.clipboard.writeText(event.text).then(() => {
-                    // Show a brief success message
+                const text = event.detail?.text ?? event.text;
+                navigator.clipboard.writeText(text).then(() => {
                     alert('Link copied to clipboard!');
                 });
             });

@@ -60,17 +60,19 @@
             </a>
         @endif
 
-        <a href="{{ route('following') }}" 
-           class="dropdown-item d-flex align-items-center py-2">
-            <i class="far fa-heart me-3 text-danger" style="width: 20px;"></i>
-            <span>Following ({{ $user->following_count }})</span>
-        </a>
-        
-        <a href="{{ route('notifications') }}" 
-           class="dropdown-item d-flex align-items-center py-2">
-            <i class="far fa-bell me-3 text-warning" style="width: 20px;"></i>
-            <span>Notifications</span>
-        </a>
+        @if(! $user->isProfessional())
+            <a href="{{ route('following') }}"
+               class="dropdown-item d-flex align-items-center py-2">
+                <i class="far fa-heart me-3 text-danger" style="width: 20px;"></i>
+                <span>Following ({{ \App\Models\User::followingCount($user->id) }})</span>
+            </a>
+
+            <a href="{{ route('notifications') }}"
+               class="dropdown-item d-flex align-items-center py-2">
+                <i class="far fa-bell me-3 text-warning" style="width: 20px;"></i>
+                <span>Notifications</span>
+            </a>
+        @endif
     </div>
     
     <!-- Logout -->

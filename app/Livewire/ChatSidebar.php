@@ -104,14 +104,23 @@ class ChatSidebar extends Component
         }
         
         $room = ChatRoom::findOrFail($this->activeRoomId);
-        
+           
         // Get other user info
         $otherUser = $room->sender_id === auth()->id() ? $room->receiver : $room->sender;
+        $peer = $room->sender_id === auth()->id() ? $room->receiver : $room->sender;
+        $isProfessional = (int) $peer->user_type === 3;
+        $username = $peer->username;
         $this->otherUser = [
             'id' => $otherUser->id,
             'name' => $otherUser->name . ' ' . ($otherUser->surname ?? ''),
             'avatar' => $otherUser->avatar_url ? asset('storage/' . $otherUser->avatar_url) : null,
-            'initials' => $otherUser->initials
+            'initials' => $otherUser->initials,
+            'id' => $peer->id,
+            'name' => trim($peer->name.' '.($peer->surname ?? '')),
+            'avatar' => $peer->avatar_url ? asset('storage/'.$peer->avatar_url) : null,
+            'initials' => $peer->initials,
+            'user_type' => (int) $peer->user_type,
+            'profile_url' => ($isProfessional && $username) ? route('professional.profile', $username) : null,
         ];
         
         $messages = ChatMessage::where('chat_room_id', $this->activeRoomId)

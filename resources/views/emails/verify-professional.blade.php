@@ -8,7 +8,18 @@
 <body style="font-family: 'DM Sans', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: #ffffff; padding: 30px;">
         <div style="text-align: center; margin-bottom: 30px;">
-            <img src="{{ asset('web/images/logo-dark.png') }}" alt="FitScout" style="max-width: 150px;">
+            @php
+                $logoPath = collect([
+                    public_path('web/images/logo-dark.png'),
+                    public_path('web/images/logo.png'),
+                    public_path('web/images/favicon.png'),
+                ])->first(fn ($p) => is_file($p));
+            @endphp
+            @if($logoPath)
+                <img src="{{ $message->embed($logoPath) }}" alt="FitScout" style="max-width: 150px; height: auto;">
+            @else
+                <span style="font-size: 22px; font-weight: 700; color: #00b3f1;">FitScout</span>
+            @endif
         </div>
         
         <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">
@@ -72,7 +83,9 @@
         </p>
         
         <p style="margin-bottom: 25px; font-size: 16px; color: #ff4444; padding-left: 20px;">
-            <img src="{{ asset('web/images/qr-code.png') }}" alt="QR Code" style="max-width: 150px;">
+            @if(is_file(public_path('web/images/qr-code.png')))
+                <img src="{{ $message->embed(public_path('web/images/qr-code.png')) }}" alt="QR Code" style="max-width: 150px; height: auto;">
+            @endif
         </p>
         <p style="margin-bottom: 15px; font-size: 16px;">
             Racconta la tua esperienza e lascia una recensione.

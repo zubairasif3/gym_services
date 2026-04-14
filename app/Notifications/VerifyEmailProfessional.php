@@ -2,12 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Mail\RegistrationVerificationMail;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
-use Carbon\Carbon;
 
 class VerifyEmailProfessional extends Notification
 {
@@ -34,16 +33,14 @@ class VerifyEmailProfessional extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(object $notifiable): RegistrationVerificationMail
     {
-        $verificationUrl = $this->verificationUrl($notifiable);
-        
-        return (new MailMessage)
-            ->subject('Conferma il tuo account FitScout - Professional')
-            ->view('emails.verify-professional', [
-                'user' => $notifiable,
-                'verificationUrl' => $verificationUrl,
-            ]);
+        return new RegistrationVerificationMail(
+            user: $notifiable,
+            verificationUrl: $this->verificationUrl($notifiable),
+            mailView: 'emails.verify-professional',
+            subjectLine: 'Conferma il tuo account FitScout - Professional',
+        );
     }
 
     /**

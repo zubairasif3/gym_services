@@ -35,7 +35,7 @@
                         </div>
                         <div class="feature-content">
                           <div class="top-area">
-                            <h6 class="title mb-1">{{ $subcategory->gigs_count }} {{ $subcategory->gigs_count == 1 ? 'skill' : 'skills' }}</h6>
+                            <h6 class="title mb-1">{{ $subcategory->gigs_count }}</h6>
                             <h5 class="text">{{ $subcategory->name }}</h5>
                           </div>
                         </div>

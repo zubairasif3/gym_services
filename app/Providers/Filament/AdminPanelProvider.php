@@ -2,23 +2,22 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
 use Filament\Http\Middleware\Authenticate;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -37,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationItems([
                 NavigationItem::make('Visit Website')
                 // ->url('/', shouldOpenInNewTab: true)
-                ->url('/')
+                    ->url('/')
                     ->icon('heroicon-o-globe-alt')
                     ->sort(999),
                 NavigationItem::make('Service calendar')
@@ -54,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandLogo(asset('web/images/logo-dark.png'))
+            ->favicon(asset('web/images/favicon.png'))
             ->brandLogoHeight('3.5rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -90,21 +90,17 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->brandLogoHeight('3.5rem')
             ->colors([
                 'primary' => '#00b3f1',
                 'secondary' => '#00b3f1',
             ])
             ->renderHook(
                 \Filament\View\PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn(): ?string => \Illuminate\Support\Facades\Blade::render('@livewire(\App\Livewire\TeamSelector::class)'),
+                fn (): ?string => \Illuminate\Support\Facades\Blade::render('@livewire(\App\Livewire\TeamSelector::class)'),
             )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
-                fn(): ?string => \Illuminate\Support\Facades\Blade::render('<div class="flex items-center mr-4">@livewire(\App\Livewire\AdminNotificationBell::class)</div>'),
-            )
-            ;
+                fn (): ?string => \Illuminate\Support\Facades\Blade::render('<div class="flex items-center mr-4">@livewire(\App\Livewire\AdminNotificationBell::class)</div>'),
+            );
     }
-
-
 }

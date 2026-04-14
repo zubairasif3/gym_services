@@ -73,21 +73,40 @@
             <!-- Active Chat (Right Panel) -->
             <div class="active-chat flex-grow-1 d-flex flex-column">
                 @if($activeRoomId)
-                    <!-- Chat User Info -->
+                    <!-- Chat User Info: link to public profile only when the other participant is a professional -->
                     <div class="chat-user-info p-3 border-bottom bg-light">
                         <div class="d-flex align-items-center">
-                            @if($otherUser['avatar'])
-                                <img src="{{ $otherUser['avatar'] }}" 
-                                     class="rounded-circle me-3" 
-                                     width="40" 
-                                     height="40">
+                            @if(($otherUser['user_type'] ?? 0) === 3 && ! empty($otherUser['profile_url']))
+                                <a href="{{ $otherUser['profile_url'] }}" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center text-decoration-none text-reset">
+                                    @if($otherUser['avatar'])
+                                        <img src="{{ $otherUser['avatar'] }}"
+                                             class="rounded-circle me-3"
+                                             width="40"
+                                             height="40"
+                                             alt="">
+                                    @else
+                                        <div class="avatar-initials bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                             style="width: 40px; height: 40px;">
+                                            {{ $otherUser['initials'] }}
+                                        </div>
+                                    @endif
+                                    <h6 class="mb-0 fw-semibold text-dark">{{ $otherUser['name'] }}</h6>
+                                </a>
                             @else
-                                <div class="avatar-initials bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                     style="width: 40px; height: 40px;">
-                                    {{ $otherUser['initials'] }}
-                                </div>
+                                @if($otherUser['avatar'])
+                                    <img src="{{ $otherUser['avatar'] }}"
+                                         class="rounded-circle me-3"
+                                         width="40"
+                                         height="40"
+                                         alt="">
+                                @else
+                                    <div class="avatar-initials bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                         style="width: 40px; height: 40px;">
+                                        {{ $otherUser['initials'] }}
+                                    </div>
+                                @endif
+                                <h6 class="mb-0 fw-semibold">{{ $otherUser['name'] }}</h6>
                             @endif
-                            <h6 class="mb-0 fw-semibold">{{ $otherUser['name'] }}</h6>
                         </div>
                     </div>
                     

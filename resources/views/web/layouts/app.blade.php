@@ -22,12 +22,10 @@
     <link rel="stylesheet" href="{{ asset('web/css/responsive.css') }}">
 
     <!-- Favicon -->
-    <link href="{{ asset('web/images/favicon.png') }}" sizes="128x128" rel="shortcut icon" type="image/x-icon" />
-    <link href="{{ asset('web/images/favicon.png') }}" sizes="128x128" rel="shortcut icon" />
-    <link href="{{ asset('web/images/apple-touch-icon-60x60.png') }}" sizes="60x60" rel="apple-touch-icon">
-    <link href="{{ asset('web/images/apple-touch-icon-72x72.png') }}" sizes="72x72" rel="apple-touch-icon">
-    <link href="{{ asset('web/images/apple-touch-icon-114x114.png') }}" sizes="114x114" rel="apple-touch-icon">
-    <link href="{{ asset('web/images/apple-touch-icon-180x180.png') }}" sizes="180x180" rel="apple-touch-icon">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('web/images/favicon.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('web/images/favicon.png') }}">
     
     @livewireStyles
     @stack('styles')

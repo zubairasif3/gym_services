@@ -24,7 +24,7 @@ class FollowButton extends Component
     public function loadFollowState()
     {
         $this->isFollowing = auth()->check() ? auth()->user()->isFollowing($this->user) : false;
-        $this->followersCount = $this->user->followers_count;
+        $this->followersCount = User::followersCount($this->user->id);
         $this->isLoading = false;
     }
     
@@ -91,7 +91,7 @@ class FollowButton extends Component
         }
         
         $this->isFollowing = true;
-        $this->followersCount = $this->user->fresh()->followers_count;
+        $this->followersCount = User::followersCount($this->user->id);
         $this->dispatch('follower-added');
     }
     
@@ -108,7 +108,7 @@ class FollowButton extends Component
         auth()->user()->decrement('following_count');
         
         $this->isFollowing = false;
-        $this->followersCount = $this->user->fresh()->followers_count;
+        $this->followersCount = User::followersCount($this->user->id);
         $this->dispatch('follower-removed');
     }
     

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Filament\Models\Contracts\HasAvatar;
@@ -185,6 +187,42 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    /**
+     * Get a user's follower count from the pivot table.
+     * Falls back to the authenticated user. Returns 0 for guests.
+     */
+    public static function followersCount(?int $userId = null): int
+    {
+        $resolvedUserId = $userId ?? Auth::id();
+        if (! $resolvedUserId) {
+            return 0;
+        }
+
+        return (int) DB::table('followers')
+            ->join('users as follower_users', 'follower_users.id', '=', 'followers.follower_id')
+            ->where('followers.following_id', $resolvedUserId)
+            ->distinct('followers.follower_id')
+            ->count('followers.follower_id');
+    }
+
+    /**
+     * Get a user's following count from the pivot table.
+     * Falls back to the authenticated user. Returns 0 for guests.
+     */
+    public static function followingCount(?int $userId = null): int
+    {
+        $resolvedUserId = $userId ?? Auth::id();
+        if (! $resolvedUserId) {
+            return 0;
+        }
+
+        return (int) DB::table('followers')
+            ->join('users as following_users', 'following_users.id', '=', 'followers.following_id')
+            ->where('followers.follower_id', $resolvedUserId)
+            ->distinct('followers.following_id')
+            ->count('followers.following_id');
     }
 
     // Notifications Relationships

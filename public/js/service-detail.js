@@ -331,13 +331,15 @@ document.addEventListener('livewire:init', () => {
     // Listen for copy-to-clipboard event
     Livewire.on('copy-to-clipboard', (event) => {
         if (typeof copyToClipboard === 'function') {
-            copyToClipboard(event.text);
+            var text = event.detail && event.detail.text !== undefined ? event.detail.text : event.text;
+            copyToClipboard(text);
         }
     });
-    
+
     // Listen for open-share-url event
     Livewire.on('open-share-url', (event) => {
-        window.open(event.url, '_blank', 'width=600,height=400,scrollbars=yes');
+        var url = event.detail && event.detail.url !== undefined ? event.detail.url : event.url;
+        window.open(url, '_blank', 'width=600,height=400,scrollbars=yes');
     });
     
     // Listen for review submitted

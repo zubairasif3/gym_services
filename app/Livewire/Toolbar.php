@@ -38,7 +38,7 @@ class Toolbar extends Component
         $this->messagesCount = $this->getUnreadMessagesCount();
         
         // Load following count
-        $this->followingCount = $user->following_count;
+        $this->followingCount = \App\Models\User::followingCount($user->id);
     }
     
     private function getUnreadMessagesCount()
