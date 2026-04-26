@@ -332,7 +332,7 @@ class HomeController extends Controller
 
     public function services(Request $request, $categoryId = null, $subcategoryId = null)
     {
-        $country = $request->get('country');
+        $city = $request->get('city');
         $minPrice = $request->get('min_price');
         $maxPrice = $request->get('max_price');
 
@@ -342,7 +342,7 @@ class HomeController extends Controller
                 $query->where('is_active', true);
             }])
             ->get()
-            ->map(function($category) use ($minPrice, $maxPrice, $country, $categoryId, $subcategoryId) {
+            ->map(function($category) use ($minPrice, $maxPrice, $city, $categoryId, $subcategoryId) {
                 // Get professionals who have active services in this category
                 $professionalsQuery = User::where('user_type', 3)
                     ->whereHas('services', function($query) use ($category, $minPrice, $maxPrice, $subcategoryId) {
@@ -373,12 +373,16 @@ class HomeController extends Controller
                                 $query->where('sub_category_id', $subcategoryId);
                             }
                         }
-                    ]);
-                
-                // Filter by country if provided
-                if ($country) {
-                    $professionalsQuery->whereHas('profile', function($query) use ($country) {
-                        $query->where('country', $country);
+                    ])
+                    // Restrict location filter to Italy only
+                    ->whereHas('profile', function($query) {
+                        $query->whereIn(DB::raw('LOWER(TRIM(country))'), ['italy', 'italia']);
+                    });
+
+                // Filter by city if provided
+                if ($city) {
+                    $professionalsQuery->whereHas('profile', function($query) use ($city) {
+                        $query->where('city', $city);
                     });
                 }
                 
@@ -396,16 +400,15 @@ class HomeController extends Controller
                 return $category;
             });
 
-        // Collect all countries from professionals
-        $countries = $categories->flatMap(function ($category) {
+        // Collect all Italian cities from professionals
+        $cities = $categories->flatMap(function ($category) {
             return $category->professionals->map(function ($professional) {
-                return $professional->profile->country ?? null;
+                return $professional->profile->city ?? null;
             });
         })->filter();
 
-        // Get unique countries
-        $uniqueCountries = $countries->unique();
-        $finalCountries = $uniqueCountries->toArray();
+        // Get unique city list for the filter
+        $finalCities = $cities->unique()->sort()->values()->toArray();
         
         // Get price range for the filter from services
         $priceRange = \App\Models\Service::where('is_active', true)
@@ -416,7 +419,7 @@ class HomeController extends Controller
         // not individual services. Impressions are tracked when services are explicitly displayed
         // (e.g., on the professional profile page).
         
-        return view('web.services', compact('categories', 'categoryId', 'subcategoryId', 'finalCountries', 'priceRange', 'minPrice', 'maxPrice'));
+        return view('web.services', compact('categories', 'categoryId', 'subcategoryId', 'finalCities', 'priceRange', 'minPrice', 'maxPrice', 'city'));
     }
 
     public function registerProcess(Request $request)

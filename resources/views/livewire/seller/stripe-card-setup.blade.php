@@ -40,8 +40,7 @@
                             payment_method: setupIntent.payment_method
                         })
                     }).then(() => {
-                        alert('Card saved successfully!');
-                        location.reload();
+                        window.location.href = '/admin?card_updated=1';
                     });
                 }
             });

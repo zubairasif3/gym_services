@@ -28,6 +28,7 @@ class NotificationsDropdown extends Component
                     'id' => $notification->id,
                     'type' => $notification->type,
                     'data' => $notification->data,
+                    'related_model_id' => $notification->related_model_id,
                     'is_read' => ! is_null($notification->read_at),
                     'created_at' => $notification->created_at->diffForHumans(),
                     'related_user' => $notification->relatedUser ? [

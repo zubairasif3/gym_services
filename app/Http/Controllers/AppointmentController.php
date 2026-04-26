@@ -362,6 +362,7 @@ class AppointmentController extends Controller
             'service_id' => 'required|exists:services,id',
             'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i',
+            'duration_minutes' => 'nullable|in:30,60',
             'external_color' => 'nullable|string|max:50',
         ]);
 
@@ -374,12 +375,35 @@ class AppointmentController extends Controller
 
         DB::beginTransaction();
         try {
+            $durationMinutes = (int) ($request->duration_minutes ?? 30);
+            $dateStr = $request->appointment_date;
+            $slotStartCarbon = Carbon::createFromFormat('H:i', $request->appointment_time);
+            $ourStartM = (int) $slotStartCarbon->format('H') * 60 + (int) $slotStartCarbon->format('i');
+            $ourEndM = $ourStartM + $durationMinutes;
+
+            // Prevent overlap with existing pending/confirmed appointments for this service/date
+            $overlaps = Appointment::where('service_id', $service->id)
+                ->where('appointment_date', $dateStr)
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->get()
+                ->contains(function ($apt) use ($ourStartM, $ourEndM) {
+                    $dur = (int) ($apt->duration_minutes ?? 30);
+                    $exStartM = (int) $apt->appointment_time->format('H') * 60 + (int) $apt->appointment_time->format('i');
+                    $exEndM = $exStartM + $dur;
+                    return $exStartM < $ourEndM && $exEndM > $ourStartM;
+                });
+
+            if ($overlaps) {
+                return response()->json(['error' => 'This time slot is already booked.'], 422);
+            }
+
             $appointment = Appointment::create([
                 'service_id' => $service->id,
                 'client_id' => Auth::id(), // Use professional as client for external
                 'professional_id' => Auth::id(),
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $request->appointment_time,
+                'duration_minutes' => $durationMinutes,
                 'status' => 'confirmed',
                 'is_external' => true,
                 'external_color' => $request->external_color ?? '#00b3f1',
@@ -423,8 +447,7 @@ class AppointmentController extends Controller
 
         // Get appointments
         $appointmentsQuery = Appointment::where('professional_id', $professionalId)
-            ->whereBetween('appointment_date', [$start->toDateString(), $end->toDateString()])
-            ->where('is_external', false);
+            ->whereBetween('appointment_date', [$start->toDateString(), $end->toDateString()]);
 
         if ($request->service_id) {
             $appointmentsQuery->where('service_id', $request->service_id);
@@ -437,7 +460,7 @@ class AppointmentController extends Controller
                     'pending' => '#dc3545',   // Red - Waiting/Pending
                     'confirmed' => '#28a745', // Green - Booked
                     'cancelled' => '#6c757d', // Gray
-                    default => '#00b3f1',    // Primary
+                    default => ($appointment->is_external ? ($appointment->external_color ?? '#0ea5e9') : '#00b3f1'),
                 };
 
                 $durationMinutes = (int) ($appointment->duration_minutes ?? 30);
@@ -447,7 +470,9 @@ class AppointmentController extends Controller
 
                 return [
                     'id' => $appointment->id,
-                    'title' => $appointment->service->title . ' - ' . $appointment->client_name,
+                    'title' => $appointment->is_external
+                        ? ('External - ' . $appointment->service->title)
+                        : ($appointment->service->title . ' - ' . $appointment->client_name),
                     'start' => $startStr,
                     'end' => $endStr,
                     'backgroundColor' => $color,
@@ -455,6 +480,7 @@ class AppointmentController extends Controller
                     'color' => $color,
                     'extendedProps' => [
                         'status' => $appointment->status,
+                        'is_external' => (bool) $appointment->is_external,
                         'service_id' => $appointment->service_id,
                         'client_name' => $appointment->client_name . ' ' . $appointment->client_surname,
                         'client_email' => $appointment->client_email ?? '',
@@ -671,6 +697,59 @@ class AppointmentController extends Controller
 
                 $current->addMinutes(30);
             }
+        }
+
+        // Ensure external appointments are always visible on calendar,
+        // even when they are outside availability windows.
+        $externalAppointments = Appointment::where('service_id', $service->id)
+            ->whereBetween('appointment_date', [$start->toDateString(), $end->copy()->subDay()->toDateString()])
+            ->where('is_external', true)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->get();
+
+        $existingKeys = [];
+        foreach ($events as $ev) {
+            $existingKeys[$ev['start'] . '|' . $ev['end']] = true;
+        }
+
+        foreach ($externalAppointments as $appointment) {
+            $durationMinutes = (int) ($appointment->duration_minutes ?? 30);
+            $startCarbon = Carbon::parse($appointment->appointment_date->format('Y-m-d') . ' ' . $appointment->appointment_time->format('H:i:s'));
+            $startStr = $startCarbon->format('Y-m-d\TH:i:s');
+            $endStr = $startCarbon->copy()->addMinutes($durationMinutes)->format('Y-m-d\TH:i:s');
+            $key = $startStr . '|' . $endStr;
+
+            if (isset($existingKeys[$key])) {
+                continue;
+            }
+
+            $externalColor = match($appointment->status) {
+                'pending' => '#dc3545',
+                'confirmed' => '#28a745',
+                'cancelled' => '#6c757d',
+                default => ($appointment->external_color ?? '#0ea5e9'),
+            };
+
+            $events[] = [
+                'title' => 'Booked',
+                'start' => $startStr,
+                'end' => $endStr,
+                'color' => $externalColor,
+                'extendedProps' => [
+                    'time' => $appointment->appointment_time->format('H:i'),
+                    'date' => $appointment->appointment_date->format('Y-m-d'),
+                    'bookable' => false,
+                    'duration_minutes' => $durationMinutes,
+                    'status' => $appointment->status,
+                    'is_external' => true,
+                    'service_title' => $appointment->service->title ?? '',
+                    'client_name' => trim(($appointment->client_name ?? '') . ' ' . ($appointment->client_surname ?? '')),
+                    'client_email' => $appointment->client_email ?? '',
+                    'client_phone' => $appointment->client_phone ?? '',
+                ],
+            ];
+
+            $existingKeys[$key] = true;
         }
 
         return response()->json(['events' => $events]);

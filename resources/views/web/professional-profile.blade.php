@@ -89,19 +89,18 @@
     .media-content {
         position: relative;
         width: 100%;
-        max-height: 500px;
+        height: 500px;
         border-radius: 12px;
         overflow: hidden;
         cursor: pointer;
-        background: #f8f9fa;
+        background: #000;
     }
 
     .media-content img,
     .media-content video {
         width: 100%;
         height: 100%;
-        max-height: 500px;
-        object-fit: cover;
+        object-fit: contain;
     }
 
     .video-play-overlay {
@@ -806,7 +805,7 @@
                         <div class="media-carousel-container">
                             <div class="media-carousel-track" id="mediaCarouselTrack">
                                 @foreach($user->activeProfileMedia as $media)
-                                    <div class="media-carousel-item">
+                                    <div class="media-carousel-item" data-media-id="{{ $media->id }}">
                                         <div class="media-content" onclick="openMediaLightbox({{ $loop->index }})">
                                             @if($media->media_type === 'image')
                                                 <img src="{{ asset('storage/' . $media->file_path) }}" 
@@ -852,6 +851,7 @@
                                 @foreach($user->activeProfileMedia as $index => $media)
                                     <div class="media-thumbnail-card {{ $index === 0 ? 'active' : '' }}" 
                                          onclick="goToMediaSlide({{ $index }})"
+                                         data-media-id="{{ $media->id }}"
                                          id="thumbnail-{{ $index }}">
                                         @if($media->media_type === 'image')
                                             <img src="{{ asset('storage/' . $media->file_path) }}" 
@@ -1259,6 +1259,23 @@
         updateCarouselButtons();
         updateReactionDisplay();
     }
+
+    function focusMediaFromQueryParam() {
+        const params = new URLSearchParams(window.location.search);
+        const targetMediaId = params.get('media_id');
+        if (!targetMediaId) return;
+
+        const track = document.getElementById('mediaCarouselTrack');
+        if (!track) return;
+
+        const items = Array.from(track.querySelectorAll('.media-carousel-item'));
+        if (items.length === 0) return;
+
+        const targetIndex = items.findIndex((item) => item.dataset.mediaId === targetMediaId);
+        if (targetIndex === -1) return;
+
+        goToMediaSlide(targetIndex);
+    }
     
     function updateCarouselButtons() {
         const prevBtn = document.querySelector('.carousel-nav-btn.prev');
@@ -1284,6 +1301,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize carousel buttons
         updateCarouselButtons();
+        focusMediaFromQueryParam();
         
         // Collect all media items for lightbox
         const carouselItems = document.querySelectorAll('.media-carousel-item');

@@ -22,11 +22,11 @@
     <link rel="stylesheet" href="{{ asset('web/css/responsive.css') }}">
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    <link rel="icon" href="{{ asset('web/images/favicon.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('favicon1.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('favicon1.ico') }}" type="image/x-icon">
+    {{-- <link rel="icon" href="{{ asset('web/images/favicon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('web/images/favicon.png') }}">
-    
+     --}}
     @livewireStyles
     @stack('styles')
 </head>

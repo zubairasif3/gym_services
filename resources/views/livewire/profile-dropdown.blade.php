@@ -53,6 +53,12 @@
         @endif
         
         @if($user->user_type == 2)
+            <a href="{{ route('customer.profile') }}"
+               class="dropdown-item d-flex align-items-center py-2">
+                <i class="far fa-user me-3 text-primary" style="width: 20px;"></i>
+                <span>My Profile</span>
+            </a>
+
             <a href="{{ route('appointments.index') }}"
                class="dropdown-item d-flex align-items-center py-2">
                 <i class="far fa-calendar-alt me-3 text-primary" style="width: 20px;"></i>

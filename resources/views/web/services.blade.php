@@ -35,20 +35,20 @@
                                 </div>
                             </div>
                             
-                            <!-- Country Filter -->
+                            <!-- City Filter (Italy only) -->
                             <div class="col-md-3">
                                 <label class="form-label fw-semibold text-dark mb-1 small">
-                                    <i class="fas fa-globe-americas text-primary me-1"></i>Location
+                                    <i class="fas fa-map-marker-alt text-primary me-1"></i>Location (Italy)
                                 </label>
-                                <select id="country-select" 
-                                        name="country" 
+                                <select id="city-select" 
+                                        name="city" 
                                         class="form-select rounded-pill border-2 shadow-sm" 
                                         style="height: 38px;"
                                         onchange="this.form.submit()">
-                                    <option value="">🌍 All Countries</option>
-                                    @foreach ($finalCountries as $country)
-                                        <option value="{{ $country }}" {{ request('country') == $country ? 'selected' : '' }}>
-                                            {{ $country }}
+                                    <option value="">🇮🇹 All Available Cities</option>
+                                    @foreach ($finalCities as $cityOption)
+                                        <option value="{{ $cityOption }}" {{ request('city') == $cityOption ? 'selected' : '' }}>
+                                            {{ $cityOption }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -95,7 +95,7 @@
                             </div>
                             
                             <!-- Clear Filters -->
-                            @if(request('country') || request('min_price') || request('max_price'))
+                            @if(request('city') || request('min_price') || request('max_price'))
                                 <div class="col-md-2">
                                     <div style="margin-top: 34px;">
                                         <a href="{{ route('web.services', [$categoryId, $subcategoryId]) }}" 
@@ -108,14 +108,14 @@
                             @endif
                             
                             <!-- Active Filters Display -->
-                            @if(request('country') || request('min_price') || request('max_price'))
+                            @if(request('city') || request('min_price') || request('max_price'))
                                 <div class="col-12">
                                     <div class="active-filters pt-2 border-top">
                                         <div class="d-flex flex-wrap gap-1 align-items-center">
                                             <small class="text-muted fw-semibold me-2">Active:</small>
-                                            @if(request('country'))
+                                            @if(request('city'))
                                                 <span class="badge bg-primary rounded-pill">
-                                                    <i class="fas fa-map-marker-alt me-1"></i>{{ request('country') }}
+                                                    <i class="fas fa-map-marker-alt me-1"></i>{{ request('city') }}
                                                 </span>
                                             @endif
                                             @if(request('min_price'))
@@ -489,12 +489,14 @@
       });
     });
 
-    // Auto-submit country filter with loading state
-    const countrySelect = document.getElementById('country-select');
-    countrySelect.addEventListener('change', function() {
-      submitBtn.classList.add('loading');
-      submitBtn.disabled = true;
-    });
+    // Auto-submit city filter with loading state
+    const citySelect = document.getElementById('city-select');
+    if (citySelect) {
+      citySelect.addEventListener('change', function() {
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+      });
+    }
   });
 </script>
 @endpush

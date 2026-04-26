@@ -56,7 +56,13 @@ class SendAppointmentReminders extends Command
             // Send email reminder if not sent
             if (!$emailSent) {
                 try {
-                    $appointment->client->notify(new AppointmentReminderNotification($appointment));
+                    // Notify both customer and professional
+                    if ($appointment->client) {
+                        $appointment->client->notify(new AppointmentReminderNotification($appointment));
+                    }
+                    if ($appointment->professional) {
+                        $appointment->professional->notify(new AppointmentReminderNotification($appointment));
+                    }
                     AppointmentReminder::create([
                         'appointment_id' => $appointment->id,
                         'reminder_type' => 'email',
@@ -71,7 +77,13 @@ class SendAppointmentReminders extends Command
             // Send in-app notification if not sent
             if (!$notificationSent) {
                 try {
-                    $appointment->client->notify(new AppointmentReminderNotification($appointment));
+                    // Notify both customer and professional
+                    if ($appointment->client) {
+                        $appointment->client->notify(new AppointmentReminderNotification($appointment));
+                    }
+                    if ($appointment->professional) {
+                        $appointment->professional->notify(new AppointmentReminderNotification($appointment));
+                    }
                     AppointmentReminder::create([
                         'appointment_id' => $appointment->id,
                         'reminder_type' => 'notification',

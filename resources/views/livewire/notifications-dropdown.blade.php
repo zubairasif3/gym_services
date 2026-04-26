@@ -65,10 +65,25 @@
                             @elseif(($notification['type'] ?? '') === 'new_media_reaction')
                                 @php
                                     $reactorName = $notification['related_user']['name'] ?? 'Someone';
+                                    $mediaId = $notification['related_model_id'] ?? null;
+                                    $profileBaseUrl = auth()->user() && auth()->user()->username
+                                        ? route('professional.profile', auth()->user()->username)
+                                        : route('professional.preview');
+                                    $profileUrl = $mediaId ? ($profileBaseUrl . '?media_id=' . $mediaId) : $profileBaseUrl;
                                 @endphp
-                                <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
+                                <a href="{{ $profileUrl }}" class="text-decoration-none text-dark">
                                     <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your photo/video</span>
                                     <span class="d-block small text-primary mt-1">View profile →</span>
+                                </a>
+                            @elseif(($notification['type'] ?? '') === 'new_profile_media' || ($notification['type'] ?? '') === 'new_service')
+                                @php
+                                    $actorName = $notification['related_user']['name'] ?? 'Someone';
+                                    $activityUrl = $notification['data']['url'] ?? route('notifications');
+                                    $message = $notification['data']['message'] ?? 'posted new content';
+                                @endphp
+                                <a href="{{ $activityUrl }}" class="text-decoration-none text-dark">
+                                    <span><strong>{{ $actorName }}</strong> {{ $message }}</span>
+                                    <span class="d-block small text-primary mt-1">View →</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_gig_review')
                                 @php

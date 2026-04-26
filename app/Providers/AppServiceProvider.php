@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\ProfileMedia;
+use App\Models\Service;
+use App\Observers\ProfileMediaObserver;
+use App\Observers\ServiceObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        ProfileMedia::observe(ProfileMediaObserver::class);
+        Service::observe(ServiceObserver::class);
+
        // Retrieve active categories with active gigs
         $categories = Category::with(['gigs' => function ($query) {
             $query->where('gigs.is_active', true); // Filter active gigs

@@ -107,10 +107,25 @@
                                                     @elseif($notification->type === 'new_media_reaction')
                                                         @php
                                                             $reactorName = $notification->relatedUser ? trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')) : 'Someone';
+                                                            $mediaId = $notification->related_model_id;
+                                                            $profileBaseUrl = auth()->user() && auth()->user()->username
+                                                                ? route('professional.profile', auth()->user()->username)
+                                                                : route('professional.preview');
+                                                            $profileUrl = $mediaId ? ($profileBaseUrl . '?media_id=' . $mediaId) : $profileBaseUrl;
                                                         @endphp
-                                                        <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark d-block">
+                                                        <a href="{{ $profileUrl }}" class="text-decoration-none text-dark d-block">
                                                             <span><strong>{{ $reactorName }}</strong> reacted {{ $notification->data['emoji'] ?? '' }} to your photo/video</span>
                                                             <span class="d-block small text-primary mt-1">View profile →</span>
+                                                        </a>
+                                                    @elseif($notification->type === 'new_profile_media' || $notification->type === 'new_service')
+                                                        @php
+                                                            $actorName = $notification->relatedUser ? trim($notification->relatedUser->name . ' ' . ($notification->relatedUser->surname ?? '')) : 'Someone';
+                                                            $activityUrl = $notification->data['url'] ?? route('notifications');
+                                                            $message = $notification->data['message'] ?? 'posted new content';
+                                                        @endphp
+                                                        <a href="{{ $activityUrl }}" class="text-decoration-none text-dark d-block">
+                                                            <span><strong>{{ $actorName }}</strong> {{ $message }}</span>
+                                                            <span class="d-block small text-primary mt-1">View →</span>
                                                         </a>
                                                     @elseif($notification->type === 'new_gig_review')
                                                         @php

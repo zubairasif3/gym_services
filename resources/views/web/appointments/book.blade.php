@@ -435,7 +435,9 @@
     width: calc(50% - 2px) !important;
 }
 .booking-calendar-container .fc-timegrid-event-harness .fc-timegrid-event {
-    min-height: 100%;
+    min-height: calc(100% - 6px);
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 /* Reference: rounded button-like event blocks, white text */
 .booking-calendar-container .fc-event {
@@ -451,13 +453,13 @@
     text-align: center;
     font-weight: 500;
     padding-top: 0px;
-    height: 100%;
-    min-height: 100%;
+    height: calc(100% - 6px);
+    min-height: calc(100% - 6px);
 }
 .booking-calendar-container .fc-event .fc-event-main {
     border-radius: 8px;
-    height: 100%;
-    min-height: 100%;
+    height: calc(100% - 2px);
+    min-height: calc(100% - 2px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -479,32 +481,36 @@
 }
 /* Each day cell contains two plus buttons: first half (e.g. 09:00) and second half (09:30) */
 .booking-slot-plus-cell {
-    display: flex;
-    gap: 2px;
+    display: block;
     margin: 2px;
     min-width: 0;
+    height: calc(100% - 4px);
 }
 .booking-slot-plus-cell .booking-slot-plus,
 .booking-slot-plus-cell .booking-slot-placeholder {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 28px;
+    box-sizing: border-box;
 }
 .booking-slot-plus {
     display: flex;
     align-items: center;
     justify-content: center;
     color: #9ca3af;
-    font-size: 1.1rem;
-    font-weight: 300;
+    font-size: 1.2rem;
+    font-weight: 500;
     background: #252525;
-    border-radius: 6px;
+    border: 1px solid #3b3b3b;
+    border-radius: 4px;
     cursor: pointer;
     pointer-events: auto;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .booking-slot-plus:hover {
     background: #333;
     color: #06a7e1;
+    border-color: #06a7e1;
 }
 .booking-slot-plus-1h {
     font-size: 0.85rem;
@@ -515,7 +521,8 @@
     align-items: center;
     justify-content: center;
     background: #252525;
-    border-radius: 6px;
+    border: 1px solid #3b3b3b;
+    border-radius: 4px;
     pointer-events: none;
 }
 .booking-calendar-container .fc .fc-toolbar-title {
@@ -690,6 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const calendarDataUrl = '{{ route("appointments.book.calendar-data", ["username" => $professional->username]) }}';
     const storeUrl = '{{ route("appointments.store") }}';
+    const externalStoreUrl = '{{ route("appointments.store.external") }}';
     const availabilityStoreUrl = '{{ route("service-availabilities.store") }}';
     const availabilityStoreWithRepeatUrl = '{{ route("service-availabilities.store-with-repeat") }}';
     const loginUrl = '{{ route("web.login") }}';
@@ -854,21 +862,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (es < seg2End && ee > seg2Start) secondCovered = true;
                     }
                     var html = '';
-                    if (cellDay < today) {
-                        html = '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
-                    } else if (fullCovered || (firstCovered && secondCovered)) {
-                        html = '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
-                    } else if (firstCovered) {
+                    // Hide the "+" for the entire hour slot as soon as any half is occupied.
+                    if (cellDay < today || fullCovered || firstCovered || secondCovered) {
                         html = '<span class="booking-slot-placeholder"></span>';
-                        html += '<span class="booking-slot-plus" data-slot-time="' + timeSecond + '" data-column="' + c + '" data-half="second" role="button" tabindex="0">+</span>';
-                    } else if (secondCovered) {
-                        html = '<span class="booking-slot-plus" data-slot-time="' + timeFirst + '" data-column="' + c + '" data-half="first" role="button" tabindex="0">+</span>';
-                        html += '<span class="booking-slot-placeholder"></span>';
-                        html += '<span class="booking-slot-placeholder"></span>';
                     } else {
-                        html = '<span class="booking-slot-plus" data-slot-time="' + timeFirst + '" data-column="' + c + '" data-half="first" role="button" tabindex="0">+</span>';
-                        html += '<span class="booking-slot-plus" data-slot-time="' + timeSecond + '" data-column="' + c + '" data-half="second" role="button" tabindex="0">+</span>';
-                        html += '<span class="booking-slot-plus booking-slot-plus-1h" data-slot-time="' + timeFirst + '" data-slot-end="' + endTime1h + '" data-column="' + c + '" data-duration-minutes="60" role="button" tabindex="0" title="Add 1 hour">+1h</span>';
+                        html = '<span class="booking-slot-plus" ' +
+                            'data-slot-time="' + timeFirst + '" ' +
+                            'data-slot-time-second="' + timeSecond + '" ' +
+                            'data-slot-end-1h="' + endTime1h + '" ' +
+                            'data-column="' + c + '" ' +
+                            'data-allow-first="' + (!firstCovered ? '1' : '0') + '" ' +
+                            'data-allow-second="' + (!secondCovered ? '1' : '0') + '" ' +
+                            'role="button" tabindex="0" title="Add slot">+</span>';
                     }
                     cells[c].innerHTML = html;
                 }
@@ -923,13 +928,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     var isPast = cellDay < today;
                     html += '<div class="booking-slot-plus-cell">';
                     if (isPast) {
-                        html += '<span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span><span class="booking-slot-placeholder"></span>';
+                        html += '<span class="booking-slot-placeholder"></span>';
                     } else {
                         var endHour = (hour + 1);
                         var endTime1h = (endHour >= 24 ? '23:59' : String(endHour).padStart(2, '0') + ':00');
-                        html += '<span class="booking-slot-plus" data-slot-time="' + timeFirst + '" data-column="' + c + '" data-half="first" role="button" tabindex="0">+</span>';
-                        html += '<span class="booking-slot-plus" data-slot-time="' + timeSecond + '" data-column="' + c + '" data-half="second" role="button" tabindex="0">+</span>';
-                        html += '<span class="booking-slot-plus booking-slot-plus-1h" data-slot-time="' + timeFirst + '" data-slot-end="' + endTime1h + '" data-column="' + c + '" data-duration-minutes="60" role="button" tabindex="0" title="Add 1 hour">+1h</span>';
+                        html += '<span class="booking-slot-plus" ' +
+                            'data-slot-time="' + timeFirst + '" ' +
+                            'data-slot-time-second="' + timeSecond + '" ' +
+                            'data-slot-end-1h="' + endTime1h + '" ' +
+                            'data-column="' + c + '" ' +
+                            'data-allow-first="1" data-allow-second="1" ' +
+                            'role="button" tabindex="0" title="Add slot">+</span>';
                     }
                     html += '</div>';
                 }
@@ -1248,21 +1257,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (calendarHeaderPlaceholder) calendarHeaderPlaceholder.style.display = 'block';
     }
 
-    /* Clickable "+" for owner: add availability for that slot (like Google Calendar) */
+    /* Single "+" for owner: choose duration/half + optional external appointment in modal */
     calendarContainer.addEventListener('click', function(e) {
         var plus = e.target.closest('.booking-slot-plus');
         if (!plus || !isServiceOwner) return;
         e.preventDefault();
         e.stopPropagation();
+
         var slotTime = plus.getAttribute('data-slot-time');
+        var slotTimeSecond = plus.getAttribute('data-slot-time-second');
+        var slotEnd1h = plus.getAttribute('data-slot-end-1h');
         var col = parseInt(plus.getAttribute('data-column'), 10);
+        var allowFirst = plus.getAttribute('data-allow-first') === '1';
+        var allowSecond = plus.getAttribute('data-allow-second') === '1';
         if (!slotTime || isNaN(col)) return;
         if (!calendar) return;
         if (!selectedServiceId) {
             bookingSwal.fire({ icon: 'info', title: 'Select a service', text: 'Please select a service from the sidebar first.', confirmButtonColor: '#00b3f1' });
             return;
         }
-        var is1h = plus.classList.contains('booking-slot-plus-1h') || plus.getAttribute('data-duration-minutes') === '60';
+
         var viewStart = calendar.view.activeStart;
         var d = new Date(viewStart.getFullYear(), viewStart.getMonth(), viewStart.getDate());
         d.setDate(d.getDate() + col);
@@ -1270,105 +1284,148 @@ document.addEventListener('DOMContentLoaded', function() {
         var hour = parseInt(parts[0], 10);
         var min = parseInt(parts[1], 10) || 0;
         d.setHours(hour, min, 0, 0);
+
         var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        var start1 = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-        var end1;
-        var start2 = null, end2 = null;
-        if (is1h && plus.getAttribute('data-slot-end')) {
-            end1 = plus.getAttribute('data-slot-end');
-        } else {
-            var endD = new Date(d.getTime());
-            endD.setMinutes(endD.getMinutes() + 30);
-            end1 = endD.getHours() === 0 && endD.getMinutes() === 0 ? '23:59' : (String(endD.getHours()).padStart(2, '0') + ':' + String(endD.getMinutes()).padStart(2, '0'));
-            start2 = end1 === '23:59' ? null : end1;
-            end2 = start2 ? (function() { var h = parseInt(start2.slice(0,2), 10); var m = parseInt(start2.slice(3), 10); m += 30; if (m >= 60) { h++; m = 0; } return h >= 24 ? '23:59' : (String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')); })() : null;
-        }
         var displayDate = d.toLocaleDateString(getCalendarLocale() === 'it' ? 'it-IT' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-        var displayTime = start1 + ' – ' + (end1 === '23:59' ? '24:00' : end1);
+
         var maxEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         maxEnd.setMonth(maxEnd.getMonth() + 6);
         var maxEndStr = maxEnd.getFullYear() + '-' + String(maxEnd.getMonth() + 1).padStart(2, '0') + '-' + String(maxEnd.getDate()).padStart(2, '0');
-        var repeatHtml = '<div class="text-left mt-3" style="padding:0.5rem 0">' +
+
+        var modalHtml = '<div class="text-left mt-2" style="padding:0.5rem 0;">' +
+            '<label class="d-flex align-items-center gap-2 mb-2" style="font-weight:600;color:#111827;">' +
+            '<input type="checkbox" id="swal-external-appointment" style="width:16px;height:16px;"> External Appointment</label>' +
+            '<label class="block text-sm font-medium mb-1">Duration</label>' +
+            '<select id="swal-slot-duration" class="swal2-input" style="width:100%;margin:0 0 8px 0;box-sizing:border-box;">' +
+            '<option value="30">30 minutes</option><option value="60">1 hour</option></select>' +
+            '<div id="swal-half-wrap">' +
+            '<label class="block text-sm font-medium mb-1">Half-hour option</label>' +
+            '<select id="swal-half-choice" class="swal2-input" style="width:100%;margin:0 0 8px 0;box-sizing:border-box;">' +
+            (allowFirst ? '<option value="first">First half</option>' : '') +
+            (allowSecond ? '<option value="second">Second half</option>' : '') +
+            ((allowFirst && allowSecond) ? '<option value="both">Both</option>' : '') +
+            '</select></div>' +
+            '<div id="swal-repeat-wrap">' +
             '<label class="block text-sm font-medium mb-1">Repeat</label>' +
-            '<select id="swal-repeat-type" class="swal2-input" style="width:100%;margin:0;box-sizing:border-box">' +
+            '<select id="swal-repeat-type" class="swal2-input" style="width:100%;margin:0;box-sizing:border-box;">' +
             '<option value="none">No repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option>' +
             '</select>' +
-            '<div id="swal-repeat-end-wrap" style="display:none;margin-top:0.5rem">' +
+            '<div id="swal-repeat-end-wrap" style="display:none;margin-top:0.5rem;">' +
             '<label class="block text-sm font-medium mb-1">Until date (max 6 months)</label>' +
-            '<input type="date" id="swal-repeat-end" class="swal2-input" style="width:100%;margin:0;box-sizing:border-box" min="' + dateStr + '" max="' + maxEndStr + '">' +
-            '</div></div>';
+            '<input type="date" id="swal-repeat-end" class="swal2-input" style="width:100%;margin:0;box-sizing:border-box;" min="' + dateStr + '" max="' + maxEndStr + '">' +
+            '</div></div></div>';
+
         bookingSwal.fire({
-            title: 'Add availability',
-            html: 'Add a ' + (is1h ? '1-hour' : '30-minute') + ' slot on <strong>' + displayDate + '</strong> at <strong>' + displayTime + '</strong>?' + repeatHtml,
+            title: 'Add slot',
+            html: 'Configure slot for <strong>' + displayDate + '</strong> starting at <strong>' + slotTime + '</strong>.' + modalHtml,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#00b3f1',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Add slot',
+            confirmButtonText: 'Save',
             didOpen: function() {
-                var sel = document.getElementById('swal-repeat-type');
-                var wrap = document.getElementById('swal-repeat-end-wrap');
-                if (!sel || !wrap) return;
-                function toggle() { wrap.style.display = (sel.value === 'daily' || sel.value === 'weekly') ? 'block' : 'none'; }
-                sel.addEventListener('change', toggle);
+                var durationSel = document.getElementById('swal-slot-duration');
+                var halfWrap = document.getElementById('swal-half-wrap');
+                var repeatSel = document.getElementById('swal-repeat-type');
+                var repeatWrap = document.getElementById('swal-repeat-wrap');
+                var repeatEndWrap = document.getElementById('swal-repeat-end-wrap');
+                var externalCb = document.getElementById('swal-external-appointment');
+                if (!durationSel || !halfWrap || !repeatSel || !repeatWrap || !repeatEndWrap || !externalCb) return;
+
+                function toggleFields() {
+                    var isExternal = !!externalCb.checked;
+                    var isOneHour = durationSel.value === '60';
+                    halfWrap.style.display = isOneHour ? 'none' : 'block';
+                    repeatWrap.style.display = isExternal ? 'none' : 'block';
+                    if (isExternal) {
+                        repeatSel.value = 'none';
+                        repeatEndWrap.style.display = 'none';
+                    } else {
+                        repeatEndWrap.style.display = (repeatSel.value === 'daily' || repeatSel.value === 'weekly') ? 'block' : 'none';
+                    }
+                }
+
+                durationSel.addEventListener('change', toggleFields);
+                repeatSel.addEventListener('change', toggleFields);
+                externalCb.addEventListener('change', toggleFields);
+                toggleFields();
             }
         }).then(function(result) {
             if (!result.isConfirmed) return;
+
+            var isExternal = !!(document.getElementById('swal-external-appointment') && document.getElementById('swal-external-appointment').checked);
+            var duration = (document.getElementById('swal-slot-duration') && document.getElementById('swal-slot-duration').value) || '30';
+            var halfChoice = (document.getElementById('swal-half-choice') && document.getElementById('swal-half-choice').value) || 'first';
             var repeatType = (document.getElementById('swal-repeat-type') && document.getElementById('swal-repeat-type').value) || 'none';
-            var repeatEndEl = document.getElementById('swal-repeat-end');
-            var repeatEndDate = repeatEndEl ? repeatEndEl.value : '';
-            var useRepeat = (repeatType === 'daily' || repeatType === 'weekly') && repeatEndDate;
+            var repeatEndDate = (document.getElementById('swal-repeat-end') && document.getElementById('swal-repeat-end').value) || '';
+            var useRepeat = !isExternal && (repeatType === 'daily' || repeatType === 'weekly') && repeatEndDate;
 
-            function doPost(sStart, sEnd) {
+            var intervals = [];
+            if (duration === '60') {
+                intervals.push({ start: slotTime, end: slotEnd1h, duration: 60 });
+            } else if (halfChoice === 'both') {
+                if (allowFirst) intervals.push({ start: slotTime, end: slotTimeSecond, duration: 30 });
+                if (allowSecond) intervals.push({ start: slotTimeSecond, end: slotEnd1h, duration: 30 });
+            } else if (halfChoice === 'second') {
+                intervals.push({ start: slotTimeSecond, end: slotEnd1h, duration: 30 });
+            } else {
+                intervals.push({ start: slotTime, end: slotTimeSecond, duration: 30 });
+            }
+
+            if (!intervals.length) {
+                bookingSwal.fire({ icon: 'error', title: 'No available option', text: 'Selected slot is not available.', confirmButtonColor: '#00b3f1' });
+                return;
+            }
+
+            function postAvailability(startTime, endTime) {
                 var fd = new FormData();
                 fd.append('service_id', selectedServiceId);
                 fd.append('availability_date', dateStr);
-                fd.append('start_time', sStart);
-                fd.append('end_time', sEnd);
+                fd.append('start_time', startTime);
+                fd.append('end_time', endTime);
                 fd.append('is_active', '1');
-                return fetch(availabilityStoreUrl, {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                    body: fd
-                }).then(function(r) { return r.json().then(function(data) { if (!r.ok) throw { status: r.status, data: data }; return data; }); });
-            }
-            function doPostWithRepeat(sStart, sEnd) {
-                var fd = new FormData();
-                fd.append('service_id', selectedServiceId);
-                fd.append('availability_date', dateStr);
-                fd.append('start_time', sStart);
-                fd.append('end_time', sEnd);
-                fd.append('is_active', '1');
-                fd.append('repeat_type', repeatType);
-                fd.append('repeat_end_date', repeatEndDate);
-                return fetch(availabilityStoreWithRepeatUrl, {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                    body: fd
-                }).then(function(r) { return r.json().then(function(data) { if (!r.ok) throw { status: r.status, data: data }; return data; }); });
-            }
-
-            var req = useRepeat ? doPostWithRepeat(start1, end1) : doPost(start1, end1);
-            req.then(function(data) {
-                var msg = data.message || (useRepeat && data.created ? 'Added ' + data.created + ' slot(s).' : 'Availability added.');
-                bookingSwal.fire({ icon: 'success', title: useRepeat ? 'Slots added' : 'Slot added', text: msg, confirmButtonColor: '#00b3f1' });
-                if (calendar) calendar.refetchEvents();
-            }).catch(function(err) {
-                var msg = err && err.data && err.data.error ? err.data.error : (err && err.error) || 'Could not add slot.';
-                if (err && err.status === 422 && !useRepeat && msg.indexOf('overlap') !== -1 && start2 && end2) {
-                    doPost(start2, end2)
-                        .then(function(data) {
-                            bookingSwal.fire({ icon: 'success', title: 'Slot added', text: data.message || 'Second half of hour added.', confirmButtonColor: '#00b3f1' });
-                            if (calendar) calendar.refetchEvents();
-                        })
-                        .catch(function(e2) {
-                            var m2 = e2 && e2.data && e2.data.error ? e2.data.error : (e2 && e2.error) || 'Could not add slot.';
-                            bookingSwal.fire({ icon: 'error', title: 'Error', text: m2, confirmButtonColor: '#00b3f1' });
-                        });
-                } else {
-                    bookingSwal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#00b3f1' });
+                if (useRepeat) {
+                    fd.append('repeat_type', repeatType);
+                    fd.append('repeat_end_date', repeatEndDate);
                 }
+                return fetch(useRepeat ? availabilityStoreWithRepeatUrl : availabilityStoreUrl, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd
+                }).then(function(r) { return r.json().then(function(data) { if (!r.ok) throw { status: r.status, data: data }; return data; }); });
+            }
+
+            function postExternal(startTime, durationMinutes) {
+                var fd = new FormData();
+                fd.append('service_id', selectedServiceId);
+                fd.append('appointment_date', dateStr);
+                fd.append('appointment_time', startTime);
+                fd.append('duration_minutes', String(durationMinutes));
+                return fetch(externalStoreUrl, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd
+                }).then(function(r) { return r.json().then(function(data) { if (!r.ok) throw { status: r.status, data: data }; return data; }); });
+            }
+
+            var jobs = intervals.map(function(iv) {
+                return isExternal ? postExternal(iv.start, iv.duration) : postAvailability(iv.start, iv.end);
             });
+
+            Promise.all(jobs)
+                .then(function() {
+                    bookingSwal.fire({
+                        icon: 'success',
+                        title: isExternal ? 'External appointment created' : (useRepeat ? 'Slots added' : 'Slot added'),
+                        text: isExternal ? 'Selected slot has been booked in your calendar.' : 'Calendar updated successfully.',
+                        confirmButtonColor: '#00b3f1'
+                    });
+                    if (calendar) calendar.refetchEvents();
+                })
+                .catch(function(err) {
+                    var msg = err && err.data && err.data.error ? err.data.error : (err && err.error) || 'Could not save slot.';
+                    bookingSwal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#00b3f1' });
+                });
         });
     });
 

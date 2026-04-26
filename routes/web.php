@@ -73,6 +73,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [App\Http\Controllers\ProfessionalProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [App\Http\Controllers\ProfessionalProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/preview', [App\Http\Controllers\ProfessionalProfileController::class, 'preview'])->name('professional.preview');
+
+    // Customer Profile Routes
+    Route::get('/customer/profile', [App\Http\Controllers\CustomerProfileController::class, 'show'])->name('customer.profile');
+    Route::post('/customer/profile/details', [App\Http\Controllers\CustomerProfileController::class, 'updateDetails'])->name('customer.profile.details');
+    Route::post('/customer/profile/avatar', [App\Http\Controllers\CustomerProfileController::class, 'updateAvatar'])->name('customer.profile.avatar');
+    Route::post('/customer/profile/password', [App\Http\Controllers\CustomerProfileController::class, 'updatePassword'])->name('customer.profile.password');
     
     // Profile Media Routes
     Route::post('/profile/media/upload', [App\Http\Controllers\ProfessionalProfileController::class, 'uploadMedia'])->name('profile.media.upload');

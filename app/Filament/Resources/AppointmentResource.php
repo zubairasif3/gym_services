@@ -27,6 +27,11 @@ class AppointmentResource extends Resource
     
     protected static ?int $navigationSort = 2;
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getEloquentQuery(): Builder
     {
         // Only show appointments for the logged-in professional
@@ -264,7 +269,6 @@ class AppointmentResource extends Resource
     {
         return [
             'index' => Pages\ListAppointments::route('/'),
-            'create' => Pages\CreateAppointment::route('/create'),
             'edit' => Pages\EditAppointment::route('/{record}/edit'),
         ];
     }
