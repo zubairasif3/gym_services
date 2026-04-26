@@ -9,22 +9,28 @@ class MyProfilePreview extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-eye';
     
-    protected static ?string $navigationLabel = 'Preview/Edit my profile';
-    
-    protected static ?string $navigationGroup = 'Profile';
-    
     protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.pages.my-profile-preview';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.preview_edit_profile');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.profile');
+    }
     
     public function getTitle(): string | Htmlable
     {
-        return 'Preview My Public Profile';
+        return __('admin.pages.profile_preview_title');
     }
     
     public function getHeading(): string | Htmlable
     {
-        return 'Preview How Your Profile Appears to Customers';
+        return __('admin.pages.profile_preview_heading');
     }
     
     public function mount(): void

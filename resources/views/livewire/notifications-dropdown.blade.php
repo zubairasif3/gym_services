@@ -1,10 +1,10 @@
 <div class="notifications-dropdown-content bg-white rounded">
     <!-- Header -->
     <div class="dropdown-header d-flex justify-content-between align-items-center p-3 border-bottom">
-        <h6 class="mb-0 fw-bold">Notifications</h6>
+        <h6 class="mb-0 fw-bold">{{ __('notifications.title') }}</h6>
         @if($unreadCount > 0)
             <button wire:click="markAllAsRead" class="btn btn-sm btn-link text-primary text-decoration-none p-0">
-                Mark all as read
+                {{ __('notifications.mark_all_read') }}
             </button>
         @endif
     </div>
@@ -52,7 +52,7 @@
                                 @endphp
                                 <a href="{{ $bookingRequestUrl }}" class="text-decoration-none text-dark">
                                     <span>{{ $notification['data']['message'] ?? 'New booking request' }}</span>
-                                    <span class="d-block small text-primary mt-1">View appointment →</span>
+                                    <span class="d-block small text-primary mt-1">{{ __('notifications.view_appointment') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_gig_reaction')
                                 @php
@@ -60,7 +60,7 @@
                                 @endphp
                                 <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
                                     <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your service</span>
-                                    <span class="d-block small text-primary mt-1">View profile →</span>
+                                    <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_media_reaction')
                                 @php
@@ -73,7 +73,7 @@
                                 @endphp
                                 <a href="{{ $profileUrl }}" class="text-decoration-none text-dark">
                                     <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your photo/video</span>
-                                    <span class="d-block small text-primary mt-1">View profile →</span>
+                                    <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_profile_media' || ($notification['type'] ?? '') === 'new_service')
                                 @php
@@ -92,7 +92,7 @@
                                 @endphp
                                 <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
                                     <span><strong>{{ $reviewerName }}</strong> left a {{ $rating ? $rating . '-star ' : '' }}review on your service</span>
-                                    <span class="d-block small text-primary mt-1">View profile →</span>
+                                    <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                 </a>
                             @else
                                 <span>{{ $notification['data']['message'] ?? 'New notification' }}</span>
@@ -114,7 +114,7 @@
         @empty
             <div class="text-center py-5 text-muted">
                 <i class="far fa-bell fs-1 mb-3 d-block"></i>
-                <p>No notifications yet</p>
+                <p>{{ __('notifications.no_notifications_yet') }}</p>
             </div>
         @endforelse
     </div>
@@ -123,7 +123,7 @@
     @if(count($notifications) > 0)
         <div class="dropdown-footer p-3 text-center border-top">
             <a href="{{ route('notifications') }}" class="btn btn-sm btn-link text-decoration-none">
-                View all notifications
+                {{ __('notifications.view_all') }}
             </a>
         </div>
     @endif

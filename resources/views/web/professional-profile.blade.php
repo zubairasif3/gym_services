@@ -774,19 +774,19 @@
                     <div class="col-md-4">
                         <div class="info-box">
                             <i class="fas fa-user-friends text-primary me-2"></i>
-                            <strong>Followers:</strong> {{ \App\Models\User::followersCount($user->id) }}
+                            <strong>{{ __('profile.followers') }}:</strong> {{ \App\Models\User::followersCount($user->id) }}
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="info-box">
                             <i class="flaticon-goal text-primary me-2"></i>
-                            <strong>Language:</strong> {{ $user->profile->languages ?? 'English' }}
+                            <strong>{{ __('profile.language') }}:</strong> {{ $user->profile->languages ?? __('language.english') }}
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="info-box">
                             <i class="flaticon-tracking text-primary me-2"></i>
-                            <strong>Location:</strong> {{ $user->profile->city ?? 'Not specified' }}
+                            <strong>{{ __('profile.location') }}:</strong> {{ $user->profile->city ?? __('profile.not_specified') }}
                         </div>
                     </div>
                 </div>
@@ -795,7 +795,7 @@
                 @if($user->activeProfileMedia && $user->activeProfileMedia->count() > 0)
                 <div class="service-gallery">
                     <h5 class="mb-3">
-                        <i class="far fa-images text-primary me-2"></i> Photos and Videos
+                        <i class="far fa-images text-primary me-2"></i> {{ __('profile.photos_videos') }}
                     </h5>
                     <div class="media-carousel-wrapper position-relative">
                         <button type="button" class="carousel-nav-btn prev" onclick="slideMedia(-1)">

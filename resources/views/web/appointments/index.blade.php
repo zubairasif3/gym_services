@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'My Appointments')
+@section('title', __('web.appointments.title'))
 
 @push('styles')
 <style>
@@ -248,13 +248,13 @@
             <div class="col-lg-12">
                 <div class="dashboard_navigationbar dn db-1024">
                     <div class="dropdown">
-                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> Dashboard Navigation</button>
+                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> {{ __('web.dashboard.navigation') }}</button>
                         <ul id="myDropdown" class="dropdown-content">
-                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>Dashboard</a></li>
-                            <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>Following</a></li>
-                            <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>Notifications</a></li>
-                            <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>Messages</a></li>
-                            <li><a href="{{ route('appointments.index') }}" class="active"><span class="flaticon-calendar mr10"></span>My Appointments</a></li>
+                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>{{ __('web.dashboard.dashboard') }}</a></li>
+                            <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>{{ __('web.dashboard.following') }}</a></li>
+                            <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>{{ __('web.dashboard.notifications') }}</a></li>
+                            <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>{{ __('web.dashboard.messages') }}</a></li>
+                            <li><a href="{{ route('appointments.index') }}" class="active"><span class="flaticon-calendar mr10"></span>{{ __('web.dashboard.my_appointments') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -264,8 +264,8 @@
                 <div class="row">
                     <div class="col-lg-12 mb20">
                         <div class="dashboard_title_area">
-                            <h2>My Appointments</h2>
-                            <p class="text">View and manage your bookings</p>
+                            <h2>{{ __('web.appointments.title') }}</h2>
+                            <p class="text">{{ __('web.appointments.subtitle') }}</p>
                         </div>
                     </div>
 
@@ -278,7 +278,7 @@
                             <div class="appt-info-notice appt-info-notice--danger">
                                 <span class="appt-info-notice__icon" aria-hidden="true"><i class="fas fa-exclamation-circle"></i></span>
                                 <div class="appt-info-notice__text">
-                                    <strong>Booking temporarily blocked.</strong>
+                                    <strong>{{ __('web.appointments.blocked') }}</strong>
                                     You exceeded the monthly cancellation limit (3). New bookings are blocked until
                                     {{ $tracking->blocked_until->format('F d, Y') }}.
                                     <p class="appt-info-notice__extra mb-0">{{ $apptInstruction }}</p>
@@ -320,13 +320,13 @@
                                                 <p class="text-muted mb-1 small">
                                                     <i class="flaticon-calendar mr5"></i>
                                                     {{ $appointment->appointment_date->format('l, F d, Y') }}
-                                                    at {{ $appointment->appointment_time->format('g:i A') }}
+                                                    {{ __('web.booking.at') }} {{ $appointment->appointment_time->format('g:i A') }}
                                                     @if(($appointment->duration_minutes ?? 30) == 60)
                                                         <span class="appt-tag appt-tag-hr">1 hr</span>
                                                     @endif
                                                 </p>
                                                 <p class="mb-0 small">
-                                                    Professional:
+                                                    {{ __('common.professionals') }}:
                                                     @if($appointment->professional->username ?? null)
                                                         <a href="{{ route('appointments.book', $appointment->professional->username) }}">{{ $appointment->professional->name }} {{ $appointment->professional->surname }}</a>
                                                     @else
@@ -339,11 +339,11 @@
                                             </div>
                                             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                                                 @if($appointment->status === 'pending')
-                                                    <span class="appt-tag appt-tag-pending">Pending</span>
+                                                    <span class="appt-tag appt-tag-pending">{{ __('web.appointments.pending') }}</span>
                                                 @elseif($appointment->status === 'confirmed')
-                                                    <span class="appt-tag appt-tag-confirmed">Confirmed</span>
+                                                    <span class="appt-tag appt-tag-confirmed">{{ __('web.appointments.confirmed') }}</span>
                                                 @elseif($isCancelled)
-                                                    <span class="appt-tag appt-tag-cancelled">Cancelled</span>
+                                                    <span class="appt-tag appt-tag-cancelled">{{ __('web.appointments.cancelled') }}</span>
                                                 @else
                                                     <span class="appt-tag appt-tag-cancelled">{{ $appointment->status }}</span>
                                                 @endif
@@ -354,11 +354,11 @@
                                                                 data-appointment-id="{{ $appointment->id }}"
                                                                 data-service-title="{{ e($appointment->service->title ?? 'Appointment') }}"
                                                                 data-appointment-datetime="{{ e($appointment->appointment_date->format('l, F d, Y') . ' at ' . $appointment->appointment_time->format('g:i A')) }}">
-                                                            Cancel appointment
+                                                            {{ __('web.appointments.cancel_title') }}
                                                         </button>
                                                     </div>
                                                 @elseif(!$isCancelled && $appointment->status === 'confirmed')
-                                                    <p class="small text-muted mb-0 mt-2">Cancellation only possible 24+ hours before.</p>
+                                                    <p class="small text-muted mb-0 mt-2">{{ __('web.appointments.cancel_24h') }}</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -367,8 +367,8 @@
                             @empty
                                 <div class="text-center py-5">
                                     <i class="flaticon-calendar text-muted" style="font-size: 3rem;"></i>
-                                    <p class="mt-3 mb-0">You have no appointments yet.</p>
-                                    <a href="{{ route('web.services') }}" class="btn mt-3 appt-btn-browse">Browse services</a>
+                                    <p class="mt-3 mb-0">{{ __('web.appointments.empty') }}</p>
+                                    <a href="{{ route('web.services') }}" class="btn mt-3 appt-btn-browse">{{ __('web.appointments.browse_services') }}</a>
                                 </div>
                             @endforelse
                         </div>
@@ -384,21 +384,21 @@
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Cancel appointment</h5>
+                <h5 class="modal-title" id="cancelModalLabel">{{ __('web.appointments.cancel_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p id="cancelModalService" class="mb-1 fw-semibold"></p>
                 <p id="cancelModalDateTime" class="text-muted small mb-3"></p>
                 <div class="mb-3">
-                    <label for="cancellation_reason" class="form-label">Reason (optional)</label>
-                    <textarea class="form-control" id="cancellation_reason" rows="3" maxlength="500" placeholder="Optional message to the professional"></textarea>
+                    <label for="cancellation_reason" class="form-label">{{ __('web.appointments.reason') }}</label>
+                    <textarea class="form-control" id="cancellation_reason" rows="3" maxlength="500" placeholder="{{ __('web.appointments.reason_placeholder') }}"></textarea>
                 </div>
                 <div id="cancelError" class="alert alert-danger d-none"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn appt-btn-keep" data-bs-dismiss="modal">Keep appointment</button>
-                <button type="button" class="btn appt-btn-confirm-cancel" id="confirmCancelBtn">Confirm cancel</button>
+                <button type="button" class="btn appt-btn-keep" data-bs-dismiss="modal">{{ __('web.appointments.keep') }}</button>
+                <button type="button" class="btn appt-btn-confirm-cancel" id="confirmCancelBtn">{{ __('web.appointments.confirm_cancel') }}</button>
             </div>
         </div>
     </div>

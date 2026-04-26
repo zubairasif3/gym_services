@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Home Page')
+@section('title', __('web.home_page'))
 
 @section('content')
 
@@ -9,13 +9,13 @@
           <div class="row align-items-center wow fadeInUp" data-wow-delay="300ms">
             <div class="col-lg-9">
               <div class="main-title2">
-                <h2 class="title">Discover the professionals present in FitScout</h2>
-                <p class="paragraph">Find certified trainers, nutritionists, and wellness experts to achieve your health goals</p>
+                <h2 class="title">{{ __('web.home.discover_title') }}</h2>
+                <p class="paragraph">{{ __('web.home.discover_subtitle') }}</p>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="text-start text-lg-end mb-4">
-                <a class="ud-btn btn-light-thm bdrs90" href="{{ route('web.services') }}">All Category<i class="fal fa-arrow-right-long"></i></a>
+                <a class="ud-btn btn-light-thm bdrs90" href="{{ route('web.services') }}">{{ __('web.home.all_category') }}<i class="fal fa-arrow-right-long"></i></a>
               </div>
             </div>
           </div>
@@ -54,8 +54,8 @@
           <div class="row align-items-center wow fadeInUp">
             <div class="col-xl-7">
               <div class="main-title mb30-lg">
-                <h2 class="title">Featured Professionals</h2>
-                <p class="paragraph">Top-rated fitness and wellness professionals ready to help you achieve your goals</p>
+                <h2 class="title">{{ __('web.home.featured_professionals') }}</h2>
+                <p class="paragraph">{{ __('web.home.featured_subtitle') }}</p>
               </div>
             </div>
             <div class="col-xl-5">
@@ -136,7 +136,7 @@
                                                 <div class="list-meta mt15">
                                                     <div class="budget">
                                                         <p class="mb-0 body-color">
-                                                            Price range
+                                                            {{ __('web.home.price_range') }}
                                                             <span class="fz17 fw500 dark-color ms-1">
                                                                 @if($professional->min_price == $professional->max_price)
                                                                     €{{ number_format($professional->min_price, 2) }}
@@ -154,7 +154,7 @@
                                     <div class="col-12">
                                         <div class="text-center py-5">
                                             <i class="far fa-user-slash text-muted" style="font-size: 3rem;"></i>
-                                            <p class="text-muted mt-3 mb-0">No professionals available in this category</p>
+                                            <p class="text-muted mt-3 mb-0">{{ __('web.home.no_professionals') }}</p>
                                         </div>
                                     </div>
                                 @endforelse
@@ -181,23 +181,22 @@
           <div class="row mb60 mb0-xl">
             <div class="col-xl-7">
               <div class="pr30 pr0-lg mb30-md position-relative">
-                <h1 class="animate-up-1 mb25 text-white">Find the service <br class="d-none d-xl-block">
-                    that best suits you</h1>
-                <p class="text-white animate-up-2">search for the professional based on your needs</p>
+                <h1 class="animate-up-1 mb25 text-white">{{ __('web.home.hero_title') }}</h1>
+                <p class="text-white animate-up-2">{{ __('web.home.hero_subtitle') }}</p>
 
                 <div class="home2-hero-feature-cards animate-up-3">
                   <div class="hero-feature-card default-box-shadow4">
                     <span class="icon flaticon-review"></span>
                     <div class="details">
-                      <h6 class="mb-1">Proof of quality</h6>
-                      <p class="text fz13 mb-0">Our professionals put seriousness and quality first</p>
+                      <h6 class="mb-1">{{ __('web.home.quality') }}</h6>
+                      <p class="text fz13 mb-0">{{ __('web.home.quality_text') }}</p>
                     </div>
                   </div>
                   <div class="hero-feature-card default-box-shadow4">
                     <span class="icon flaticon-review"></span>
                     <div class="details">
-                      <h6 class="mb-1">Safe and secure</h6>
-                      <p class="text fz13 mb-0">We guarantee you a unique and safe experience</p>
+                      <h6 class="mb-1">{{ __('web.home.safe_secure') }}</h6>
+                      <p class="text fz13 mb-0">{{ __('web.home.safe_text') }}</p>
                     </div>
                   </div>
                 </div>
@@ -293,8 +292,8 @@
           <div class="row">
             <div class="col-lg-12">
               <div class="main-title">
-                <h2>Need something done?</h2>
-                <p class="text">Discover our most popular and top-rated service categories.</p>
+                <h2>{{ __('web.home.need_done') }}</h2>
+                <p class="text">{{ __('web.home.need_done_subtitle') }}</p>
               </div>
             </div>
           </div>
@@ -303,8 +302,8 @@
               <div class="iconbox-style1 at-home5 p-0">
                 <div class="icon before-none"><span class="flaticon-cv"></span></div>
                 <div class="details">
-                  <h4 class="title mt10 mb-3">Post your services</h4>
-                  <p class="text">Make your service offerings known to the public.</p>
+                  <h4 class="title mt10 mb-3">{{ __('web.home.post_services') }}</h4>
+                  <p class="text">{{ __('web.home.post_services_text') }}</p>
                 </div>
               </div>
             </div>
@@ -312,8 +311,8 @@
               <div class="iconbox-style1 at-home5 p-0">
                 <div class="icon before-none"><span class="flaticon-web-design"></span></div>
                 <div class="details">
-                  <h4 class="title mt10 mb-3">Private Chat</h4>
-                  <p class="text">Interact directly with centers and professionals and evaluate the service that is right for you.</p>
+                  <h4 class="title mt10 mb-3">{{ __('web.home.private_chat') }}</h4>
+                  <p class="text">{{ __('web.home.private_chat_text') }}</p>
                 </div>
               </div>
             </div>
@@ -321,8 +320,8 @@
               <div class="iconbox-style1 at-home5 p-0">
                 <div class="icon before-none"><span class="flaticon-secure"></span></div>
                 <div class="details">
-                  <h4 class="title mt10 mb-3">Choose the professional</h4>
-                  <p class="text">Look for the service that best suits your needs.</p>
+                  <h4 class="title mt10 mb-3">{{ __('web.home.choose_professional') }}</h4>
+                  <p class="text">{{ __('web.home.choose_professional_text') }}</p>
                 </div>
               </div>
             </div>

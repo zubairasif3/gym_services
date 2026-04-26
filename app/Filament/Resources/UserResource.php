@@ -31,9 +31,20 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
-    protected static ?string $navigationGroup = 'Users';
-    protected static ?string $label = 'User';
-    protected static ?string $pluralLabel = 'Users';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.users');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.user.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.user.plural');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -45,7 +56,7 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Basic Information')
+                Section::make(__('admin.sections.basic_information'))
                     ->schema([
                         Grid::make(['default' => 2])
                             ->schema([
@@ -81,17 +92,17 @@ class UserResource extends Resource
 
                                 Select::make('user_type')
                                     ->options([
-                                        1 => 'Admin',
-                                        2 => 'Customer',
-                                        3 => 'Professional',
+                                        1 => __('admin.status.admin'),
+                                        2 => __('admin.status.customer'),
+                                        3 => __('admin.status.professional'),
                                     ])
                                     ->required()
                                     ->default(1)
-                                    ->label('User Type')
+                                    ->label(__('admin.fields.user_type'))
                                     ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
 
                                 TextInput::make('business_name')
-                                    ->label('Business Name')
+                                    ->label(__('admin.fields.business_name'))
                                     ->maxLength(255)
                                     ->visible(fn ($record) => $record && $record->user_type == 3)
                                     ->disabled(fn ($record) => $record && in_array($record->user_type, [2, 3])),
@@ -99,13 +110,13 @@ class UserResource extends Resource
                     ]),
                 
                 // Customer-specific fields
-                Section::make('Customer Information')
+                Section::make(__('admin.sections.customer_information'))
                     ->visible(fn ($record) => $record && $record->user_type == 2)
                     ->schema([
                         Grid::make(['default' => 2])
                             ->schema([
                                 DatePicker::make('profile.date_of_birth')
-                                    ->label('Date of Birth')
+                                    ->label(__('admin.fields.date_of_birth'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -114,7 +125,7 @@ class UserResource extends Resource
                                     }),
 
                                 TextInput::make('profile.country')
-                                    ->label('Country')
+                                    ->label(__('admin.fields.country'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -123,7 +134,7 @@ class UserResource extends Resource
                                     }),
 
                                 TextInput::make('profile.city')
-                                    ->label('City')
+                                    ->label(__('admin.fields.city'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -132,7 +143,7 @@ class UserResource extends Resource
                                     }),
 
                                 TextInput::make('profile.cap')
-                                    ->label('Zip Code')
+                                    ->label(__('admin.fields.zip_code'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -143,13 +154,13 @@ class UserResource extends Resource
                     ]),
 
                 // Professional-specific fields
-                Section::make('Professional Information')
+                Section::make(__('admin.sections.professional_information'))
                     ->visible(fn ($record) => $record && $record->user_type == 3)
                     ->schema([
                         Grid::make(['default' => 2])
                             ->schema([
                                 TextInput::make('profile.country')
-                                    ->label('Country')
+                                    ->label(__('admin.fields.country'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -158,7 +169,7 @@ class UserResource extends Resource
                                     }),
 
                                 TextInput::make('profile.city')
-                                    ->label('City')
+                                    ->label(__('admin.fields.city'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -167,7 +178,7 @@ class UserResource extends Resource
                                     }),
 
                                 TextInput::make('profile.address')
-                                    ->label('Address')
+                                    ->label(__('admin.fields.address'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -176,7 +187,7 @@ class UserResource extends Resource
                                     }),
 
                                 TextInput::make('profile.cap')
-                                    ->label('Zip Code')
+                                    ->label(__('admin.fields.zip_code'))
                                     ->disabled()
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->profile) {
@@ -187,32 +198,32 @@ class UserResource extends Resource
                     ]),
 
                 // Professional Subcategories
-                Section::make('Professional Categories')
+                Section::make(__('admin.sections.professional_categories'))
                     ->visible(fn ($record) => $record && $record->user_type == 3)
                     ->schema([
                         Forms\Components\Placeholder::make('subcategories_display')
-                            ->label('Subcategories')
+                            ->label(__('admin.fields.subcategories'))
                             ->content(function ($record) {
                                 if (!$record) {
-                                    return 'No subcategories assigned';
+                                    return __('admin.messages.no_subcategories_assigned');
                                 }
                                 
                                 $userSubcategories = $record->userSubcategories()->with('subcategory')->orderBy('priority')->get();
                                 
                                 if ($userSubcategories->isEmpty()) {
-                                    return 'No subcategories assigned';
+                                    return __('admin.messages.no_subcategories_assigned');
                                 }
                                 
                                 $subcategoryNames = $userSubcategories->map(function ($userSubcategory) {
-                                    return $userSubcategory->subcategory->name ?? 'Unknown';
+                                    return $userSubcategory->subcategory->name ?? __('admin.messages.unknown');
                                 })->filter()->implode(', ');
                                 
-                                return $subcategoryNames ?: 'No subcategories assigned';
+                                return $subcategoryNames ?: __('admin.messages.no_subcategories_assigned');
                             }),
                     ]),
 
                 // Admin/General Profile Information (for Admin users only)
-                Section::make('Profile Information')
+                Section::make(__('admin.sections.profile_information'))
                     ->visible(fn ($record) => !$record || $record->user_type == 1)
                     ->schema([
                         Grid::make(['default' => 2])
@@ -227,7 +238,7 @@ class UserResource extends Resource
                                     }),
 
                                 FileUpload::make('avatar_url')
-                                    ->label('Profile Pic')
+                                    ->label(__('admin.fields.profile_pic'))
                                     ->nullable()
                                     ->image()
                                     ->directory('avartar'),
@@ -290,18 +301,18 @@ class UserResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('profile.phone')
-                    ->label('Phone')
+                    ->label(__('admin.fields.phone'))
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('business_name')
-                    ->label('Business Name')
+                    ->label(__('admin.fields.business_name'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('user_type_label')
-                    ->label('User Type')
+                    ->label(__('admin.fields.user_type'))
                     ->sortable(),
             ])
             ->filters([

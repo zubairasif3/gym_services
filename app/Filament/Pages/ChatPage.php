@@ -16,14 +16,22 @@ class ChatPage extends Page
     // DISABLED - Chat is now handled via toolbar on frontend
     protected static bool $shouldRegisterNavigation = false;
     
-    protected static ?string $navigationLabel = 'Chats';
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
     protected static string $view = 'filament.pages.chat-page';
 
-    protected static ?string $navigationGroup = 'Conversation';
     protected static ?int $navigationSort = 1;
 
     protected static ?string $title = '';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.chats');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.conversation');
+    }
 
 
     public $chatRoomId;

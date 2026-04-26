@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\SetLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -26,24 +27,26 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->navigationGroups([
-                NavigationGroup::make('Dashboard'),
-                NavigationGroup::make('Categories'),
-                NavigationGroup::make('Marketplace'),
-                NavigationGroup::make('Conversation'),
-                NavigationGroup::make('Users'),
-                NavigationGroup::make('Setting'),
+                NavigationGroup::make(__('admin.navigation.dashboard')),
+                NavigationGroup::make(__('admin.navigation.categories')),
+                NavigationGroup::make(__('admin.navigation.marketplace')),
+                NavigationGroup::make(__('admin.navigation.conversation')),
+                NavigationGroup::make(__('admin.navigation.users')),
+                NavigationGroup::make(__('admin.navigation.setting')),
             ])
             ->navigationItems([
-                NavigationItem::make('Visit Website')
+                NavigationItem::make('visit-website')
+                    ->label(fn (): string => __('admin.navigation.visit_website'))
                 // ->url('/', shouldOpenInNewTab: true)
                     ->url('/')
                     ->icon('heroicon-o-globe-alt')
                     ->sort(999),
-                NavigationItem::make('Service calendar')
+                NavigationItem::make('service-calendar')
+                    ->label(fn (): string => __('admin.navigation.service_calendar'))
                     ->url(fn (): string => route('appointments.book', ['username' => auth()->user()->username]))
                     ->icon('heroicon-o-calendar-days')
                     ->sort(1)
-                    ->group('Appointments')
+                    ->group(fn (): string => __('admin.navigation.appointments'))
                     ->visible(fn (): bool => auth()->check()
                         && auth()->user()->user_type === 3
                         && ! empty(auth()->user()->username ?? '')),
@@ -71,6 +74,7 @@ class AdminPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
+                SetLocale::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,

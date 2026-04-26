@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'My Profile')
+@section('title', __('web.customer_profile.title'))
 
 @section('content')
 <style>
@@ -128,8 +128,8 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12 mb20">
-                <h2 class="profile-page-title">My Profile</h2>
-                <p class="profile-page-subtitle">Manage your profile and security settings.</p>
+                <h2 class="profile-page-title">{{ __('web.customer_profile.title') }}</h2>
+                <p class="profile-page-subtitle">{{ __('web.customer_profile.subtitle') }}</p>
             </div>
         </div>
 
@@ -152,12 +152,12 @@
                 <div class="profile-card">
                     <div class="profile-card-header">
                         <i class="fas fa-user-circle"></i>
-                        <h5>Avatar</h5>
+                        <h5>{{ __('web.customer_profile.avatar') }}</h5>
                     </div>
                     <div class="profile-card-body">
                         <div class="avatar-wrapper">
                             @if($user->avatar_url)
-                                <img src="{{ asset('storage/' . $user->avatar_url) }}" alt="Avatar">
+                                <img src="{{ asset('storage/' . $user->avatar_url) }}" alt="{{ __('web.customer_profile.avatar') }}">
                             @else
                                 <div class="avatar-placeholder">{{ $user->initials }}</div>
                             @endif
@@ -166,11 +166,11 @@
                         <form action="{{ route('customer.profile.avatar') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
-                                <label class="field-label">Change Avatar</label>
+                                <label class="field-label">{{ __('web.customer_profile.change_avatar') }}</label>
                                 <input type="file" name="avatar" class="form-control" accept="image/*" required>
-                                <small class="readonly-note">JPG, PNG, GIF. Max 2MB.</small>
+                                <small class="readonly-note">{{ __('web.customer_profile.avatar_help') }}</small>
                             </div>
-                            <button type="submit" class="btn btn-profile-primary w-100">Update Avatar</button>
+                            <button type="submit" class="btn btn-profile-primary w-100">{{ __('web.customer_profile.update_avatar') }}</button>
                         </form>
                     </div>
                 </div>
@@ -180,48 +180,48 @@
                 <div class="profile-card mb30">
                     <div class="profile-card-header">
                         <i class="fas fa-id-card"></i>
-                        <h4>Personal Data</h4>
+                        <h4>{{ __('web.customer_profile.personal_data') }}</h4>
                     </div>
                     <div class="profile-card-body custom-form-style1">
-                        <p class="readonly-note mb-3">You can update your personal details below.</p>
+                        <p class="readonly-note mb-3">{{ __('web.customer_profile.personal_help') }}</p>
                         <form action="{{ route('customer.profile.details') }}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-md-6 mb3">
-                                    <label class="field-label">First Name</label>
+                                    <label class="field-label">{{ __('web.customer_profile.first_name') }}</label>
                                     <input type="text" class="form-control" name="name" value="{{ old('name', $user->name) }}" required>
                                 </div>
                                 <div class="col-md-6 mb3">
-                                    <label class="field-label">Last Name</label>
+                                    <label class="field-label">{{ __('web.customer_profile.last_name') }}</label>
                                     <input type="text" class="form-control" name="surname" value="{{ old('surname', $user->surname) }}" required>
                                 </div>
                                 <div class="col-md-6 mb3">
-                                    <label class="field-label">Username</label>
+                                    <label class="field-label">{{ __('web.customer_profile.username') }}</label>
                                     <input type="text" class="form-control readonly-input" value="{{ $user->username }}" readonly disabled>
                                 </div>
                                 <div class="col-md-6 mb3">
-                                    <label class="field-label">Email</label>
+                                    <label class="field-label">{{ __('web.customer_profile.email') }}</label>
                                     <input type="text" class="form-control readonly-input" value="{{ $user->email }}" readonly disabled>
                                 </div>
                                 <div class="col-md-4 mb3">
-                                    <label class="field-label">City</label>
+                                    <label class="field-label">{{ __('web.customer_profile.city') }}</label>
                                     <input type="text" class="form-control" name="city" value="{{ old('city', $user->profile->city ?? '') }}">
                                 </div>
                                 <div class="col-md-4 mb3">
-                                    <label class="field-label">Country</label>
+                                    <label class="field-label">{{ __('web.customer_profile.country') }}</label>
                                     <input type="text" class="form-control" name="country" value="{{ old('country', $user->profile->country ?? '') }}">
                                 </div>
                                 <div class="col-md-4 mb3">
-                                    <label class="field-label">ZIP / CAP</label>
+                                    <label class="field-label">{{ __('web.customer_profile.zip') }}</label>
                                     <input type="text" class="form-control" name="cap" value="{{ old('cap', $user->profile->cap ?? '') }}">
                                 </div>
                                 <div class="col-md-6 mb3">
-                                    <label class="field-label">Date of Birth</label>
+                                    <label class="field-label">{{ __('web.customer_profile.dob') }}</label>
                                     <input type="date" class="form-control" name="date_of_birth" value="{{ old('date_of_birth', $user->profile && $user->profile->date_of_birth ? $user->profile->date_of_birth->format('Y-m-d') : '') }}">
                                 </div>
                             </div>
                             <div class="mt-4 d-flex justify-content-end">
-                                <button type="submit" class="btn btn-profile-primary">Save Details</button>
+                                <button type="submit" class="btn btn-profile-primary">{{ __('web.customer_profile.save_details') }}</button>
                             </div>
                         </form>
                     </div>
@@ -230,25 +230,25 @@
                 <div class="profile-card">
                     <div class="profile-card-header">
                         <i class="fas fa-lock"></i>
-                        <h4>Change Password</h4>
+                        <h4>{{ __('web.customer_profile.change_password') }}</h4>
                     </div>
                     <div class="profile-card-body custom-form-style1">
                         <form action="{{ route('customer.profile.password') }}" method="POST">
                             @csrf
                             <div class="mb3">
-                                <label class="field-label">Current Password</label>
+                                <label class="field-label">{{ __('web.customer_profile.current_password') }}</label>
                                 <input type="password" name="current_password" class="form-control" required>
                             </div>
                             <div class="mb3">
-                                <label class="field-label">New Password</label>
+                                <label class="field-label">{{ __('web.customer_profile.new_password') }}</label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
                             <div class="mb3">
-                                <label class="field-label">Confirm New Password</label>
+                                <label class="field-label">{{ __('web.customer_profile.confirm_new_password') }}</label>
                                 <input type="password" name="password_confirmation" class="form-control" required>
                             </div>
                             <div class="mt-4 d-flex justify-content-end">
-                                <button type="submit" class="btn btn-profile-primary">Update Password</button>
+                                <button type="submit" class="btn btn-profile-primary">{{ __('web.customer_profile.update_password') }}</button>
                             </div>
                         </form>
                     </div>

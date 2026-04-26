@@ -3,16 +3,16 @@
         <!-- Service Filter -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Filter by Service:
+                {{ __('admin.widgets.filter_by_service') }}
             </label>
             <select wire:model.live="selectedServiceId" class="w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-900">
-                <option value="">All Services</option>
+                <option value="">{{ __('admin.widgets.all_services') }}</option>
                 @foreach($this->services as $service)
                     <option value="{{ $service['id'] }}">{{ $service['title'] }}</option>
                 @endforeach
             </select>
             <div wire:loading wire:target="selectedServiceId" class="text-sm text-gray-500 mt-2">
-                Loading...
+                {{ __('admin.widgets.loading') }}
             </div>
         </div>
 
@@ -26,7 +26,7 @@
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
                 <div class="mt-3">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold" id="modal-title">Appointment Details</h3>
+                        <h3 class="text-lg font-bold" id="modal-title">{{ __('admin.widgets.appointment_details') }}</h3>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -49,6 +49,25 @@
     <script>
         let calendar;
         let currentAppointmentId = null;
+        const adminCalendarTranslations = @json([
+            'appointmentDetails' => __('admin.widgets.appointment_details'),
+            'service' => __('admin.widgets.service'),
+            'client' => __('admin.widgets.client'),
+            'email' => __('admin.widgets.email'),
+            'phone' => __('admin.widgets.phone'),
+            'date' => __('admin.widgets.date'),
+            'time' => __('admin.widgets.time'),
+            'status' => __('admin.widgets.status'),
+            'confirm' => __('admin.actions.confirm'),
+            'cancel' => __('admin.actions.cancel'),
+            'cancelAppointment' => __('admin.widgets.cancel_appointment'),
+            'appointmentConfirmed' => __('admin.widgets.appointment_confirmed_alert'),
+            'appointmentCancelled' => __('admin.widgets.appointment_cancelled_alert'),
+            'failedConfirm' => __('admin.widgets.failed_confirm'),
+            'failedCancel' => __('admin.widgets.failed_cancel'),
+            'genericError' => __('admin.widgets.generic_error'),
+            'cancelReasonPrompt' => __('admin.widgets.cancel_reason_prompt'),
+        ]);
 
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('appointment-calendar');
@@ -120,31 +139,31 @@
             currentAppointmentId = event.id;
             const props = event.extendedProps;
             
-            document.getElementById('modal-title').textContent = 'Appointment Details';
+            document.getElementById('modal-title').textContent = adminCalendarTranslations.appointmentDetails;
             document.getElementById('modal-content').innerHTML = `
-                <p><strong>Service:</strong> ${event.title.split(' - ')[0]}</p>
-                <p><strong>Client:</strong> ${props.client_name || 'N/A'}</p>
-                <p><strong>Email:</strong> ${props.client_email || 'N/A'}</p>
-                <p><strong>Phone:</strong> ${props.client_phone || 'N/A'}</p>
-                <p><strong>Date:</strong> ${event.start.toLocaleDateString()}</p>
-                <p><strong>Time:</strong> ${event.start.toLocaleTimeString()}</p>
-                <p><strong>Status:</strong> <span class="px-2 py-1 rounded text-white" style="background-color: ${event.backgroundColor}">${props.status}</span></p>
+                <p><strong>${adminCalendarTranslations.service}</strong> ${event.title.split(' - ')[0]}</p>
+                <p><strong>${adminCalendarTranslations.client}</strong> ${props.client_name || 'N/A'}</p>
+                <p><strong>${adminCalendarTranslations.email}</strong> ${props.client_email || 'N/A'}</p>
+                <p><strong>${adminCalendarTranslations.phone}</strong> ${props.client_phone || 'N/A'}</p>
+                <p><strong>${adminCalendarTranslations.date}</strong> ${event.start.toLocaleDateString()}</p>
+                <p><strong>${adminCalendarTranslations.time}</strong> ${event.start.toLocaleTimeString()}</p>
+                <p><strong>${adminCalendarTranslations.status}</strong> <span class="px-2 py-1 rounded text-white" style="background-color: ${event.backgroundColor}">${props.status}</span></p>
             `;
 
             let actionsHtml = '';
             if (props.status === 'pending') {
                 actionsHtml = `
                     <button onclick="confirmAppointment(${event.id})" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                        Confirm
+                        ${adminCalendarTranslations.confirm}
                     </button>
                     <button onclick="cancelAppointment(${event.id})" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                        Cancel
+                        ${adminCalendarTranslations.cancel}
                     </button>
                 `;
             } else if (props.status === 'confirmed') {
                 actionsHtml = `
                     <button onclick="cancelAppointment(${event.id})" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                        Cancel Appointment
+                        ${adminCalendarTranslations.cancelAppointment}
                     </button>
                 `;
             }
@@ -169,21 +188,21 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Appointment confirmed successfully!');
+                    alert(adminCalendarTranslations.appointmentConfirmed);
                     calendar.refetchEvents();
                     closeModal();
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to confirm appointment'));
+                    alert('Error: ' + (data.error || adminCalendarTranslations.failedConfirm));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                alert(adminCalendarTranslations.genericError);
             });
         }
 
         function cancelAppointment(appointmentId) {
-            const reason = prompt('Please provide a cancellation reason (optional):');
+            const reason = prompt(adminCalendarTranslations.cancelReasonPrompt);
             
             fetch(`/appointments/${appointmentId}/cancel-professional`, {
                 method: 'POST',
@@ -199,16 +218,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Appointment cancelled successfully!');
+                    alert(adminCalendarTranslations.appointmentCancelled);
                     calendar.refetchEvents();
                     closeModal();
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to cancel appointment'));
+                    alert('Error: ' + (data.error || adminCalendarTranslations.failedCancel));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                alert(adminCalendarTranslations.genericError);
             });
         }
 

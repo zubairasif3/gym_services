@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Messages')
+@section('title', __('web.messages.title'))
 
 @section('content')
 <section class="our-dashbord dashbord bgc-f7 pb50 pt-4">
@@ -9,14 +9,14 @@
             <div class="col-lg-12">
                 <div class="dashboard_navigationbar dn db-1024">
                     <div class="dropdown">
-                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> Dashboard Navigation</button>
+                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> {{ __('web.dashboard.navigation') }}</button>
                         <ul id="myDropdown" class="dropdown-content">
-                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>Dashboard</a></li>
-                            <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>Following</a></li>
-                            <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>Notifications</a></li>
-                            <li><a href="{{ route('messages') }}" class="active"><span class="flaticon-chat mr10"></span>Messages</a></li>
+                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>{{ __('web.dashboard.dashboard') }}</a></li>
+                            <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>{{ __('web.dashboard.following') }}</a></li>
+                            <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>{{ __('web.dashboard.notifications') }}</a></li>
+                            <li><a href="{{ route('messages') }}" class="active"><span class="flaticon-chat mr10"></span>{{ __('web.dashboard.messages') }}</a></li>
                             @if(auth()->user()->user_type === 2)
-                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>My Appointments</a></li>
+                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>{{ __('web.dashboard.my_appointments') }}</a></li>
                             @endif
                         </ul>
                     </div>
@@ -28,8 +28,8 @@
                     <!-- Dashboard Title -->
                     <div class="col-lg-12 mb20">
                         <div class="dashboard_title_area">
-                            <h2>Messages</h2>
-                            <p class="text">Connect with professionals and clients</p>
+                            <h2>{{ __('web.messages.title') }}</h2>
+                            <p class="text">{{ __('web.messages.subtitle') }}</p>
                         </div>
                     </div>
                     
@@ -38,10 +38,10 @@
                         <div class="dashboard_setting_box p-4">
                             <div class="text-center py-5">
                                 <i class="far fa-comments text-primary" style="font-size: 5rem;"></i>
-                                <h3 class="mt-4 mb-3">Open Your Chat</h3>
-                                <p class="text-muted mb-4">Click the button below to access your conversations</p>
+                                <h3 class="mt-4 mb-3">{{ __('web.messages.open_chat') }}</h3>
+                                <p class="text-muted mb-4">{{ __('web.messages.open_chat_text') }}</p>
                                 <button onclick="openChatSidebar()" class="btn btn-primary btn-lg">
-                                    <i class="far fa-comments me-2"></i> Open Chat Sidebar
+                                    <i class="far fa-comments me-2"></i> {{ __('web.messages.open_chat_sidebar') }}
                                 </button>
                             </div>
                             
@@ -52,7 +52,7 @@
                                         <div class="card-body">
                                             <i class="far fa-envelope text-info fs-1 mb-3"></i>
                                             <h4>{{ $totalRooms }}</h4>
-                                            <p class="text-muted mb-0">Total Conversations</p>
+                                            <p class="text-muted mb-0">{{ __('web.messages.total_conversations') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -61,7 +61,7 @@
                                         <div class="card-body">
                                             <i class="fas fa-comment-dots text-success fs-1 mb-3"></i>
                                             <h4>{{ $totalMessages }}</h4>
-                                            <p class="text-muted mb-0">Total Messages</p>
+                                            <p class="text-muted mb-0">{{ __('web.messages.total_messages') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -70,7 +70,7 @@
                                         <div class="card-body">
                                             <i class="fas fa-exclamation-circle text-danger fs-1 mb-3"></i>
                                             <h4>{{ $unreadCount }}</h4>
-                                            <p class="text-muted mb-0">Unread Messages</p>
+                                            <p class="text-muted mb-0">{{ __('web.messages.unread_messages') }}</p>
                                         </div>
                                     </div>
                                 </div>

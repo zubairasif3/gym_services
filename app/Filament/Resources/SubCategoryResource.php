@@ -34,32 +34,44 @@ class SubCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
-    protected static ?string $navigationGroup = 'Categories';
-
-    protected static ?string $navigationLabel = 'Sub Categories';
-
-    protected static ?string $label = 'Sub Category';
-
     public static function shouldRegisterNavigation(): bool
     {
         $user = Auth::user();
         return  $user->user_type == 1;
     }
 
-
-    protected static ?string $pluralLabel = 'Sub Categories';
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.categories');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.subcategory.plural');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.subcategory.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.subcategory.plural');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Basic Information')
+                Section::make(__('admin.sections.basic_information'))
                     ->schema([
                         Grid::make(['default' => 2])
                             ->schema([
                                 Select::make('category_id')
-                                    ->label('Category')
+                                    ->label(__('admin.fields.category'))
                                     ->options(Category::all()->pluck('name', 'id'))
                                     ->required(),
                                 TextInput::make('name')
@@ -78,7 +90,7 @@ class SubCategoryResource extends Resource
                                 ->maxLength(1000),
 
                             IconPicker::make('icon')
-                                ->label('Icon')
+                                ->label(__('admin.fields.icon'))
                                 ->sets(['heroicons', 'fontawesome-solid'])
                                 ->columns([
                                     'default' => 5,
@@ -88,7 +100,7 @@ class SubCategoryResource extends Resource
                                 ->nullable(),
 
                             FileUpload::make('image')
-                                ->label('Category Image')
+                                ->label(__('admin.fields.category_image'))
                                 ->image()
                                 ->directory('subcategories')
                                 ->imageEditor()
@@ -127,11 +139,11 @@ class SubCategoryResource extends Resource
                     ->sortable(),
 
                 BooleanColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.fields.active'))
                     ->sortable(),
 
                 TextColumn::make('category.name')
-                    ->label('Category')
+                    ->label(__('admin.fields.category'))
                     ->sortable(),
 
                 // BadgeColumn::make('display_order')

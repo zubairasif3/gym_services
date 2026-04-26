@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,11 +52,11 @@
                              <a class="header-logo logo2" href="{{ route('web.index') }}"><img src="{{ asset('web/images/logo-dark.png') }}" alt="Header Logo" width="120px"></a>
                           </div>
                           <div class="home1_style d-flex align-items-center">
-                            <span class="btn-mega fw500" data-bs-toggle="modal" href="#exampleModalToggle" role="button">
-                                <span class="pl30 pl10-xl pr5 fz15 vam flaticon-search"></span> Search
+                                <span class="btn-mega fw500" data-bs-toggle="modal" href="#exampleModalToggle" role="button">
+                                <span class="pl30 pl10-xl pr5 fz15 vam flaticon-search"></span> {{ __('common.search') }}
                             </span>
                              <div id="mega-menu">
-                                <a class="btn-mega fw500" href="#"><span class="pl30 pl10-xl pr5 fz15 vam flaticon-menu"></span> Categories</a>
+                                <a class="btn-mega fw500" href="#"><span class="pl30 pl10-xl pr5 fz15 vam flaticon-menu"></span> {{ __('common.categories') }}</a>
                                 <ul class="menu ps-0">
                                     @foreach($active_categories as $category)
                                         <li>
@@ -112,34 +112,36 @@
                             <!-- Responsive Menu Structure-->
                             <ul id="respMenu" class="ace-responsive-menu" data-menu-style="horizontal">
                                 <li class="visible_list">
-                                    <a class="list-item" href="{{ route('web.index') }}"><span class="title">Home</span></a>
+                                    <a class="list-item" href="{{ route('web.index') }}"><span class="title">{{ __('common.home') }}</span></a>
                                 </li>
                                 <li class="visible_list">
-                                    <a class="list-item" href="{{ route('web.about') }}"><span class="title">About Us</span></a>
+                                    <a class="list-item" href="{{ route('web.about') }}"><span class="title">{{ __('common.about_us') }}</span></a>
                                 </li>
                                 <li class="visible_list">
-                                    <a class="list-item" href="{{ route('web.services') }}"><span class="title">Professionals</span></a>
+                                    <a class="list-item" href="{{ route('web.services') }}"><span class="title">{{ __('common.professionals') }}</span></a>
                                 </li>
                                 <li class="visible_list">
-                                    <a class="list-item" href="{{ route('web.contact') }}"><span class="title">Contact Us</span></a>
+                                    <a class="list-item" href="{{ route('web.contact') }}"><span class="title">{{ __('common.contact_us') }}</span></a>
                                 </li>
                             </ul>
                             {{-- <a class="login-info bdrl1 pl15-lg pl30" data-bs-toggle="modal" href="#exampleModalToggle" role="button"><span class="flaticon-loupe"></span></a> --}}
-                            <a class="login-info d-inline-flex mr15-lg mr30" href="#">
+                            <form method="POST" action="{{ route('locale.switch') }}" id="locale-switch-form" class="login-info d-inline-flex mr15-lg mr30">
+                                @csrf
+                                <input type="hidden" name="locale" id="locale-input" value="{{ app()->getLocale() }}">
                                 <div class="switch-toggle">
-                                    <input id="language-toggle" class="check-toggle check-toggle-round-flat" type="checkbox">
+                                    <input id="language-toggle" class="check-toggle check-toggle-round-flat" type="checkbox" {{ app()->getLocale() === 'it' ? 'checked' : '' }}>
                                     <label for="language-toggle"></label>
-                                    <span class="on">English</span>
-                                    <span class="off">Italian</span>
+                                    <span class="on">{{ __('language.english') }}</span>
+                                    <span class="off">{{ __('language.italian') }}</span>
                                 </div>
-                            </a>
+                            </form>
                             @guest
-                                <a class="ud-btn btn-white add-joining me-2" href="{{ route('web.register') }}">Subscribe</a>
-                                <a class="ud-btn btn-white add-joining" href="{{ route('web.login') }}">Log In</a>
+                                <a class="ud-btn btn-white add-joining me-2" href="{{ route('web.register') }}">{{ __('auth.subscribe') }}</a>
+                                <a class="ud-btn btn-white add-joining" href="{{ route('web.login') }}">{{ __('auth.log_in') }}</a>
                             @else
                                 <form method="POST" action="{{ route('web.logout') }}">
                                     @csrf
-                                    <button type="submit" class="ud-btn btn-white add-joining">Logout</button>
+                                    <button type="submit" class="ud-btn btn-white add-joining">{{ __('auth.logout') }}</button>
                                 </form>
                             @endguest
                        </div>
@@ -166,7 +168,7 @@
                                             <div class="advance-search-field mb10-sm">
                                                 <div class="box-search">
                                                     <span class="icon far fa-magnifying-glass"></span>
-                                                    <input class="form-control" type="text" name="search" placeholder="Search for service or explore relevant subcategories.">
+                                                    <input class="form-control" type="text" name="search" placeholder="{{ __('common.search') }}">
                                                     {{-- <div class="search-suggestions">
                                                         <h6 class="fz14 ml30 mt25 mb-3">Popular Search</h6>
                                                         <div class="box-suggestions">
@@ -210,7 +212,7 @@
                                         <div class="col-md-4 col-lg-4 col-xl-3">
                                             <div class="bselect-style1 bdrl1 bdrn-sm">
                                                 <select class="selectpicker" name="category_id" data-width="100%">
-                                                    <option>Choose Category</option>
+                                                    <option>{{ __('common.choose_category') }}</option>
                                                     @foreach($active_categories as $avcat)
                                                         <option data-tokens="Graphics&Design" value="{{ $avcat->id }}">{{ $avcat->name }}</option>
                                                     @endforeach
@@ -219,7 +221,7 @@
                                         </div>
                                         <div class="col-md-3 col-lg-2 col-xl-3">
                                             <div class="text-center text-xl-start">
-                                                <button type="submit" class="ud-btn btn-thm w-100 bdrs60" type="button">Search</button>
+                                                <button type="submit" class="ud-btn btn-thm w-100 bdrs60" type="button">{{ __('common.search') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -241,11 +243,11 @@
                        <a class="mobile_logo" href="#"><img src="{{ asset('web/images/logo.png') }}" alt="" width="120px"></a>
                        <div class="right-side text-end">
                           @guest
-                            <a class="text-white" href="{{ route('web.login') }}">Log In</a>
+                            <a class="text-white" href="{{ route('web.login') }}">{{ __('auth.log_in') }}</a>
                           @else
                             <form method="POST" action="{{ route('web.logout') }}" style="display:inline;">
                                 @csrf
-                                <button type="submit" class="text-white" style="background:none;border:none;padding:0;">Logout</button>
+                                <button type="submit" class="text-white" style="background:none;border:none;padding:0;">{{ __('auth.logout') }}</button>
                             </form>
                           @endguest
                           <a class="menubar ml30" href="#menu"><img src="{{ asset('web/images/white-nav-icon.svg') }}" alt=""></a>
@@ -261,19 +263,19 @@
             <nav id="menu" class="">
                 <ul>
                     <li>
-                        <a href="{{ route('web.index') }}">Home</a>
+                        <a href="{{ route('web.index') }}">{{ __('common.home') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('web.about') }}">About Us</a>
+                        <a href="{{ route('web.about') }}">{{ __('common.about_us') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('web.services') }}">Professionals</a>
+                        <a href="{{ route('web.services') }}">{{ __('common.professionals') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('web.contact') }}">Contact Us</a>
+                        <a href="{{ route('web.contact') }}">{{ __('common.contact_us') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('web.register') }}">Subscribe</a>
+                        <a href="{{ route('web.register') }}">{{ __('auth.subscribe') }}</a>
                     </li>
                 </ul>
             </nav>
@@ -286,15 +288,15 @@
                  <div class="row bb-white-light pb10 mb60">
                     <div class="col-md-7">
                        <div class="d-block text-center text-md-start justify-content-center justify-content-md-start d-md-flex align-items-center mb-3 mb-md-0">
-                          <a class="fz17 fw500 text-white mr15-md mr30" href="{{ route('web.term_of_services') }}">Terms of Service</a>
-                          <a class="fz17 fw500 text-white mr15-md mr30" href="{{ route('web.privacy_policy') }}">Privacy Policy</a>
+                          <a class="fz17 fw500 text-white mr15-md mr30" href="{{ route('web.term_of_services') }}">{{ __('common.terms_of_service') }}</a>
+                          <a class="fz17 fw500 text-white mr15-md mr30" href="{{ route('web.privacy_policy') }}">{{ __('common.privacy_policy') }}</a>
                           {{-- <a class="fz17 fw500 text-white" href="#">Site Map</a> --}}
                        </div>
                     </div>
                     <div class="col-md-5">
                        <div class="social-widget text-center text-md-end">
                           <div class="social-style1">
-                             <a class="text-white me-2 fw500 fz17" href="#">Follow us</a>
+                             <a class="text-white me-2 fw500 fz17" href="#">{{ __('common.follow_us') }}</a>
                              <a href="#"><i class="fab fa-tiktok list-inline-item"></i></a>
                              <a href="#"><i class="fab fa-twitter list-inline-item"></i></a>
                              <a href="#"><i class="fab fa-instagram list-inline-item"></i></a>
@@ -306,13 +308,13 @@
                  <div class="row">
                     <div class="col-sm-6 col-lg-4">
                         <div class="link-style1 mb-4 mb-sm-5">
-                            <h5 class="text-white mb15">Quick Link</h5>
+                            <h5 class="text-white mb15">{{ __('common.quick_link') }}</h5>
                             <div class="link-list">
-                                <a href="{{ route('web.about') }}">About Us</a>
-                                <a href="{{ route('web.login') }}">Login</a>
-                                <a href="{{ route('web.register') }}">Subscribe</a>
-                                <a href="{{ route('web.services') }}">Professionals</a>
-                                <a href="{{ route('web.contact') }}">Contact Us</a>
+                                <a href="{{ route('web.about') }}">{{ __('common.about_us') }}</a>
+                                <a href="{{ route('web.login') }}">{{ __('auth.log_in') }}</a>
+                                <a href="{{ route('web.register') }}">{{ __('auth.subscribe') }}</a>
+                                <a href="{{ route('web.services') }}">{{ __('common.professionals') }}</a>
+                                <a href="{{ route('web.contact') }}">{{ __('common.contact_us') }}</a>
                             </div>
                         </div>
                     </div>
@@ -360,7 +362,7 @@
                  <div class="row align-items-center">
                     <div class="col-md-6">
                        <div class="text-center text-lg-start">
-                          <p class="copyright-text mb-2 mb-md-0 text-white-light ff-heading">© FitScout. 2025. All rights reserved.</p>
+                          <p class="copyright-text mb-2 mb-md-0 text-white-light ff-heading">{{ __('common.copyright') }}</p>
                        </div>
                     </div>
                  </div>
@@ -546,66 +548,18 @@
         }
     </style>
 
-    <!-- Hidden Google Translate Element -->
-    <div id="google_translate_element" style="display: none;"></div>
-
-    <script type="text/javascript">
-        // Shared storage key for language preference (used across app layout, team-selector, booking)
-        window.FITSCOUT_LANG_KEY = 'fitScoutPreferredLanguage';
-
-        function googleTranslateElementInit() {
-          new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,it',
-            autoDisplay: false
-          }, 'google_translate_element');
-        }
-
-        // 🧠 Get current language: localStorage first, then cookie, then default 'en'
-        function getCurrentGoogleLanguage() {
-          try {
-            const stored = localStorage.getItem(window.FITSCOUT_LANG_KEY);
-            if (stored === 'it' || stored === 'en') return stored;
-          } catch (e) {}
-          const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
-          return match ? match[1] : 'en';
-        }
-
-        // Wait for DOM to load
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-          const toggle = document.getElementById('language-toggle');
-          if (!toggle) return;
+            const toggle = document.getElementById('language-toggle');
+            const form = document.getElementById('locale-switch-form');
+            const input = document.getElementById('locale-input');
+            if (!toggle || !form || !input) return;
 
-          // 🔁 Restore language from localStorage and apply to Translate widget
-          function restoreAndApplyLanguage() {
-            const preferredLang = getCurrentGoogleLanguage();
-            const select = document.querySelector("select.goog-te-combo");
-            if (select) {
-              select.value = preferredLang;
-              select.dispatchEvent(new Event("change"));
-            }
-            toggle.checked = (preferredLang === 'it');
-          }
-
-          // 📌 Change language when toggle is flipped + persist to localStorage
-          toggle.addEventListener('change', function () {
-            const selectedLang = this.checked ? 'it' : 'en';
-            try {
-              localStorage.setItem(window.FITSCOUT_LANG_KEY, selectedLang);
-            } catch (e) {}
-            const select = document.querySelector("select.goog-te-combo");
-            if (select) {
-              select.value = selectedLang;
-              select.dispatchEvent(new Event("change"));
-            }
-          });
-
-          // 🔄 Restore from localStorage when Translate widget is ready
-          setTimeout(restoreAndApplyLanguage, 500);
+            toggle.addEventListener('change', function () {
+                input.value = this.checked ? 'it' : 'en';
+                form.submit();
+            });
         });
-    </script>
-
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
     </script>
     
     <!-- Script to handle fixed headers -->

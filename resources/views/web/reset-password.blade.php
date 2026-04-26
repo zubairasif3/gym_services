@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Reset Password')
+@section('title', __('web.reset_password.title'))
 
 @section('content')
     {{-- <div style="padding-top: 78px;"></div> --}}
@@ -9,8 +9,8 @@
             <div class="row">
                 <div class="col-lg-6 m-auto wow fadeInUp" data-wow-delay="300ms">
                     <div class="main-title text-center">
-                        <h2 class="title">Reset Password</h2>
-                        <p class="paragraph">Enter your new password to complete the reset process.</p>
+                        <h2 class="title">{{ __('web.reset_password.title') }}</h2>
+                        <p class="paragraph">{{ __('web.reset_password.subtitle') }}</p>
                     </div>
                 </div>
             </div>
@@ -31,24 +31,24 @@
                             @endif
 
                             <div class="mb30">
-                                <h4>Create New Password</h4>
-                                <p class="text">Your new password must be different from previously used passwords.</p>
+                                <h4>{{ __('web.reset_password.heading') }}</h4>
+                                <p class="text">{{ __('web.reset_password.description') }}</p>
                             </div>
                             <div class="mb20">
-                                <label class="form-label fw600 dark-color">Email Address</label>
+                                <label class="form-label fw600 dark-color">{{ __('web.login.email') }}</label>
                                 <input type="email" name="email" class="form-control" placeholder="alitfn58@gmail.com" value="{{ $email ?? old('email') }}" required readonly>
                             </div>
                             <div class="mb20">
-                                <label class="form-label fw600 dark-color">New Password</label>
+                                <label class="form-label fw600 dark-color">{{ __('web.reset_password.new_password') }}</label>
                                 <input type="password" name="password" class="form-control" placeholder="*******" required autofocus>
-                                <small class="text-muted">Minimum 6 characters</small>
+                                <small class="text-muted">{{ __('web.reset_password.minimum') }}</small>
                             </div>
                             <div class="mb20">
-                                <label class="form-label fw600 dark-color">Confirm Password</label>
+                                <label class="form-label fw600 dark-color">{{ __('web.reset_password.confirm_password') }}</label>
                                 <input type="password" name="password_confirmation" class="form-control" placeholder="*******" required>
                             </div>
                             <div class="d-grid mb20">
-                                <button class="ud-btn btn-thm" type="submit">Reset Password <i class="fal fa-arrow-right-long"></i></button>
+                                <button class="ud-btn btn-thm" type="submit">{{ __('web.reset_password.button') }} <i class="fal fa-arrow-right-long"></i></button>
                             </div>
                         </div>
                     </div>

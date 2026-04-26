@@ -454,10 +454,10 @@
             <div class="col-lg-12">
                 <div class="dashboard_navigationbar dn db-1024 mb-3">
                     <div class="dropdown">
-                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> Dashboard Navigation</button>
+                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> {{ __('web.dashboard.navigation') }}</button>
                         <ul id="myDropdown" class="dropdown-content">
-                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>Dashboard</a></li>
-                            <li><a href="{{ route('profile.edit') }}" class="active"><span class="flaticon-user mr10"></span>Edit Profile</a></li>
+                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>{{ __('web.dashboard.dashboard') }}</a></li>
+                            <li><a href="{{ route('profile.edit') }}" class="active"><span class="flaticon-user mr10"></span>{{ __('web.profile_edit.title') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -466,8 +466,8 @@
             <div class="col-lg-12">
                 <!-- Page Header -->
                 <div class="page-header">
-                    <h2><i class="far fa-user-edit me-2"></i> Edit Profile</h2>
-                    <p>Update your profile information and make it stand out</p>
+                    <h2><i class="far fa-user-edit me-2"></i> {{ __('web.profile_edit.title') }}</h2>
+                    <p>{{ __('web.profile_edit.subtitle') }}</p>
                 </div>
                 
                 @if(session('success'))
@@ -484,13 +484,13 @@
                     <div class="profile-card">
                         <h5 class="section-title">
                             <i class="far fa-images"></i>
-                            Profile Images
+                            {{ __('web.profile_edit.profile_images') }}
                         </h5>
                         
                         <div class="row">
                             <!-- Wallpaper Image -->
                             <div class="col-md-6 mb-4">
-                                <label class="form-label">Profile Wallpaper</label>
+                                <label class="form-label">{{ __('web.profile_edit.wallpaper') }}</label>
                                 @if($user->profile && $user->profile->wallpaper_image)
                                     <div class="image-preview">
                                         <img src="{{ asset('storage/' . $user->profile->wallpaper_image) }}" 
@@ -505,8 +505,8 @@
                                 <div class="file-upload-wrapper">
                                     <label for="wallpaper_image" class="file-upload-label">
                                         <i class="far fa-image"></i>
-                                        <span>Upload Wallpaper</span>
-                                        <small>Recommended: 1920x350px (JPG, PNG)</small>
+                                        <span>{{ __('web.profile_edit.upload_wallpaper') }}</span>
+                                        <small>{{ __('web.profile_edit.wallpaper_help') }}</small>
                                     </label>
                                     <input type="file" 
                                            class="file-upload-input" 
@@ -522,7 +522,7 @@
                             
                             <!-- Avatar Image -->
                             <div class="col-md-6 mb-4">
-                                <label class="form-label">Profile Picture</label>
+                                <label class="form-label">{{ __('web.profile_edit.profile_picture') }}</label>
                                 <div class="d-flex flex-column align-items-center">
                                     @if($user->avatar_url)
                                         <img src="{{ asset('storage/' . $user->avatar_url) }}" 
@@ -539,8 +539,8 @@
                                     <div class="file-upload-wrapper" style="max-width: 300px;">
                                         <label for="avatar" class="file-upload-label">
                                             <i class="far fa-user-circle"></i>
-                                            <span>Upload Avatar</span>
-                                            <small>Square image recommended</small>
+                                            <span>{{ __('web.profile_edit.upload_avatar') }}</span>
+                                            <small>{{ __('web.profile_edit.avatar_help') }}</small>
                                         </label>
                                         <input type="file" 
                                                class="file-upload-input" 
@@ -561,11 +561,11 @@
                     <div class="profile-card">
                         <h5 class="section-title">
                             <i class="far fa-photo-video"></i>
-                            Media Gallery
+                            {{ __('web.profile_edit.media_gallery') }}
                         </h5>
                         <p class="text-muted mb-4">
                             <i class="far fa-info-circle me-1"></i> 
-                            Upload images and short videos (max 30 seconds) to showcase your work. Unlimited media items.
+                            {{ __('web.profile_edit.media_help') }}
                         </p>
                         
                         <!-- Media Slider -->
@@ -583,7 +583,7 @@
                                                      alt="Profile media" 
                                                      class="media-preview">
                                                 <div class="media-badge">
-                                                    <i class="far fa-image"></i> Image
+                                                    <i class="far fa-image"></i> {{ __('web.profile_edit.image') }}
                                                 </div>
                                             @else
                                                 <video src="{{ asset('storage/' . $media->file_path) }}" 
@@ -594,7 +594,7 @@
                                                        onmouseout="this.pause()">
                                                 </video>
                                                 <div class="media-badge video-badge">
-                                                    <i class="far fa-video"></i> Video
+                                                    <i class="far fa-video"></i> {{ __('web.profile_edit.video') }}
                                                     @if($media->duration)
                                                         <span class="ms-1">({{ $media->duration }}s)</span>
                                                     @endif
@@ -625,7 +625,7 @@
                         <div class="text-center mb-3">
                             <small class="text-muted">
                                 <i class="far fa-images me-1"></i>
-                                <span id="media-count">{{ $user->activeProfileMedia->count() }}</span> media items
+                                <span id="media-count">{{ $user->activeProfileMedia->count() }}</span> {{ __('web.profile_edit.media_items') }}
                             </small>
                         </div>
                         @endif
@@ -634,13 +634,13 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    <i class="far fa-images me-1"></i> Upload Images
+                                    <i class="far fa-images me-1"></i> {{ __('web.profile_edit.upload_images') }}
                                 </label>
                                 <div class="file-upload-wrapper">
                                     <label for="media_images" class="file-upload-label media-upload-label">
                                         <i class="far fa-image"></i>
-                                        <span>Click to upload images</span>
-                                        <small>JPG, PNG, GIF (Max 10MB each)</small>
+                                        <span>{{ __('web.profile_edit.upload_images_click') }}</span>
+                                        <small>{{ __('web.profile_edit.upload_images_help') }}</small>
                                     </label>
                                     <input type="file" 
                                            class="file-upload-input" 
@@ -652,13 +652,13 @@
                             
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    <i class="far fa-video me-1"></i> Upload Videos
+                                    <i class="far fa-video me-1"></i> {{ __('web.profile_edit.upload_videos') }}
                                 </label>
                                 <div class="file-upload-wrapper">
                                     <label for="media_videos" class="file-upload-label media-upload-label">
                                         <i class="far fa-video"></i>
-                                        <span>Click to upload videos</span>
-                                        <small>MP4, MOV (Max 30 seconds, 20MB)</small>
+                                        <span>{{ __('web.profile_edit.upload_videos_click') }}</span>
+                                        <small>{{ __('web.profile_edit.upload_videos_help') }}</small>
                                     </label>
                                     <input type="file" 
                                            class="file-upload-input" 
@@ -676,7 +676,7 @@
                                      role="progressbar" 
                                      id="progress-bar"
                                      style="width: 0%">
-                                    <span id="progress-text">Uploading...</span>
+                                    <span id="progress-text">{{ __('web.profile_edit.uploading') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -689,13 +689,13 @@
                     <div class="profile-card">
                         <h5 class="section-title">
                             <i class="far fa-id-card"></i>
-                            Basic Information
+                            {{ __('web.profile_edit.basic_information') }}
                         </h5>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">
-                                    <i class="far fa-user me-1"></i> First Name
+                                    <i class="far fa-user me-1"></i> {{ __('web.profile_edit.first_name') }}
                                 </label>
                                 <input type="text" 
                                        class="form-control" 
@@ -703,7 +703,7 @@
                                        name="name" 
                                        value="{{ old('name', $user->name) }}" 
                                        required
-                                       placeholder="Enter your first name">
+                                       placeholder="{{ __('web.profile_edit.first_name') }}">
                                 @error('name')
                                     <div class="text-danger small mt-1"><i class="far fa-exclamation-circle me-1"></i>{{ $message }}</div>
                                 @enderror
@@ -711,14 +711,14 @@
                             
                             <div class="col-md-6 mb-3">
                                 <label for="surname" class="form-label">
-                                    <i class="far fa-user me-1"></i> Last Name
+                                    <i class="far fa-user me-1"></i> {{ __('web.profile_edit.last_name') }}
                                 </label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="surname" 
                                        name="surname" 
                                        value="{{ old('surname', $user->surname) }}"
-                                       placeholder="Enter your last name">
+                                       placeholder="{{ __('web.profile_edit.last_name') }}">
                                 @error('surname')
                                     <div class="text-danger small mt-1"><i class="far fa-exclamation-circle me-1"></i>{{ $message }}</div>
                                 @enderror
@@ -727,7 +727,7 @@
                         
                         <div class="mb-3">
                             <label for="username" class="form-label">
-                                <i class="far fa-at me-1"></i> Username
+                                <i class="far fa-at me-1"></i> {{ __('web.profile_edit.username') }}
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text">@</span>
@@ -746,7 +746,7 @@
                         
                         <div class="mb-3">
                             <label for="email" class="form-label">
-                                <i class="far fa-envelope me-1"></i> Email Address
+                                <i class="far fa-envelope me-1"></i> {{ __('web.profile_edit.email_address') }}
                             </label>
                             <input type="email" 
                                    class="form-control" 
@@ -765,21 +765,21 @@
                     <div class="profile-card">
                         <h5 class="section-title">
                             <i class="far fa-file-alt"></i>
-                            Profile Details
+                            {{ __('web.profile_edit.profile_details') }}
                         </h5>
                         
                         <div class="mb-4">
                             <label for="bio" class="form-label">
-                                <i class="far fa-quote-left me-1"></i> Bio (Short description)
+                                <i class="far fa-quote-left me-1"></i> {{ __('web.profile_edit.bio') }}
                             </label>
                             <textarea class="form-control" 
                                       id="bio" 
                                       name="bio" 
                                       rows="3" 
                                       maxlength="160"
-                                      placeholder="Write a short bio that describes you...">{{ old('bio', $user->profile->bio ?? '') }}</textarea>
+                                      placeholder="{{ __('web.profile_edit.bio_placeholder') }}">{{ old('bio', $user->profile->bio ?? '') }}</textarea>
                             <div class="char-counter" id="bio-counter">
-                                <span id="bio-count">0</span>/160 characters
+                                <span id="bio-count">0</span>/160 {{ __('web.profile_edit.characters') }}
                             </div>
                             @error('bio')
                                 <div class="text-danger small mt-1"><i class="far fa-exclamation-circle me-1"></i>{{ $message }}</div>
@@ -788,13 +788,13 @@
                         
                         <div class="mb-4">
                             <label for="about" class="form-label">
-                                <i class="far fa-align-left me-1"></i> About (Detailed description)
+                                <i class="far fa-align-left me-1"></i> {{ __('web.profile_edit.about') }}
                             </label>
                             <textarea class="form-control" 
                                       id="about" 
                                       name="about" 
                                       rows="6"
-                                      placeholder="Tell people more about yourself, your experience, and what you offer...">{{ old('about', $user->profile->about ?? '') }}</textarea>
+                                      placeholder="{{ __('web.profile_edit.about_placeholder') }}">{{ old('about', $user->profile->about ?? '') }}</textarea>
                             @error('about')
                                 <div class="text-danger small mt-1"><i class="far fa-exclamation-circle me-1"></i>{{ $message }}</div>
                             @enderror
@@ -802,16 +802,16 @@
                         
                         <div class="mb-3">
                             <label for="skills" class="form-label">
-                                <i class="far fa-star me-1"></i> Skills
+                                <i class="far fa-star me-1"></i> {{ __('web.profile_edit.skills') }}
                             </label>
                             <input type="text" 
                                    class="form-control" 
                                    id="skills" 
                                    name="skills" 
                                    value="{{ old('skills', is_array($user->profile->skills ?? null) ? implode(', ', json_decode($user->profile->skills, true) ?? []) : '') }}"
-                                   placeholder="e.g., Personal Training, Nutrition, Yoga, Fitness Coaching">
+                                   placeholder="{{ __('web.profile_edit.skills_placeholder') }}">
                             <small class="text-muted d-block mt-1">
-                                <i class="far fa-info-circle me-1"></i> Enter skills separated by commas
+                                <i class="far fa-info-circle me-1"></i> {{ __('web.profile_edit.skills_help') }}
                             </small>
                             @error('skills')
                                 <div class="text-danger small mt-1"><i class="far fa-exclamation-circle me-1"></i>{{ $message }}</div>
@@ -823,15 +823,15 @@
                     <div class="profile-card">
                         <div class="d-flex flex-wrap gap-3 justify-content-end">
                             <a href="{{ route('filament.admin.pages.dashboard') }}" class="btn btn-outline-secondary btn-enhanced">
-                                <i class="far fa-times"></i> Cancel
+                                <i class="far fa-times"></i> {{ __('web.profile_edit.cancel') }}
                             </a>
                             @if($user->isProfessional())
                                 <a href="{{ route('professional.preview') }}" class="btn btn-outline-primary btn-enhanced" target="_blank">
-                                    <i class="far fa-eye"></i> Preview Profile
+                                    <i class="far fa-eye"></i> {{ __('web.profile_edit.preview_profile') }}
                                 </a>
                             @endif
                             <button type="submit" class="btn btn-primary btn-enhanced">
-                                <i class="far fa-save"></i> Save Changes
+                                <i class="far fa-save"></i> {{ __('web.profile_edit.save_changes') }}
                             </button>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Services')
+@section('title', __('services.title'))
 
 @section('content')
     {{-- <div style="padding-top: 78px;"></div> --}}
@@ -10,8 +10,8 @@
             <div class="col-sm-8 col-lg-8">
               <div class="breadcumb-style1 mb10-xs">
                 <div class="breadcumb-list">
-                  <a href="#">Home</a>
-                  <a href="#">Services</a>
+                  <a href="#">{{ __('common.home') }}</a>
+                  <a href="#">{{ __('services.title') }}</a>
                 </div>
               </div>
             </div>
@@ -31,21 +31,21 @@
                             <div class="col-auto">
                                 <div class="d-flex align-items-center h-100">
                                     <i class="fas fa-filter text-primary me-2"></i>
-                                    <h6 class="mb-0 fw-bold text-dark">Filters:</h6>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ __('services.filters') }}</h6>
                                 </div>
                             </div>
                             
                             <!-- City Filter (Italy only) -->
                             <div class="col-md-3">
                                 <label class="form-label fw-semibold text-dark mb-1 small">
-                                    <i class="fas fa-map-marker-alt text-primary me-1"></i>Location (Italy)
+                                    <i class="fas fa-map-marker-alt text-primary me-1"></i>{{ __('services.location_italy') }}
                                 </label>
                                 <select id="city-select" 
                                         name="city" 
                                         class="form-select rounded-pill border-2 shadow-sm" 
                                         style="height: 38px;"
                                         onchange="this.form.submit()">
-                                    <option value="">🇮🇹 All Available Cities</option>
+                                    <option value="">🇮🇹 {{ __('services.all_available_cities') }}</option>
                                     @foreach ($finalCities as $cityOption)
                                         <option value="{{ $cityOption }}" {{ request('city') == $cityOption ? 'selected' : '' }}>
                                             {{ $cityOption }}
@@ -57,7 +57,7 @@
                             <!-- Price Range Filter -->
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold text-dark mb-1 small">
-                                    <i class="fas fa-dollar-sign text-success me-1"></i>Price Range
+                                    <i class="fas fa-dollar-sign text-success me-1"></i>{{ __('services.price_range') }}
                                 </label>
                                 <div class="d-flex gap-2 align-items-center">
                                     <div class="input-group">
@@ -82,14 +82,14 @@
                                                min="0">
                                     </div>
                                 </div>
-                                <small class="text-muted">Range: €{{ $priceRange->min_price ?? 0 }} - €{{ $priceRange->max_price ?? 1000 }}</small>
+                                <small class="text-muted">{{ __('services.range') }}: €{{ $priceRange->min_price ?? 0 }} - €{{ $priceRange->max_price ?? 1000 }}</small>
                             </div>
                             
                             <!-- Apply Filter Button -->
                             <div class="col-md-2 ">
                                 <div style="margin-top: 34px;">
                                     <button type="submit" class="btn btn-primary rounded-pill shadow-sm fw-semibold w-100" style="height: 38px;">
-                                        <i class="fas fa-search me-1"></i>Search
+                                        <i class="fas fa-search me-1"></i>{{ __('services.search') }}
                                     </button>
                                 </div>
                             </div>
@@ -101,7 +101,7 @@
                                         <a href="{{ route('web.services', [$categoryId, $subcategoryId]) }}" 
                                            class="btn btn-outline-danger rounded-pill px-3 w-100" 
                                            style="height: 38px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-times me-1"></i>Clear
+                                            <i class="fas fa-times me-1"></i>{{ __('services.clear') }}
                                         </a>
                                     </div>
                                 </div>
@@ -112,7 +112,7 @@
                                 <div class="col-12">
                                     <div class="active-filters pt-2 border-top">
                                         <div class="d-flex flex-wrap gap-1 align-items-center">
-                                            <small class="text-muted fw-semibold me-2">Active:</small>
+                                            <small class="text-muted fw-semibold me-2">{{ __('services.active') }}</small>
                                             @if(request('city'))
                                                 <span class="badge bg-primary rounded-pill">
                                                     <i class="fas fa-map-marker-alt me-1"></i>{{ request('city') }}
@@ -120,12 +120,12 @@
                                             @endif
                                             @if(request('min_price'))
                                                 <span class="badge bg-success rounded-pill">
-                                                    Min: €{{ request('min_price') }}
+                                                    {{ __('services.min') }}: €{{ request('min_price') }}
                                                 </span>
                                             @endif
                                             @if(request('max_price'))
                                                 <span class="badge bg-success rounded-pill">
-                                                    Max: €{{ request('max_price') }}
+                                                    {{ __('services.max') }}: €{{ request('max_price') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -145,8 +145,8 @@
           <div class="row align-items-center wow fadeInUp">
             <div class="col-xl-5">
               <div class="main-title mb30-lg">
-                <h2 class="title">Featured Professionals</h2>
-                <p class="paragraph">Top-rated professionals in your selected category</p>
+                <h2 class="title">{{ __('services.featured_professionals') }}</h2>
+                <p class="paragraph">{{ __('services.top_rated_professionals') }}</p>
               </div>
             </div>
             <div class="col-xl-7">
@@ -178,7 +178,7 @@
                         <div class="tab-pane fade {{ $categoryId == $category->id ? 'show active' : ($loop->first && !$categoryId ? 'show active' : '') }}" id="pills-{{ $category->id }}" role="tabpanel" aria-labelledby="pills-{{ $category->id }}-tab">
                             @if($category->subcategories->count())
                                 <div class="mb3 d-flex flex-wrap align-items-center justify-content-start gap-2 mb-4">
-                                <button class="btn btn-sm btn-outline-dark subcategory-filter {{ ($subcategoryId ==  null) ? 'active' : '' }}" data-category="{{ $category->id }}" data-subcategory="all">All</button>
+                                <button class="btn btn-sm btn-outline-dark subcategory-filter {{ ($subcategoryId ==  null) ? 'active' : '' }}" data-category="{{ $category->id }}" data-subcategory="all">{{ __('services.all') }}</button>
                                 @foreach($category->subcategories as $subcategory)
                                     <button class="btn btn-sm btn-outline-dark subcategory-filter {{ ($subcategoryId == $subcategory->id) ? 'active' : '' }}" data-category="{{ $category->id }}" data-subcategory="{{ $subcategory->id }}">
                                     {{ $subcategory->name }}
@@ -238,7 +238,7 @@
                                                 <div class="list-meta mt15">
                                                     <div class="budget">
                                                         <p class="mb-0 body-color">
-                                                            Price range
+                                                            {{ __('services.price_label') }}
                                                             <span class="fz17 fw500 dark-color ms-1">
                                                                 @if($professional->min_price == $professional->max_price)
                                                                     €{{ number_format($professional->min_price, 2) }}
@@ -256,7 +256,7 @@
                                     <div class="col-12">
                                         <div class="text-center py-5">
                                             <i class="far fa-user-slash text-muted" style="font-size: 3rem;"></i>
-                                            <p class="text-muted mt-3 mb-0">No professionals available in this category</p>
+                                            <p class="text-muted mt-3 mb-0">{{ __('services.no_professionals') }}</p>
                                         </div>
                                     </div>
                                 @endforelse

@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Book Appointment')
+@section('title', __('web.booking.title'))
 
 @section('content')
 
@@ -22,9 +22,9 @@
                 <h2 class="booking-profile-name">{{ $professional->name }} {{ $professional->surname }}</h2>
             </div>
             <div class="booking-sidebar-block">
-                <label for="service-select" class="booking-label">Services</label>
+                <label for="service-select" class="booking-label">{{ __('web.booking.services') }}</label>
                 <select id="service-select" class="booking-select">
-                    <option value="">-- Select a Service --</option>
+                    <option value="">{{ __('web.booking.select_service') }}</option>
                     @foreach($professional->services as $service)
                         <option value="{{ $service->id }}" data-price="{{ $service->price }}">
                             {{ $service->title }} - €{{ number_format($service->price, 2) }}
@@ -33,11 +33,11 @@
                 </select>
             </div>
             <div class="booking-sidebar-block">
-                <span class="booking-label">Appointments</span>
+                <span class="booking-label">{{ __('web.booking.appointments') }}</span>
                 <div class="booking-legend">
-                    <span class="booking-legend-item"><i class="booking-legend-box booking-legend-available"></i> Available</span>
-                    <span class="booking-legend-item"><i class="booking-legend-box booking-legend-waiting"></i> Waiting</span>
-                    <span class="booking-legend-item"><i class="booking-legend-box booking-legend-booked"></i> Booked</span>
+                    <span class="booking-legend-item"><i class="booking-legend-box booking-legend-available"></i> {{ __('web.booking.available') }}</span>
+                    <span class="booking-legend-item"><i class="booking-legend-box booking-legend-waiting"></i> {{ __('web.booking.waiting') }}</span>
+                    <span class="booking-legend-item"><i class="booking-legend-box booking-legend-booked"></i> {{ __('web.booking.booked') }}</span>
                 </div>
             </div>
         </aside>
@@ -49,15 +49,15 @@
                 <div id="calendar-header-placeholder" class="booking-calendar-header booking-custom-toolbar-wrap" style="display: none;"></div>
                 <div id="calendar-container" class="booking-calendar-container"></div>
                 <div id="calendar-no-service" class="booking-no-service" style="display: none;">
-                    <p>Select a service from the sidebar to see available time slots.</p>
+                    <p>{{ __('web.booking.no_service') }}</p>
                 </div>
                 <div id="calendar-error" class="booking-calendar-error" style="display: none;"></div>
                 @if(!$isServiceOwner)
                 <div id="selected-datetime-bar" class="booking-selected-bar" style="display: none;">
-                    <span class="booking-selected-label">Selected:</span>
-                    <span id="selected-date-display"></span> at <span id="selected-time-display"></span>
+                    <span class="booking-selected-label">{{ __('web.booking.selected') }}</span>
+                    <span id="selected-date-display"></span> {{ __('web.booking.at') }} <span id="selected-time-display"></span>
                     <button type="button" class="booking-btn booking-btn-primary" id="btn-next-datetime">
-                        Confirm Booking <i class="fas fa-arrow-right"></i>
+                        {{ __('web.booking.confirm_booking') }} <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
                 @endif
@@ -69,18 +69,18 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content" style="background: #2d2d2d; border: 1px solid #404040;">
                         <div class="modal-header" style="border-color: #404040;">
-                            <h5 class="modal-title text-white" id="bookingConfirmModalLabel">Confirm Appointment</h5>
+                            <h5 class="modal-title text-white" id="bookingConfirmModalLabel">{{ __('web.booking.confirm_appointment') }}</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body text-white">
-                            <p><strong>Service:</strong> <span id="modal-service"></span></p>
-                            <p><strong>Date:</strong> <span id="modal-date"></span></p>
-                            <p><strong>Time:</strong> <span id="modal-time"></span></p>
+                            <p><strong>{{ __('web.booking.service') }}</strong> <span id="modal-service"></span></p>
+                            <p><strong>{{ __('web.booking.date') }}</strong> <span id="modal-date"></span></p>
+                            <p><strong>{{ __('web.booking.time') }}</strong> <span id="modal-time"></span></p>
                         </div>
                         <div class="modal-footer" style="border-color: #404040;">
-                            <button type="button" class="booking-btn booking-btn-outline" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="booking-btn booking-btn-outline" data-bs-dismiss="modal">{{ __('web.booking.cancel') }}</button>
                             <button type="button" class="booking-btn booking-btn-primary" id="btn-confirm-booking">
-                                <i class="far fa-calendar-check"></i> Confirm
+                                <i class="far fa-calendar-check"></i> {{ __('web.booking.confirm') }}
                             </button>
                         </div>
                     </div>
@@ -94,20 +94,20 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content" style="background: #2d2d2d; border: 1px solid #404040;">
                         <div class="modal-header" style="border-color: #404040;">
-                            <h5 class="modal-title text-white">Appointment Details</h5>
+                            <h5 class="modal-title text-white">{{ __('web.booking.appointment_details') }}</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body text-white">
-                            <p><strong>Service:</strong> <span id="slot-modal-service"></span></p>
-                            <p><strong>Client:</strong> <span id="slot-modal-client"></span></p>
-                            <p><strong>Email:</strong> <span id="slot-modal-email"></span></p>
-                            <p><strong>Phone:</strong> <span id="slot-modal-phone"></span></p>
-                            <p><strong>Date:</strong> <span id="slot-modal-date"></span></p>
-                            <p><strong>Time:</strong> <span id="slot-modal-time"></span></p>
-                            <p><strong>Status:</strong> <span id="slot-modal-status" class="badge"></span></p>
+                            <p><strong>{{ __('web.booking.service') }}</strong> <span id="slot-modal-service"></span></p>
+                            <p><strong>{{ __('web.booking.client') }}</strong> <span id="slot-modal-client"></span></p>
+                            <p><strong>{{ __('web.booking.email') }}</strong> <span id="slot-modal-email"></span></p>
+                            <p><strong>{{ __('web.booking.phone') }}</strong> <span id="slot-modal-phone"></span></p>
+                            <p><strong>{{ __('web.booking.date') }}</strong> <span id="slot-modal-date"></span></p>
+                            <p><strong>{{ __('web.booking.time') }}</strong> <span id="slot-modal-time"></span></p>
+                            <p><strong>{{ __('web.booking.status') }}</strong> <span id="slot-modal-status" class="badge"></span></p>
                         </div>
                         <div class="modal-footer" style="border-color: #404040;">
-                            <button type="button" class="booking-btn booking-btn-outline" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="booking-btn booking-btn-outline" data-bs-dismiss="modal">{{ __('web.booking.close') }}</button>
                         </div>
                     </div>
                 </div>
@@ -723,19 +723,37 @@ document.addEventListener('DOMContentLoaded', function() {
     @endphp
     const isServiceOwner = @json($isServiceOwner);
     const bookingDebug = @json($bookingDebug);
+    const webTranslations = {
+        loginRequired: @json(__('web.booking.login_required')),
+        loginRequiredText: @json(__('web.booking.login_required_text')),
+        submitting: @json(__('web.booking.submitting')),
+        addSlot: @json(__('web.booking.add_slot')),
+        configureSlot: @json(__('web.booking.configure_slot')),
+        externalAppointment: @json(__('web.booking.external_appointment')),
+        duration: @json(__('web.booking.duration')),
+        thirtyMinutes: @json(__('web.booking.thirty_minutes')),
+        oneHour: @json(__('web.booking.one_hour')),
+        halfHourOption: @json(__('web.booking.half_hour_option')),
+        firstHalf: @json(__('web.booking.first_half')),
+        secondHalf: @json(__('web.booking.second_half')),
+        both: @json(__('web.booking.both')),
+        repeat: @json(__('web.booking.repeat')),
+        noRepeat: @json(__('web.booking.no_repeat')),
+        daily: @json(__('web.booking.daily')),
+        weekly: @json(__('web.booking.weekly')),
+        untilDateMax: @json(__('web.booking.until_date_max')),
+        save: @json(__('web.booking.save')),
+        noAvailableOption: @json(__('web.booking.no_available_option')),
+        selectedSlotNotAvailable: @json(__('web.booking.selected_slot_not_available')),
+    };
 
     console.log('[Booking] Debug:', bookingDebug);
     console.log('[Booking] isServiceOwner =', isServiceOwner, '(plus button should', isServiceOwner ? 'show)' : 'be hidden)');
 
-    // Detect current language: localStorage first, then cookie, then default 'en'
+    // Detect current language from app locale
     function getCurrentGoogleLanguage() {
-        const STORAGE_KEY = window.FITSCOUT_LANG_KEY || 'fitScoutPreferredLanguage';
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored === 'it' || stored === 'en') return stored;
-        } catch (e) {}
-        const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
-        return match ? match[1] : 'en';
+        const locale = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
+        return locale === 'it' ? 'it' : 'en';
     }
 
     function getCalendarLocale() {
@@ -1292,37 +1310,39 @@ document.addEventListener('DOMContentLoaded', function() {
         maxEnd.setMonth(maxEnd.getMonth() + 6);
         var maxEndStr = maxEnd.getFullYear() + '-' + String(maxEnd.getMonth() + 1).padStart(2, '0') + '-' + String(maxEnd.getDate()).padStart(2, '0');
 
-        var modalHtml = '<div class="text-left mt-2" style="padding:0.5rem 0;">' +
-            '<label class="d-flex align-items-center gap-2 mb-2" style="font-weight:600;color:#111827;">' +
-            '<input type="checkbox" id="swal-external-appointment" style="width:16px;height:16px;"> External Appointment</label>' +
-            '<label class="block text-sm font-medium mb-1">Duration</label>' +
+        var modalHtml = '<div class="text-left mt-2" style="padding:0.5rem 0;text-align:left;">' +
+            '<label class="d-flex align-items-center gap-2 mb-2" style="font-weight:600;color:#111827;text-align:left;justify-content:flex-start;">' +
+            '<input type="checkbox" id="swal-external-appointment" style="width:16px;height:16px;"> ' + webTranslations.externalAppointment + '</label>' +
+            '<label class="block text-sm font-medium mb-1" style="display:block;text-align:left;">' + webTranslations.duration + '</label>' +
             '<select id="swal-slot-duration" class="swal2-input" style="width:100%;margin:0 0 8px 0;box-sizing:border-box;">' +
-            '<option value="30">30 minutes</option><option value="60">1 hour</option></select>' +
+            '<option value="30">' + webTranslations.thirtyMinutes + '</option><option value="60">' + webTranslations.oneHour + '</option></select>' +
             '<div id="swal-half-wrap">' +
-            '<label class="block text-sm font-medium mb-1">Half-hour option</label>' +
+            '<label class="block text-sm font-medium mb-1" style="display:block;text-align:left;">' + webTranslations.halfHourOption + '</label>' +
             '<select id="swal-half-choice" class="swal2-input" style="width:100%;margin:0 0 8px 0;box-sizing:border-box;">' +
-            (allowFirst ? '<option value="first">First half</option>' : '') +
-            (allowSecond ? '<option value="second">Second half</option>' : '') +
-            ((allowFirst && allowSecond) ? '<option value="both">Both</option>' : '') +
+            (allowFirst ? '<option value="first">' + webTranslations.firstHalf + '</option>' : '') +
+            (allowSecond ? '<option value="second">' + webTranslations.secondHalf + '</option>' : '') +
+            ((allowFirst && allowSecond) ? '<option value="both">' + webTranslations.both + '</option>' : '') +
             '</select></div>' +
             '<div id="swal-repeat-wrap">' +
-            '<label class="block text-sm font-medium mb-1">Repeat</label>' +
+            '<label class="block text-sm font-medium mb-1" style="display:block;text-align:left;">' + webTranslations.repeat + '</label>' +
             '<select id="swal-repeat-type" class="swal2-input" style="width:100%;margin:0;box-sizing:border-box;">' +
-            '<option value="none">No repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option>' +
+            '<option value="none">' + webTranslations.noRepeat + '</option><option value="daily">' + webTranslations.daily + '</option><option value="weekly">' + webTranslations.weekly + '</option>' +
             '</select>' +
             '<div id="swal-repeat-end-wrap" style="display:none;margin-top:0.5rem;">' +
-            '<label class="block text-sm font-medium mb-1">Until date (max 6 months)</label>' +
+            '<label class="block text-sm font-medium mb-1" style="display:block;text-align:left;">' + webTranslations.untilDateMax + '</label>' +
             '<input type="date" id="swal-repeat-end" class="swal2-input" style="width:100%;margin:0;box-sizing:border-box;" min="' + dateStr + '" max="' + maxEndStr + '">' +
             '</div></div></div>';
 
         bookingSwal.fire({
-            title: 'Add slot',
-            html: 'Configure slot for <strong>' + displayDate + '</strong> starting at <strong>' + slotTime + '</strong>.' + modalHtml,
+            title: webTranslations.addSlot,
+            html: webTranslations.configureSlot
+                .replace(':date', displayDate)
+                .replace(':time', slotTime) + modalHtml,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#00b3f1',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Save',
+            confirmButtonText: webTranslations.save,
             didOpen: function() {
                 var durationSel = document.getElementById('swal-slot-duration');
                 var halfWrap = document.getElementById('swal-half-wrap');
@@ -1373,7 +1393,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!intervals.length) {
-                bookingSwal.fire({ icon: 'error', title: 'No available option', text: 'Selected slot is not available.', confirmButtonColor: '#00b3f1' });
+                bookingSwal.fire({ icon: 'error', title: webTranslations.noAvailableOption, text: webTranslations.selectedSlotNotAvailable, confirmButtonColor: '#00b3f1' });
                 return;
             }
 
@@ -1469,8 +1489,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!bookingUser) {
             bookingSwal.fire({
                 icon: 'warning',
-                title: 'Login Required',
-                text: 'Please log in to book an appointment.',
+                title: webTranslations.loginRequired,
+                text: webTranslations.loginRequiredText,
                 confirmButtonColor: '#00b3f1'
             }).then(function() {
                 window.location.href = loginUrl + '?intended=' + encodeURIComponent(returnUrl);
@@ -1479,7 +1499,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         var submitBtn = document.getElementById('btn-confirm-booking');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + webTranslations.submitting;
 
         var formData = new FormData();
         formData.append('service_id', selectedServiceId);

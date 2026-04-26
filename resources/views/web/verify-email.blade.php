@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Verify Email - FitScout')
+@section('title', __('web.verify_email.title'))
 
 @section('content')
 <div style="padding-top: 78px;"></div>
@@ -8,8 +8,8 @@
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="main-title text-center">
-                    <h2 class="title">Verify your email address</h2>
-                    <p class="paragraph">We have sent a verification email to your address.</p>
+                    <h2 class="title">{{ __('web.verify_email.heading') }}</h2>
+                    <p class="paragraph">{{ __('web.verify_email.subtitle') }}</p>
                 </div>
             </div>
         </div>
@@ -18,7 +18,7 @@
                 <div class="log-reg-form search_area" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                     @if (session('registered'))
                         <div class="alert alert-success" role="alert">
-                            <strong>Registration completed!</strong> We have sent a verification email to your address. Check your email and click on the link to verify your account.
+                            <strong>{{ __('web.verify_email.registered') }}</strong> {{ __('web.verify_email.registered_message') }}
                         </div>
                     @endif
 
@@ -38,15 +38,14 @@
 
                     <div class="mb-4">
                         <p style="font-size: 16px; line-height: 1.8; color: #333;">
-                            Before continuing, check your email (including your <strong>Spam/Junk</strong> folder) for the verification link.
-                            If you didn't receive the email, we can send you another one using the button below.
+                            {!! __('web.verify_email.instructions', ['folder' => '<strong>' . __('web.verify_email.spam_folder') . '</strong>']) !!}
                         </p>
                     </div>
 
                     @if (session('email'))
                         <div class="mb-3">
                             <p style="font-size: 14px; color: #666;">
-                                Email sent to: <strong>{{ session('email') }}</strong>
+                                {{ __('web.verify_email.email_sent_to') }} <strong>{{ session('email') }}</strong>
                             </p>
                         </div>
                     @endif
@@ -56,7 +55,7 @@
                             <form method="POST" action="{{ route('verification.send') }}">
                                 @csrf
                                 <button type="submit" class="btn btn-primary w-100" style="padding: 12px 20px; background: #00b3f1; border: none; border-radius: 4px; color: white; font-weight: 600; margin-bottom: 15px;">
-                                    Send verification email again
+                                    {{ __('web.verify_email.resend') }}
                                 </button>
                             </form>
                         @endif
@@ -65,21 +64,20 @@
                             @csrf
                             <input type="hidden" name="email" value="{{ session('email') }}">
                             <button type="submit" class="btn btn-primary w-100" style="padding: 12px 20px; background: #00b3f1; border: none; border-radius: 4px; color: white; font-weight: 600; margin-bottom: 15px;">
-                                Send verification email again
+                                {{ __('web.verify_email.resend') }}
                             </button>
                         </form>
                     @endauth
 
                     <div class="alert alert-info" role="alert" style="margin-top: 20px;">
                         <p style="margin: 0; font-size: 14px;">
-                            If you have just registered an account, check your email for the verification link.
-                            After verifying the email, you can login.
+                            {{ __('web.verify_email.info') }}
                         </p>
                     </div>
 
                     <div class="mt-4 text-center">
                         <a href="{{ route('web.login') }}" style="color: #00b3f1; text-decoration: none;">
-                            Go to login
+                            {{ __('web.verify_email.go_login') }}
                         </a>
                     </div>
                 </div>

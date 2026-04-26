@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Privacy Policy')
+@section('title', __('web.privacy_policy_page.title'))
 
 @section('content')
     {{-- <div style="padding-top: 78px;"></div> --}}
@@ -13,8 +13,8 @@
                 <div class="row">
                     <div class="col-xl-5">
                         <div class="position-relative wow fadeInUp" data-wow-delay="300ms">
-                            <h2 class="text-white">Privacy Policy</h2>
-                            <p class="text mb0 text-white">Learn how we collect, use, and protect your personal data.</p>
+                            <h2 class="text-white">{{ __('web.privacy_policy_page.title') }}</h2>
+                            <p class="text mb0 text-white">{{ __('web.privacy_policy_page.subtitle') }}</p>
                         </div>
                     </div>
                 </div>
@@ -28,59 +28,59 @@
             <div class="row justify-content-center wow fadeInUp" data-wow-delay="300ms">
                 <div class="col-lg-10">
                     <div class="terms-content">
-                        <h4>Privacy Policy</h4>
-                        <p>FitScout ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and protect your information when you use our website, mobile application, or any related service (together, the "Service").</p>
-                        <p>By using our Service, you agree to this Privacy Policy. If you do not agree, please do not use the Service.</p>
+                        <h4>{{ __('web.privacy_policy_page.title') }}</h4>
+                        <p>{{ __('web.privacy_policy_page.intro_1') }}</p>
+                        <p>{{ __('web.privacy_policy_page.intro_2') }}</p>
 
-                        <h5>1. Information We Collect</h5>
-                        <p>We may collect the following information:</p>
+                        <h5>{{ __('web.privacy_policy_page.collect_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.collect_intro') }}</p>
                         <ul>
-                            <li><strong>Personal information:</strong> name, email address, phone number, billing data, and any other details you provide during registration or communication.</li>
-                            <li><strong>Profile information:</strong> photos, service descriptions, skills, and qualifications you choose to display.</li>
-                            <li><strong>Usage data:</strong> IP address, browser type, device information, pages visited, and actions on our platform.</li>
-                            <li><strong>Transaction data:</strong> payment details (processed by third-party payment providers) and purchase history.</li>
+                            <li><strong>{{ __('web.privacy_policy_page.personal_info') }}</strong> {{ __('web.privacy_policy_page.personal_info_text') }}</li>
+                            <li><strong>{{ __('web.privacy_policy_page.profile_info') }}</strong> {{ __('web.privacy_policy_page.profile_info_text') }}</li>
+                            <li><strong>{{ __('web.privacy_policy_page.usage_data') }}</strong> {{ __('web.privacy_policy_page.usage_data_text') }}</li>
+                            <li><strong>{{ __('web.privacy_policy_page.transaction_data') }}</strong> {{ __('web.privacy_policy_page.transaction_data_text') }}</li>
                         </ul>
 
-                        <h5>2. How We Use Your Information</h5>
+                        <h5>{{ __('web.privacy_policy_page.use_title') }}</h5>
                         <ul>
-                            <li>Provide, operate, and improve the Service.</li>
-                            <li>Connect users with sports professionals, gyms, and related service providers.</li>
-                            <li>Process payments and send invoices.</li>
-                            <li>Communicate updates, offers, and important changes.</li>
-                            <li>Ensure compliance with our Terms of Service and legal requirements.</li>
+                            <li>{{ __('web.privacy_policy_page.use_1') }}</li>
+                            <li>{{ __('web.privacy_policy_page.use_2') }}</li>
+                            <li>{{ __('web.privacy_policy_page.use_3') }}</li>
+                            <li>{{ __('web.privacy_policy_page.use_4') }}</li>
+                            <li>{{ __('web.privacy_policy_page.use_5') }}</li>
                         </ul>
 
-                        <h5>3. Sharing Your Information</h5>
-                        <p>We do not sell your personal data. We may share it with:</p>
+                        <h5>{{ __('web.privacy_policy_page.sharing_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.sharing_intro') }}</p>
                         <ul>
-                            <li><strong>Service providers:</strong> payment processors, hosting providers, analytics tools.</li>
-                            <li><strong>Business partners:</strong> only when needed to provide the requested service.</li>
-                            <li><strong>Legal authorities:</strong> if required by law or to protect our rights, safety, or property.</li>
+                            <li><strong>{{ __('web.privacy_policy_page.service_providers') }}</strong> {{ __('web.privacy_policy_page.service_providers_text') }}</li>
+                            <li><strong>{{ __('web.privacy_policy_page.business_partners') }}</strong> {{ __('web.privacy_policy_page.business_partners_text') }}</li>
+                            <li><strong>{{ __('web.privacy_policy_page.legal_authorities') }}</strong> {{ __('web.privacy_policy_page.legal_authorities_text') }}</li>
                         </ul>
 
-                        <h5>4. Data Retention</h5>
-                        <p>We store your personal information only as long as necessary to provide the Service and for legal or business needs.</p>
+                        <h5>{{ __('web.privacy_policy_page.retention_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.retention_text') }}</p>
 
-                        <h5>5. Security</h5>
-                        <p>We take reasonable steps to protect your information from unauthorized access, use, or disclosure. However, no online service is 100% secure.</p>
+                        <h5>{{ __('web.privacy_policy_page.security_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.security_text') }}</p>
 
-                        <h5>6. Your Rights</h5>
-                        <p>Depending on your location, you may have the right to:</p>
+                        <h5>{{ __('web.privacy_policy_page.rights_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.rights_intro') }}</p>
                         <ul>
-                            <li>Access, update, or delete your personal data.</li>
-                            <li>Restrict or object to the processing of your data.</li>
-                            <li>Withdraw consent at any time when processing is based on consent.</li>
+                            <li>{{ __('web.privacy_policy_page.rights_1') }}</li>
+                            <li>{{ __('web.privacy_policy_page.rights_2') }}</li>
+                            <li>{{ __('web.privacy_policy_page.rights_3') }}</li>
                         </ul>
-                        <p>You can contact us to exercise these rights: <a href="mailto:info@fitscout.it">info@fitscout.it</a></p>
+                        <p>{{ __('web.privacy_policy_page.rights_contact') }} <a href="mailto:info@fitscout.it">info@fitscout.it</a></p>
 
-                        <h5>7. Third-Party Links</h5>
-                        <p>The Service may contain links to third-party websites or services. We are not responsible for their privacy practices.</p>
+                        <h5>{{ __('web.privacy_policy_page.links_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.links_text') }}</p>
 
-                        <h5>8. Changes to This Policy</h5>
-                        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with a new effective date.</p>
+                        <h5>{{ __('web.privacy_policy_page.changes_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.changes_text') }}</p>
 
-                        <h5>9. Contact</h5>
-                        <p>For any questions about this Privacy Policy, contact us at: <a href="mailto:info@fitscout.it">info@fitscout.it</a></p>
+                        <h5>{{ __('web.privacy_policy_page.contact_title') }}</h5>
+                        <p>{{ __('web.privacy_policy_page.contact_text') }} <a href="mailto:info@fitscout.it">info@fitscout.it</a></p>
                     </div>
                 </div>
             </div>

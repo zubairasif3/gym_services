@@ -5,7 +5,7 @@
 
         <!-- Left panel: Chat Rooms -->
         <div class="w-1/4 p-4 border md:border-r border-gray-200 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
-            <h3 class="text-xl font-semibold mb-4">Your Conversations</h3>
+            <h3 class="text-xl font-semibold mb-4">{{ __('admin.chat.your_conversations') }}</h3>
 
             @if($this->chatRooms->count())
                 <ul role="list">
@@ -34,7 +34,7 @@
                     @endforeach
                 </ul>
             @else
-                <p class="text-gray-500">No conversations yet.</p>
+                <p class="text-gray-500">{{ __('admin.chat.no_conversations') }}</p>
             @endif
         </div>
 
@@ -42,7 +42,7 @@
         <div class="md:w-3/4 w-full p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm flex flex-col h-[600px]">
 
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="text-xl font-semibold">Chat</h3>
+                <h3 class="text-xl font-semibold">{{ __('admin.chat.chat') }}</h3>
                 {{-- @if ($this->chatRoomId)
                     <span class="text-sm text-gray-500">Room ID: {{ $this->chatRoomId }}</span>
                 @endif --}}
@@ -63,7 +63,7 @@
                         </div>
                     @endforeach
                 @else
-                    <p class="text-gray-500">No messages in this conversation yet.</p>
+                    <p class="text-gray-500">{{ __('admin.chat.no_messages') }}</p>
                 @endif
             </div>
 
@@ -73,10 +73,10 @@
                     <div class="flex items-center gap-2">
                         <textarea wire:model="newMessage"
                                   class="border focus-visible:border-primary-500 focus:ring-0 p-3 resize-none rounded-md w-full dark:!bg-gray-700"
-                                  placeholder="Type your message..." rows="2"></textarea>
+                                  placeholder="{{ __('admin.chat.type_message') }}" rows="2"></textarea>
                         <button type="submit"
                                 class=" bg-primary-600 hover: bg-primary-700 text-white px-4 py-2 rounded-md transition">
-                            Send
+                            {{ __('admin.chat.send') }}
                         </button>
                     </div>
                     @error('newMessage')
@@ -84,7 +84,7 @@
                     @enderror
                 </form>
             @else
-                <div class="mt-4 text-gray-500">Select a conversation to start chatting.</div>
+                <div class="mt-4 text-gray-500">{{ __('admin.chat.select_conversation') }}</div>
             @endif
 
         </div>

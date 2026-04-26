@@ -30,7 +30,7 @@ class SubscriptionBillingWidget extends Widget
     public function loadSummary(): void
     {
         $user = Filament::auth()->user();
-        $savedCardDisplay = 'Not configured';
+        $savedCardDisplay = __('admin.widgets.not_configured');
         $savedCardBrand = null;
         $savedCardLast4 = null;
         $savedCardExp = null;
@@ -61,29 +61,33 @@ class SubscriptionBillingWidget extends Widget
                     $last4 = (string) $card->last4;
                     $expMonth = str_pad((string) $card->exp_month, 2, '0', STR_PAD_LEFT);
                     $expYear = (string) $card->exp_year;
-                    $savedCardDisplay = "{$brand} ending in {$last4} (exp {$expMonth}/{$expYear})";
+                    $savedCardDisplay = __('admin.widgets.card_ending', [
+                        'brand' => $brand,
+                        'last4' => $last4,
+                        'exp' => "{$expMonth}/{$expYear}",
+                    ]);
                     $savedCardBrand = strtoupper($brand);
                     $savedCardLast4 = $last4;
                     $savedCardExp = "{$expMonth}/{$expYear}";
                 } else {
-                    $savedCardDisplay = 'Payment method configured';
+                    $savedCardDisplay = __('admin.widgets.payment_method_configured');
                 }
             } catch (\Throwable $e) {
-                $savedCardDisplay = 'Payment method configured';
+                $savedCardDisplay = __('admin.widgets.payment_method_configured');
             }
         }
 
         $this->summary = [
             'active_promotions' => $activePromotions,
-            'status' => $activePromotions > 0 ? 'Active' : 'Inactive',
-            'renewal_note' => 'Per-impression billing model (no fixed monthly renewal).',
+            'status' => $activePromotions > 0 ? __('admin.widgets.active') : __('admin.widgets.inactive'),
+            'renewal_note' => __('admin.widgets.renewal_note'),
             'expiration_note' => $activePromotions > 0
-                ? 'Subscription remains active while promotions are enabled.'
-                : 'No active promotion, so billing is currently inactive.',
+                ? __('admin.widgets.expiration_active')
+                : __('admin.widgets.expiration_inactive'),
             'last_activity_at' => $latestActivePromotion?->updated_at?->format('d M Y, H:i'),
             'payment_method' => $user->default_payment_method
                 ? ('**** ' . substr($user->default_payment_method, -4))
-                : 'Not configured',
+                : __('admin.widgets.not_configured'),
             'saved_card_display' => $savedCardDisplay,
             'saved_card_brand' => $savedCardBrand,
             'saved_card_last4' => $savedCardLast4,
@@ -105,10 +109,10 @@ class SubscriptionBillingWidget extends Widget
         $this->loadSummary();
 
         Notification::make()
-            ->title($affected > 0 ? 'Subscription cancelled' : 'No active subscription')
+            ->title($affected > 0 ? __('admin.widgets.subscription_cancelled') : __('admin.widgets.no_active_subscription'))
             ->body($affected > 0
-                ? 'All active promotions were disabled successfully.'
-                : 'There were no active promotions to disable.')
+                ? __('admin.widgets.promotions_disabled')
+                : __('admin.widgets.no_promotions_to_disable'))
             ->success()
             ->send();
     }

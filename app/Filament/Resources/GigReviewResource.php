@@ -19,13 +19,24 @@ class GigReviewResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
     
-    protected static ?string $navigationGroup = 'Gig';
-    
-    protected static ?string $navigationLabel = 'Reviews';
-    
     protected static ?int $navigationSort = 4;
     
     protected static ?string $recordTitleAttribute = 'comment';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.review.plural');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.review.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.review.plural');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -36,7 +47,7 @@ class GigReviewResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Review Information')
+                Forms\Components\Section::make(__('admin.reviews.review_information'))
                     ->schema([
                         Forms\Components\Select::make('gig_id')
                             ->relationship('gig', 'title')
@@ -68,7 +79,7 @@ class GigReviewResource extends Resource
                             ->columnSpan(1),
                     ])->columns(2),
                     
-                Forms\Components\Section::make('Review Content')
+                Forms\Components\Section::make(__('admin.reviews.review_content'))
                     ->schema([
                         Forms\Components\Textarea::make('comment')
                             ->required()
@@ -76,17 +87,17 @@ class GigReviewResource extends Resource
                             ->columnSpanFull(),
                     ]),
                     
-                Forms\Components\Section::make('Status')
+                Forms\Components\Section::make(__('admin.reviews.status'))
                     ->schema([
                         Forms\Components\Toggle::make('is_verified')
-                            ->label('Verified Purchase')
-                            ->helperText('Mark this review as verified purchase')
+                            ->label(__('admin.fields.verified_purchase'))
+                            ->helperText(__('admin.messages.verified_purchase_help'))
                             ->default(false),
                         Forms\Components\Placeholder::make('created_at')
-                            ->label('Created At')
+                            ->label(__('admin.fields.created_at'))
                             ->content(fn ($record) => $record ? $record->created_at->format('M d, Y H:i') : '-'),
                         Forms\Components\Placeholder::make('updated_at')
-                            ->label('Updated At')
+                            ->label(__('admin.fields.updated_at'))
                             ->content(fn ($record) => $record ? $record->updated_at->format('M d, Y H:i') : '-'),
                     ])->columns(3),
             ]);
@@ -97,12 +108,12 @@ class GigReviewResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('gig.title')
-                    ->label('Service')
+                    ->label(__('admin.fields.service'))
                     ->searchable()
                     ->sortable()
                     ->limit(30),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Reviewer')
+                    ->label(__('admin.fields.reviewer'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')
@@ -119,19 +130,19 @@ class GigReviewResource extends Resource
                     ->searchable()
                     ->wrap(),
                 Tables\Columns\IconColumn::make('is_verified')
-                    ->label('Verified')
+                    ->label(__('admin.fields.verified'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('gray'),
                 Tables\Columns\TextColumn::make('helpful_count')
-                    ->label('Helpful')
+                    ->label(__('admin.fields.helpful'))
                     ->badge()
                     ->color('info')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Date')
+                    ->label(__('admin.fields.date'))
                     ->dateTime('M d, Y')
                     ->sortable(),
             ])
@@ -145,16 +156,16 @@ class GigReviewResource extends Resource
                         1 => '⭐ 1 Star',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_verified')
-                    ->label('Verified Purchase')
-                    ->placeholder('All reviews')
+                    ->label(__('admin.fields.verified_purchase'))
+                    ->placeholder(__('admin.messages.all_reviews'))
                     ->trueLabel('Verified only')
                     ->falseLabel('Unverified only'),
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label('From'),
+                            ->label(__('admin.fields.from')),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label('Until'),
+                            ->label(__('admin.fields.until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -173,7 +184,7 @@ class GigReviewResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('verify')
-                    ->label('Verify')
+                    ->label(__('admin.actions.verify'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
@@ -184,7 +195,7 @@ class GigReviewResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\BulkAction::make('verify')
-                        ->label('Mark as Verified')
+                        ->label(__('admin.actions.mark_as_verified'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()

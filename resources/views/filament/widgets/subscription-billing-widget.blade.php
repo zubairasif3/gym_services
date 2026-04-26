@@ -3,46 +3,46 @@
         <div class="space-y-6 relative" x-data="{ showCancelModal: false }">
             @if(request()->get('card_updated') == '1')
                 <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/30 dark:text-green-200">
-                    Payment method updated successfully.
+                    {{ __('admin.widgets.card_updated') }}
                 </div>
             @endif
 
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Subscription & Billing</h3>
+                <h3 class="text-lg font-semibold">{{ __('admin.widgets.subscription_billing') }}</h3>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="rounded-xl border p-4 bg-white dark:bg-gray-900">
-                    <p class="text-sm text-gray-500">Subscription Status</p>
-                    <p class="text-xl font-semibold mt-1">{{ $summary['status'] ?? 'Inactive' }}</p>
+                    <p class="text-sm text-gray-500">{{ __('admin.widgets.subscription_status') }}</p>
+                    <p class="text-xl font-semibold mt-1">{{ $summary['status'] ?? __('admin.widgets.inactive') }}</p>
                 </div>
                 <div class="rounded-xl border p-4 bg-white dark:bg-gray-900">
-                    <p class="text-sm text-gray-500">Active Promotions</p>
+                    <p class="text-sm text-gray-500">{{ __('admin.widgets.active_promotions') }}</p>
                     <p class="text-xl font-semibold mt-1">{{ $summary['active_promotions'] ?? 0 }}</p>
                 </div>
                 <div class="rounded-xl border p-4 bg-white dark:bg-gray-900">
-                    <p class="text-sm text-gray-500">Payment Method</p>
-                    <p class="text-xl font-semibold mt-1">{{ $summary['payment_method'] ?? 'Not configured' }}</p>
+                    <p class="text-sm text-gray-500">{{ __('admin.widgets.payment_method') }}</p>
+                    <p class="text-xl font-semibold mt-1">{{ $summary['payment_method'] ?? __('admin.widgets.not_configured') }}</p>
                 </div>
             </div>
 
             <div class="rounded-xl border bg-white dark:bg-gray-900 p-6">
-                <h4 class="text-base font-semibold">Renewal & Expiration</h4>
+                <h4 class="text-base font-semibold">{{ __('admin.widgets.renewal_expiration') }}</h4>
                 <div class="mt-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 space-y-3">
                     <p class="text-sm text-gray-600 dark:text-gray-300">
-                        <strong>Renewal:</strong> {{ $summary['renewal_note'] ?? '-' }}
+                        <strong>{{ __('admin.widgets.renewal') }}</strong> {{ $summary['renewal_note'] ?? '-' }}
                     </p>
                     <p class="text-sm text-gray-600 dark:text-gray-300">
-                        <strong>Expiration:</strong> {{ $summary['expiration_note'] ?? '-' }}
+                        <strong>{{ __('admin.widgets.expiration') }}</strong> {{ $summary['expiration_note'] ?? '-' }}
                     </p>
                     <p class="text-sm text-gray-600 dark:text-gray-300">
-                        <strong>Last Billing Activity:</strong> {{ $summary['last_activity_at'] ?? 'N/A' }}
+                        <strong>{{ __('admin.widgets.last_billing_activity') }}</strong> {{ $summary['last_activity_at'] ?? 'N/A' }}
                     </p>
                 </div>
             </div>
 
             <div class="rounded-xl border bg-white dark:bg-gray-900 p-6">
-                <h4 class="text-sm font-semibold tracking-wide text-gray-700 dark:text-gray-200 uppercase">Payment Method</h4>
+                <h4 class="text-sm font-semibold tracking-wide text-gray-700 dark:text-gray-200 uppercase">{{ __('admin.widgets.payment_method') }}</h4>
                 <div class="mt-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
                     @if(!empty($summary['saved_card_last4']) && !empty($summary['saved_card_exp']))
                         @php
@@ -64,13 +64,13 @@
                                     {{ ucfirst(strtolower($summary['saved_card_brand'] ?? 'Card')) }} •••• {{ $summary['saved_card_last4'] }}
                                 </p>
                                 <p class="text-sm text-gray-600 dark:text-gray-300">
-                                    Expires {{ $summary['saved_card_exp'] }}
+                                    {{ __('admin.widgets.expires', ['date' => $summary['saved_card_exp']]) }}
                                 </p>
                             </div>
                         </div>
                     @else
                         <p class="text-sm text-gray-600 dark:text-gray-300">
-                            {{ $summary['saved_card_display'] ?? 'Not configured' }}
+                            {{ $summary['saved_card_display'] ?? __('admin.widgets.not_configured') }}
                         </p>
                     @endif
                 </div>
@@ -80,14 +80,14 @@
                 <a href="{{ url('/admin/add-card') }}"
                     class="fi-btn relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 rounded-lg fi-color-custom fi-btn-color-primary fi-color-primary fi-size-md fi-btn-size-md gap-1.5 px-3 py-2 text-sm inline-grid shadow-sm bg-custom-600 text-white hover:bg-custom-500 focus-visible:ring-custom-500/50 dark:bg-custom-500 dark:hover:bg-custom-400 dark:focus-visible:ring-custom-400/50"
                     style="--c-400:var(--primary-400);--c-500:var(--primary-500);--c-600:var(--primary-600);">
-                    Modify Payment Method
+                    {{ __('admin.widgets.modify_payment_method') }}
                 </a>
 
                 <button type="button"
                     @click="showCancelModal = true"
                     class="fi-btn relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 rounded-lg fi-size-md fi-btn-size-md gap-1.5 px-3 py-2 text-sm inline-grid shadow-sm"
                     style="background:#dc2626;color:#ffffff;border:1px solid #b91c1c;">
-                    Cancel Subscription
+                    {{ __('admin.widgets.cancel_subscription') }}
                 </button>
             </div>
 
@@ -96,22 +96,22 @@
                  class="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-[2px] px-4"
                  style="display: none; background: #0000004a; z-index: 100000; margin: 0px;">
                 <div class="w-full max-w-md rounded-xl border border-gray-300 bg-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.35)] dark:border-gray-600 dark:bg-gray-900">
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Cancel Subscription</h4>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('admin.widgets.cancel_subscription') }}</h4>
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                        This will disable all active promotions for your account. You can enable them again later.
+                        {{ __('admin.widgets.cancel_subscription_text') }}
                     </p>
 
                     <div class="mt-5 flex justify-end gap-3">
                         <button type="button"
                                 @click="showCancelModal = false"
                                 class="fi-btn relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 rounded-lg fi-size-md fi-btn-size-md gap-1.5 px-3 py-2 text-sm inline-grid shadow-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
-                            Keep Subscription
+                            {{ __('admin.widgets.keep_subscription') }}
                         </button>
                         <button type="button"
                                 @click="$wire.cancelSubscription(); showCancelModal = false"
                                 class="fi-btn relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 rounded-lg fi-size-md fi-btn-size-md gap-1.5 px-3 py-2 text-sm inline-grid shadow-sm"
                                 style="background:#dc2626;color:#ffffff;border:1px solid #b91c1c;">
-                            Yes, Cancel
+                            {{ __('admin.widgets.yes_cancel') }}
                         </button>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Following')
+@section('title', __('web.following.title'))
 
 @section('content')
 <section class="our-dashbord dashbord bgc-f7 pb50">
@@ -9,14 +9,14 @@
             <div class="col-lg-12">
                 <div class="dashboard_navigationbar dn db-1024">
                     <div class="dropdown">
-                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> Dashboard Navigation</button>
+                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> {{ __('web.dashboard.navigation') }}</button>
                         <ul id="myDropdown" class="dropdown-content">
-                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>Dashboard</a></li>
-                            <li><a href="{{ route('following') }}" class="active"><span class="flaticon-heart mr10"></span>Following</a></li>
-                            <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>Notifications</a></li>
-                            <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>Messages</a></li>
+                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>{{ __('web.dashboard.dashboard') }}</a></li>
+                            <li><a href="{{ route('following') }}" class="active"><span class="flaticon-heart mr10"></span>{{ __('web.dashboard.following') }}</a></li>
+                            <li><a href="{{ route('notifications') }}"><span class="flaticon-bell mr10"></span>{{ __('web.dashboard.notifications') }}</a></li>
+                            <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>{{ __('web.dashboard.messages') }}</a></li>
                             @if(auth()->user()->user_type === 2)
-                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>My Appointments</a></li>
+                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>{{ __('web.dashboard.my_appointments') }}</a></li>
                             @endif
                         </ul>
                     </div>
@@ -28,8 +28,8 @@
                     <!-- Dashboard Title -->
                     <div class="col-lg-12 mb20">
                         <div class="dashboard_title_area">
-                            <h2>Following</h2>
-                            <p class="text">Manage the professionals you follow</p>
+                            <h2>{{ __('web.following.title') }}</h2>
+                            <p class="text">{{ __('web.following.subtitle') }}</p>
                         </div>
                     </div>
                     
@@ -70,11 +70,11 @@
                                                 <div class="d-flex justify-content-center gap-3 mb-3">
                                                     <div>
                                                         <strong>{{ \App\Models\User::followersCount($user->id) }}</strong>
-                                                        <small class="text-muted d-block">Followers</small>
+                                                        <small class="text-muted d-block">{{ __('web.following.followers') }}</small>
                                                     </div>
                                                     <div>
                                                         <strong>{{ $user->services->count() }}</strong>
-                                                        <small class="text-muted d-block">Services</small>
+                                                        <small class="text-muted d-block">{{ __('web.following.services') }}</small>
                                                     </div>
                                                 </div>
                                                 
@@ -84,7 +84,7 @@
                                                 <!-- Message Button -->
                                                 <button class="btn btn-outline-primary btn-sm mt-2 w-100" 
                                                         onclick="openChatWith({{ $user->id }})">
-                                                    <i class="far fa-envelope me-1"></i> Message
+                                                    <i class="far fa-envelope me-1"></i> {{ __('web.following.message') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -93,10 +93,10 @@
                                     <div class="col-12">
                                         <div class="text-center py-5">
                                             <i class="far fa-heart text-muted" style="font-size: 4rem;"></i>
-                                            <h4 class="mt-3">You're not following anyone yet</h4>
-                                            <p class="text-muted">Discover talented professionals and follow them to stay updated!</p>
+                                            <h4 class="mt-3">{{ __('web.following.empty_title') }}</h4>
+                                            <p class="text-muted">{{ __('web.following.empty_text') }}</p>
                                             <a href="{{ route('web.services') }}" class="btn btn-primary mt-3">
-                                                Browse Services
+                                                {{ __('web.following.browse_services') }}
                                             </a>
                                         </div>
                                     </div>

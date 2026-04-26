@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Search Professionals')
+@section('title', __('web.search.title'))
 
 @section('content')
 <div style="padding-top: 78px;"></div>
@@ -10,10 +10,10 @@
             <div class="col-sm-8 col-lg-10">
                 <div class="breadcumb-style1 mb10-xs">
                     <div class="breadcumb-list">
-                        <a href="{{ url('') }}">Home</a>
-                        <a href="#">Search</a>
+                        <a href="{{ url('') }}">{{ __('common.home') }}</a>
+                        <a href="#">{{ __('web.search.breadcrumb') }}</a>
                     </div>
-                    <h2 class="mt-2">Search Results for "{{ $query }}"</h2>
+                    <h2 class="mt-2">{{ __('web.search.results_for', ['query' => $query]) }}</h2>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@
                             <div class="list-meta mt15">
                                 <div class="budget">
                                     <p class="mb-0 body-color">
-                                        Price range
+                                        {{ __('web.search.price_range') }}
                                         <span class="fz17 fw500 dark-color ms-1">
                                             @if($professional->min_price == $professional->max_price)
                                                 €{{ number_format($professional->min_price, 2) }}
@@ -91,7 +91,7 @@
                 <div class="col-12">
                     <div class="text-center py-5">
                         <i class="far fa-user-slash text-muted" style="font-size: 3rem;"></i>
-                        <p class="text-muted mt-3 mb-0">No professionals found matching your query.</p>
+                        <p class="text-muted mt-3 mb-0">{{ __('web.search.no_results') }}</p>
                     </div>
                 </div>
             @endforelse

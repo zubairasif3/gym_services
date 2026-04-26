@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Notifications')
+@section('title', __('notifications.title'))
 
 @section('content')
 <section class="our-dashbord dashbord bgc-f7 pt-4">
@@ -9,14 +9,14 @@
             <div class="col-lg-12">
                 <div class="dashboard_navigationbar dn db-1024">
                     <div class="dropdown">
-                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> Dashboard Navigation</button>
+                        <button onclick="myFunction()" class="dropbtn"><i class="fa fa-bars pr10"></i> {{ __('notifications.dashboard_navigation') }}</button>
                         <ul id="myDropdown" class="dropdown-content">
-                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>Dashboard</a></li>
-                            <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>Following</a></li>
-                            <li><a href="{{ route('notifications') }}" class="active"><span class="flaticon-bell mr10"></span>Notifications</a></li>
-                            <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>Messages</a></li>
+                            <li><a href="{{ route('filament.admin.pages.dashboard') }}"><span class="flaticon-home mr10"></span>{{ __('notifications.dashboard') }}</a></li>
+                            <li><a href="{{ route('following') }}"><span class="flaticon-heart mr10"></span>{{ __('notifications.following') }}</a></li>
+                            <li><a href="{{ route('notifications') }}" class="active"><span class="flaticon-bell mr10"></span>{{ __('notifications.title') }}</a></li>
+                            <li><a href="{{ route('messages') }}"><span class="flaticon-chat mr10"></span>{{ __('notifications.messages') }}</a></li>
                             @if(auth()->user()->user_type === 2)
-                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>My Appointments</a></li>
+                            <li><a href="{{ route('appointments.index') }}"><span class="flaticon-calendar mr10"></span>{{ __('notifications.my_appointments') }}</a></li>
                             @endif
                         </ul>
                     </div>
@@ -29,14 +29,14 @@
                     <div class="col-lg-12 mb20">
                         <div class="dashboard_title_area d-flex justify-content-between align-items-center">
                             <div>
-                                <h2>Notifications</h2>
-                                <p class="text">Stay updated with your activity</p>
+                                <h2>{{ __('notifications.title') }}</h2>
+                                <p class="text">{{ __('notifications.stay_updated') }}</p>
                             </div>
                             @if($notifications->where('read_at', null)->count() > 0)
                                 <form action="{{ route('notifications.mark-all-read') }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-primary">
-                                        <i class="far fa-check-circle me-1"></i> Mark All as Read
+                                        <i class="far fa-check-circle me-1"></i> {{ __('notifications.mark_all_read') }}
                                     </button>
                                 </form>
                             @endif
@@ -94,7 +94,7 @@
                                                         @endphp
                                                         <a href="{{ $bookingRequestUrl }}" class="text-decoration-none text-dark d-block">
                                                             <span>{{ $notification->data['message'] ?? 'New booking request' }}</span>
-                                                            <span class="d-block small text-primary mt-1">View appointment →</span>
+                                                            <span class="d-block small text-primary mt-1">{{ __('notifications.view_appointment') }}</span>
                                                         </a>
                                                     @elseif($notification->type === 'new_gig_reaction')
                                                         @php
@@ -102,7 +102,7 @@
                                                         @endphp
                                                         <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark d-block">
                                                             <span><strong>{{ $reactorName }}</strong> reacted {{ $notification->data['emoji'] ?? '' }} to your service</span>
-                                                            <span class="d-block small text-primary mt-1">View profile →</span>
+                                                            <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                                         </a>
                                                     @elseif($notification->type === 'new_media_reaction')
                                                         @php
@@ -115,7 +115,7 @@
                                                         @endphp
                                                         <a href="{{ $profileUrl }}" class="text-decoration-none text-dark d-block">
                                                             <span><strong>{{ $reactorName }}</strong> reacted {{ $notification->data['emoji'] ?? '' }} to your photo/video</span>
-                                                            <span class="d-block small text-primary mt-1">View profile →</span>
+                                                            <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                                         </a>
                                                     @elseif($notification->type === 'new_profile_media' || $notification->type === 'new_service')
                                                         @php
@@ -134,7 +134,7 @@
                                                         @endphp
                                                         <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark d-block">
                                                             <span><strong>{{ $reviewerName }}</strong> left a {{ $rating ? $rating . '-star ' : '' }}review on your service</span>
-                                                            <span class="d-block small text-primary mt-1">View profile →</span>
+                                                            <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                                         </a>
                                                     @else
                                                         <span>{{ $notification->data['message'] ?? 'New notification' }}</span>

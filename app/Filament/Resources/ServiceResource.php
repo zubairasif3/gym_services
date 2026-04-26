@@ -21,20 +21,33 @@ class ServiceResource extends Resource
     
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     
-    protected static ?string $navigationGroup = 'Marketplace';
-    
     protected static ?int $navigationSort = 1;
     
     protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.marketplace');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.service.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.service.plural');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Service Information')
+                Forms\Components\Section::make(__('admin.sections.service_information'))
                     ->schema([
                         Forms\Components\Select::make('user_id')
-                            ->label('Professional')
+                            ->label(__('admin.fields.professional'))
                             ->relationship('user', 'name', function(Builder $query){
                                 $user = auth()->user();
                                 // If not admin, only show current user
@@ -54,7 +67,7 @@ class ServiceResource extends Resource
                             }),
 
                         Forms\Components\Select::make('category_id')
-                            ->label('Category')
+                            ->label(__('admin.fields.category'))
                             ->options(Category::where('is_active', true)->pluck('name', 'id'))
                             ->searchable()
                             ->preload()
@@ -63,7 +76,7 @@ class ServiceResource extends Resource
                             ->afterStateUpdated(fn (callable $set) => $set('sub_category_id', null)),
 
                         Forms\Components\Select::make('sub_category_id')
-                            ->label('Subcategory')
+                            ->label(__('admin.fields.subcategory'))
                             ->options(function (callable $get) {
                                 $categoryId = $get('category_id');
                                 if (!$categoryId) {
@@ -87,11 +100,11 @@ class ServiceResource extends Resource
                             ->required()
                             ->rows(5)
                             ->columnSpanFull()
-                            ->helperText('Describe your service in detail'),
+                            ->helperText(__('admin.messages.service_description_help')),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Pricing') //  & Delivery
+                Forms\Components\Section::make(__('admin.sections.pricing')) //  & Delivery
                     ->schema([
                         Forms\Components\TextInput::make('price')
                             ->required()
@@ -99,7 +112,7 @@ class ServiceResource extends Resource
                             ->prefix('€')
                             ->minValue(0)
                             ->step(0.01)
-                            ->helperText('Service price'),
+                            ->helperText(__('admin.messages.service_price_help')),
 
                         // Forms\Components\TextInput::make('delivery')
                         //     ->label('Delivery Time')
@@ -110,9 +123,9 @@ class ServiceResource extends Resource
                         //     ->helperText('Expected delivery time in days'),
 
                         Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
+                            ->label(__('admin.fields.active'))
                             ->default(true)
-                            ->helperText('Set whether this service is active and visible'),
+                            ->helperText(__('admin.messages.service_active_help')),
                     ])
                     ->columns(2),
             ]);
@@ -154,7 +167,7 @@ class ServiceResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Professional')
+                    ->label(__('admin.fields.professional'))
                     ->sortable()
                     ->searchable()
                     ->formatStateUsing(fn ($record) => $record->user->name . ' ' . $record->user->surname),
@@ -172,12 +185,12 @@ class ServiceResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('category.name')
-                    ->label('Category')
+                    ->label(__('admin.fields.category'))
                     ->sortable()
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('subcategory.name')
-                    ->label('Subcategory')
+                    ->label(__('admin.fields.subcategory'))
                     ->sortable()
                     ->searchable(),
 
@@ -191,7 +204,7 @@ class ServiceResource extends Resource
                 //     ->suffix(' days'),
 
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.fields.active'))
                     ->boolean()
                     ->sortable(),
 
@@ -207,7 +220,7 @@ class ServiceResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category_id')
-                    ->label('Category')
+                    ->label(__('admin.fields.category'))
                     ->relationship('category', 'name')
                     ->searchable()
                     ->preload(),
@@ -219,7 +232,7 @@ class ServiceResource extends Resource
                 //     ->preload(),
 
                 Tables\Filters\SelectFilter::make('user_id')
-                    ->label('Professional')
+                    ->label(__('admin.fields.professional'))
                     ->relationship('user', 'name', function(Builder $query){
                         $query->where('user_type', 3);
                     })
@@ -227,10 +240,10 @@ class ServiceResource extends Resource
                     ->preload(),
 
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Active Status')
+                    ->label(__('admin.fields.active'))
                     ->boolean()
-                    ->trueLabel('Active only')
-                    ->falseLabel('Inactive only')
+                    ->trueLabel(__('admin.status.active_only'))
+                    ->falseLabel(__('admin.status.inactive_only'))
                     ->native(false),
             ])
             ->actions([

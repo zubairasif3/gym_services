@@ -22,11 +22,13 @@ class GigResource extends Resource
     protected static ?string $model = Gig::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
-    protected static ?string $navigationGroup = 'Marketplace1';
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'title';
-    protected static ?string $modelLabel = 'Gig';
-    protected static ?string $pluralModelLabel = 'Gigs';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.marketplace');
+    }
     public static function shouldRegisterNavigation(): bool
     {
         return false;
@@ -36,11 +38,11 @@ class GigResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('Service Details')
+                Forms\Components\Tabs::make(__('admin.gig.service_details'))
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('Basic Info')
+                        Forms\Components\Tabs\Tab::make(__('admin.gig.basic_info'))
                             ->schema([
-                                Forms\Components\Section::make('Service Information')
+                                Forms\Components\Section::make(__('admin.sections.service_information'))
                                     ->schema([
                                         Forms\Components\Select::make('user_id')
                                             ->relationship('user', 'name', function(Builder $query){
@@ -90,9 +92,9 @@ class GigResource extends Resource
                                     ->columns(2),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('Pricing & Delivery')
+                        Forms\Components\Tabs\Tab::make(__('admin.gig.pricing_delivery'))
                             ->schema([
-                                Forms\Components\Section::make('Pricing Details')
+                                Forms\Components\Section::make(__('admin.gig.pricing_details'))
                                     ->schema([
                                         Forms\Components\TextInput::make('starting_price')
                                             ->required()
@@ -140,14 +142,14 @@ class GigResource extends Resource
                                 //     ]),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('Requirements & Skills')
+                        Forms\Components\Tabs\Tab::make(__('admin.gig.requirements_skills'))
                             ->schema([
-                                Forms\Components\Section::make('Requirements')
+                                Forms\Components\Section::make(__('admin.gig.requirements'))
                                     ->schema([
                                         Forms\Components\RichEditor::make('about')
-                                            ->label('About this service')
+                                            ->label(__('admin.fields.about_this_service'))
                                             ->columnSpanFull()
-                                            ->helperText('Provide detailed information about your service'),
+                                            ->helperText(__('admin.messages.about_service_help')),
 
                                         // Forms\Components\Repeater::make('requirements')
                                         //     ->schema([
@@ -159,7 +161,7 @@ class GigResource extends Resource
                                         //     ->itemLabel(fn (array $state): ?string => $state['requirement'] ?? null),
                                     ]),
 
-                                Forms\Components\Section::make('Skills')
+                                Forms\Components\Section::make(__('admin.gig.skills'))
                                     ->schema([
                                         // Forms\Components\TagsInput::make('skills')
                                         //     ->separator(',')
@@ -187,12 +189,12 @@ class GigResource extends Resource
                                     ]),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('Images')
+                        Forms\Components\Tabs\Tab::make(__('admin.gig.images'))
                             ->schema([
-                                Forms\Components\Section::make('Service Images')
+                                Forms\Components\Section::make(__('admin.gig.service_images'))
                                     ->schema([
                                         Forms\Components\FileUpload::make('gig_images')
-                                            ->label('Upload Images')
+                                            ->label(__('admin.fields.upload_images'))
                                             ->image()
                                             ->multiple()
                                             ->directory('gigs/images')
@@ -200,13 +202,13 @@ class GigResource extends Resource
                                             ->maxFiles(10)
                                             ->reorderable()
                                             ->columnSpanFull()
-                                            ->helperText('You can upload up to 10 images for your Service'),
+                                            ->helperText(__('admin.messages.upload_service_images_help')),
                                     ]),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('Packages')
+                        Forms\Components\Tabs\Tab::make(__('admin.gig.packages'))
                             ->schema([
-                                Forms\Components\Section::make('Service Packages')
+                                Forms\Components\Section::make(__('admin.gig.service_packages'))
                                     ->schema([
                                         Forms\Components\Repeater::make('packages')
                                             ->relationship('packages')
@@ -252,22 +254,22 @@ class GigResource extends Resource
                                     ]),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('Stats & Settings')
+                        Forms\Components\Tabs\Tab::make(__('admin.gig.stats_settings'))
                             ->schema([
-                                Forms\Components\Section::make('Visibility Settings')
+                                Forms\Components\Section::make(__('admin.gig.visibility_settings'))
                                     ->schema([
                                         Forms\Components\Toggle::make('is_active')
                                             ->default(true)
-                                            ->label('Published')
-                                            ->helperText('Enable to make this Service publicly visible'),
+                                            ->label(__('admin.fields.published'))
+                                            ->helperText(__('admin.messages.published_help')),
                                         Forms\Components\Toggle::make('is_featured')
                                             ->default(false)
-                                            ->label('Featured')
-                                            ->helperText('Feature this Service on the homepage'),
+                                            ->label(__('admin.fields.featured'))
+                                            ->helperText(__('admin.messages.featured_help')),
                                     ])
                                     ->columns(2),
 
-                                Forms\Components\Section::make('Statistics')
+                                Forms\Components\Section::make(__('admin.gig.statistics'))
                                     ->schema([
                                         Forms\Components\Placeholder::make('impressions')
                                             ->content(fn (Gig $record): int => $record->impressions),
@@ -317,13 +319,13 @@ class GigResource extends Resource
 
                 IconColumn::make('is_featured')
                     ->boolean()
-                    ->label('Featured')
+                    ->label(__('admin.fields.featured'))
                     ->sortable()
                     ->toggleable(),
 
                 IconColumn::make('is_active')
                     ->boolean()
-                    ->label('Published')
+                    ->label(__('admin.fields.published'))
                     ->sortable(),
             ])
             ->filters([

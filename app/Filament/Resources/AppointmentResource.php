@@ -23,9 +23,22 @@ class AppointmentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
     
-    protected static ?string $navigationGroup = 'Appointments';
-    
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.appointments');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.appointment.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.appointment.plural');
+    }
 
     public static function canCreate(): bool
     {
@@ -52,23 +65,23 @@ class AppointmentResource extends Resource
                     ->columnSpanFull()
                     ->disabled(fn ($record) => $record !== null),
                     
-                Forms\Components\Section::make('Appointment Details')
+                Forms\Components\Section::make(__('admin.sections.appointment_details'))
                     ->schema([
                         Forms\Components\DatePicker::make('appointment_date')
-                            ->label('Date')
+                            ->label(__('admin.fields.date'))
                             ->required()
                             ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TimePicker::make('appointment_time')
-                            ->label('Time')
+                            ->label(__('admin.fields.time'))
                             ->required()
                             ->seconds(false)
                             ->disabled(fn ($record) => $record !== null),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'pending' => 'Pending',
-                                'confirmed' => 'Confirmed',
-                                'cancelled' => 'Cancelled',
-                                'completed' => 'Completed',
+                                'pending' => __('admin.status.pending'),
+                                'confirmed' => __('admin.status.confirmed'),
+                                'cancelled' => __('admin.status.cancelled'),
+                                'completed' => __('admin.status.completed'),
                             ])
                             ->required()
                             ->default('confirmed')
@@ -76,54 +89,54 @@ class AppointmentResource extends Resource
                     ])
                     ->columns(3),
                     
-                Forms\Components\Section::make('Client Information')
-                    ->description(fn ($record) => $record ? 'Client details are read-only and cannot be changed.' : 'Enter the client details for this appointment.')
+                Forms\Components\Section::make(__('admin.sections.client_information'))
+                    ->description(fn ($record) => $record ? __('admin.messages.client_read_only') : __('admin.messages.enter_client_details'))
                     ->schema([
                         Forms\Components\TextInput::make('client_name')
-                            ->label('First Name')
+                            ->label(__('admin.fields.first_name'))
                             ->required()
                             ->maxLength(255)
                             ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TextInput::make('client_surname')
-                            ->label('Last Name')
+                            ->label(__('admin.fields.last_name'))
                             ->required()
                             ->maxLength(255)
                             ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TextInput::make('client_email')
-                            ->label('Email')
+                            ->label(__('admin.fields.email'))
                             ->email()
                             ->required()
                             ->maxLength(255)
                             ->disabled(fn ($record) => $record !== null),
                         Forms\Components\TextInput::make('client_phone')
-                            ->label('Phone')
+                            ->label(__('admin.fields.phone'))
                             ->tel()
                             ->maxLength(255)
                             ->disabled(fn ($record) => $record !== null),
                         Forms\Components\DatePicker::make('client_date_of_birth')
-                            ->label('Date of Birth')
+                            ->label(__('admin.fields.date_of_birth'))
                             ->required()
                             ->maxDate(now()->subDay())
                             ->disabled(fn ($record) => $record !== null),
                     ])
                     ->columns(2),
                     
-                Forms\Components\Section::make('External Appointment Settings')
+                Forms\Components\Section::make(__('admin.sections.external_appointment_settings'))
                     ->schema([
                         Forms\Components\Toggle::make('is_external')
-                            ->label('External Appointment (Not visible to clients)')
+                            ->label(__('admin.fields.external_appointment'))
                             ->default(false),
                         Forms\Components\ColorPicker::make('external_color')
-                            ->label('Calendar Color')
+                            ->label(__('admin.fields.calendar_color'))
                             ->default('#00b3f1')
                             ->visible(fn ($get) => $get('is_external')),
                     ])
                     ->columns(2),
                     
-                Forms\Components\Section::make('Cancellation Details')
+                Forms\Components\Section::make(__('admin.sections.cancellation_details'))
                     ->schema([
                         Forms\Components\Textarea::make('cancellation_reason')
-                            ->label('Reason')
+                            ->label(__('admin.fields.reason'))
                             ->rows(3)
                             ->columnSpanFull(),
                     ])
@@ -137,26 +150,26 @@ class AppointmentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('service.title')
-                    ->label('Service')
+                    ->label(__('admin.fields.service'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('client_name')
-                    ->label('Client Name')
+                    ->label(__('admin.fields.client_name'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->formatStateUsing(fn ($record) => $record->client_name . ' ' . $record->client_surname)
                     ->searchable(['client_name', 'client_surname']),
                 Tables\Columns\TextColumn::make('client_email')
-                    ->label('Email')
+                    ->label(__('admin.fields.email'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('appointment_date')
-                    ->label('Date')
+                    ->label(__('admin.fields.date'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->date('M d, Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('appointment_time')
-                    ->label('Time')
+                    ->label(__('admin.fields.time'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->time('h:i A'),
                 Tables\Columns\BadgeColumn::make('status')
@@ -169,7 +182,7 @@ class AppointmentResource extends Resource
                     ])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Requested At')
+                    ->label(__('admin.fields.requested_at'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->dateTime('M d, Y h:i A')
                     ->sortable()
@@ -178,17 +191,17 @@ class AppointmentResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'cancelled' => 'Cancelled',
-                        'completed' => 'Completed',
+                        'pending' => __('admin.status.pending'),
+                        'confirmed' => __('admin.status.confirmed'),
+                        'cancelled' => __('admin.status.cancelled'),
+                        'completed' => __('admin.status.completed'),
                     ]),
                 Tables\Filters\Filter::make('appointment_date')
                     ->form([
                         Forms\Components\DatePicker::make('date_from')
-                            ->label('Date From'),
+                            ->label(__('admin.fields.date_from')),
                         Forms\Components\DatePicker::make('date_until')
-                            ->label('Date Until'),
+                            ->label(__('admin.fields.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -204,7 +217,7 @@ class AppointmentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('confirm')
-                    ->label('Confirm')
+                    ->label(__('admin.actions.confirm'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->size(ActionSize::Small)
@@ -216,20 +229,20 @@ class AppointmentResource extends Resource
                         app(\App\Services\ChatService::class)->sendAppointmentConfirmationMessage($record);
                         
                         Notification::make()
-                            ->title('Appointment confirmed successfully')
+                            ->title(__('admin.messages.appointment_confirmed'))
                             ->success()
                             ->send();
                     }),
                 Tables\Actions\Action::make('cancel')
-                    ->label('Cancel')
+                    ->label(__('admin.actions.cancel'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->size(ActionSize::Small)
                     ->visible(fn ($record) => in_array($record->status, ['pending', 'confirmed']))
                     ->form([
                         Forms\Components\Textarea::make('cancellation_reason')
-                            ->label('Cancellation Reason')
-                            ->placeholder('Optional reason for cancellation'),
+                            ->label(__('admin.fields.cancellation_reason'))
+                            ->placeholder(__('admin.messages.optional_cancellation_reason')),
                     ])
                     ->action(function ($record, array $data) {
                         $record->update([
@@ -242,7 +255,7 @@ class AppointmentResource extends Resource
                         $record->client->notify(new \App\Notifications\AppointmentCancelledByProfessional($record));
                         
                         Notification::make()
-                            ->title('Appointment cancelled successfully')
+                            ->title(__('admin.messages.appointment_cancelled'))
                             ->success()
                             ->send();
                     }),

@@ -15,11 +15,17 @@ class AppointmentCalendar extends Page
     
     protected static string $view = 'filament.pages.appointment-calendar';
     
-    protected static ?string $navigationLabel = 'Appointment Calendar';
-    
-    protected static ?string $navigationGroup = 'Appointments';
-    
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.navigation.appointment_calendar');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.appointments');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {

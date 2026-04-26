@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'About Us')
+@section('title', __('web.about.title'))
 
 @section('content')
    <!-- Breadcumb Sections -->
@@ -9,8 +9,8 @@
           <div class="row">
             <div class="col-xl-5">
               <div class="position-relative">
-                <h2 class="text-white">About FitScout</h2>
-                <p class="text-white mb30">Turn your skills into opportunities</p>
+                <h2 class="text-white">{{ __('web.about.heading') }}</h2>
+                <p class="text-white mb30">{{ __('web.about.subtitle') }}</p>
               </div>
             </div>
           </div>
@@ -33,16 +33,16 @@
           </div>
           <div class="col-md-6 col-xl-5 offset-xl-1">
             <div class="position-relative wow fadeInLeft" data-wow-delay="300ms">
-              <h2 class="mb25">Your Premier Marketplace for <br class="d-none d-xl-block"> Fitness & Wellness Professionals</h2>
-              <p class="text mb25">FitScout is the platform that connects customers and professionals by offering a unique and complete experience</p>
+              <h2 class="mb25">{{ __('web.about.main_heading') }}</h2>
+              <p class="text mb25">{{ __('web.about.main_text') }}</p>
               <div class="list-style2">
                 <ul class="mb20">
-                  <li><i class="far fa-check"></i>Discover the best fitness, health and sports experts, the most active and followed by the community.</li>
-                  <li><i class="far fa-check"></i>Follow, stay connected, and stay in touch with the professionals you love.</li>
-                  <li><i class="far fa-check"></i>Get in direct contact with them and start your wellness path, in a simple and immediate way.</li>
+                  <li><i class="far fa-check"></i>{{ __('web.about.point_1') }}</li>
+                  <li><i class="far fa-check"></i>{{ __('web.about.point_2') }}</li>
+                  <li><i class="far fa-check"></i>{{ __('web.about.point_3') }}</li>
                 </ul>
               </div>
-              <a href="{{ route('web.services') }}" class="ud-btn btn-thm-border">Find Your Trainer<i class="fal fa-arrow-right-long"></i></a>
+              <a href="{{ route('web.services') }}" class="ud-btn btn-thm-border">{{ __('web.about.find_trainer') }}<i class="fal fa-arrow-right-long"></i></a>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@
                   <li><div class="timer">834</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Fitness Professionals</p>
+                <p class="text mb-0">{{ __('web.about.fitness_professionals') }}</p>
               </div>
             </div>
           </div>
@@ -71,7 +71,7 @@
                   <li><div class="timer">732</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">5-Star Reviews</p>
+                <p class="text mb-0">{{ __('web.about.five_star_reviews') }}</p>
               </div>
             </div>
           </div>
@@ -82,7 +82,7 @@
                   <li><div class="timer">90</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Sessions Booked</p>
+                <p class="text mb-0">{{ __('web.about.sessions_booked') }}</p>
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@
                   <li><div class="timer">236</div></li>
                   <li><span>M</span></li>
                 </ul>
-                <p class="text mb-0">Goals Achieved</p>
+                <p class="text mb-0">{{ __('web.about.goals_achieved') }}</p>
               </div>
             </div>
           </div>
@@ -109,29 +109,29 @@
             <div class="col-md-6 col-xl-5 pl30-md pl15-xs wow fadeInRight" data-wow-delay="500ms">
               <div class="mb30">
                 <div class="main-title">
-                  <h2 class="title">A whole world of professionals at your disposal</h2>
+                  <h2 class="title">{{ __('web.about.world_heading') }}</h2>
                 </div>
               </div>
               <div class="why-chose-list">
                 <div class="list-one d-flex align-items-start mb30">
                   <span class="list-icon flex-shrink-0 flaticon-badge"></span>
                   <div class="list-content flex-grow-1 ml20">
-                    <h4 class="mb-1">Find the right professional</h4>
-                    <p class="text mb-0 fz15">Search for the professional that best suits your needs, compare them with each other thanks to the reviews of other customers.</p>
+                    <h4 class="mb-1">{{ __('web.about.right_professional') }}</h4>
+                    <p class="text mb-0 fz15">{{ __('web.about.right_professional_text') }}</p>
                   </div>
                 </div>
                 <div class="list-one d-flex align-items-start mb30">
                   <span class="list-icon flex-shrink-0 flaticon-money"></span>
                   <div class="list-content flex-grow-1 ml20">
-                    <h4 class="mb-1">Totally free for customers</h4>
-                    <p class="text mb-0 fz15">The use of the platform for customers is totally free.</p>
+                    <h4 class="mb-1">{{ __('web.about.free_customers') }}</h4>
+                    <p class="text mb-0 fz15">{{ __('web.about.free_customers_text') }}</p>
                   </div>
                 </div>
                 <div class="list-one d-flex align-items-start mb30">
                   <span class="list-icon flex-shrink-0 flaticon-security"></span>
                   <div class="list-content flex-grow-1 ml20">
-                    <h4 class="mb-1">Safe and secure</h4>
-                    <p class="text mb-0 fz15">Travel safely within the platform, we will protect your data and your privacy. We will be at your disposal if you need it.</p>
+                    <h4 class="mb-1">{{ __('web.about.safe_secure') }}</h4>
+                    <p class="text mb-0 fz15">{{ __('web.about.safe_secure_text') }}</p>
                   </div>
                 </div>
               </div>
@@ -158,10 +158,9 @@
         <div class="row align-items-center">
           <div class="col-md-6 col-xl-4 offset-xl-1 wow fadeInRight" data-wow-delay="100ms">
             <div class="cta-style6 mb30-sm">
-              <h2 class="cta-title mb25">Find the professional  <br class="d-none d-lg-block"> that best suits your needs</h2>
-              <p class="text-thm2 fz15 mb25">We give importance to your well-being and your health, which is why
-                we have chosen to offer you the best professionals.</p>
-              <a href="{{ route('web.contact') }}" class="ud-btn btn-thm">Get Started <i class="fal fa-arrow-right-long"></i></a>
+              <h2 class="cta-title mb25">{{ __('web.about.needs_heading') }}</h2>
+              <p class="text-thm2 fz15 mb25">{{ __('web.about.needs_text') }}</p>
+              <a href="{{ route('web.contact') }}" class="ud-btn btn-thm">{{ __('web.about.get_started') }} <i class="fal fa-arrow-right-long"></i></a>
             </div>
           </div>
           <div class="col-md-6 col-xl-6 offset-xl-1 wow fadeInLeft" data-wow-delay="300ms">
@@ -178,7 +177,7 @@
                     </div>
                     <div class="feature-content">
                       <div class="top-area">
-                        <h6 class="title mb-1">Explore</h6>
+                        <h6 class="title mb-1">{{ __('web.about.explore') }}</h6>
                         <h5 class="text">Fitness & Strength</h5>
                       </div>
                     </div>
@@ -197,7 +196,7 @@
                     </div>
                     <div class="feature-content">
                       <div class="top-area">
-                        <h6 class="title mb-1">Explore</h6>
+                        <h6 class="title mb-1">{{ __('web.about.explore') }}</h6>
                         <h5 class="text">Yoga & Mobility</h5>
                       </div>
                     </div>
@@ -216,8 +215,8 @@
         <div class="row">
           <div class="col-lg-6 m-auto">
             <div class="main-title text-center">
-              <h2 class="title">What our customers say</h2>
-              <p class="paragraph mt10">Discover the perfect service for you thanks to the reviews</p>
+              <h2 class="title">{{ __('web.about.what_customers_say') }}</h2>
+              <p class="paragraph mt10">{{ __('web.about.reviews_subtitle') }}</p>
             </div>
           </div>
         </div>
@@ -243,7 +242,7 @@
                     <div class="testimonial-style2 at-about2 text-center">
                       <div class="testi-content text-center">
                         <span class="icon fas fa-quote-left"></span>
-                        <h4 class="testi-text">“FitScout made it easy to compare professionals and book with confidence. Great experience overall.”</h4>
+                        <h4 class="testi-text">{{ __('web.about.fallback_testimonial') }}</h4>
                       </div>
                     </div>
                   </div>
@@ -271,8 +270,8 @@
                   <li class="nav-item" role="presentation">
                     <a class="nav-link active" id="testimonial-0-tab" data-bs-toggle="pill" href="#testimonial-0" role="tab" aria-controls="testimonial-0" aria-selected="true">
                       <div class="thumb d-flex align-items-center">
-                        <img class="rounded-circle" src="{{ asset('web/images/testimonials/1.jpg') }}" alt="Customer">
-                        <h6 class="title ml30 ml15-xl mb-0">Customer<br><small>Review</small></h6>
+                        <img class="rounded-circle" src="{{ asset('web/images/testimonials/1.jpg') }}" alt="{{ __('web.about.customer') }}">
+                        <h6 class="title ml30 ml15-xl mb-0">{{ __('web.about.customer') }}<br><small>{{ __('web.about.review') }}</small></h6>
                       </div>
                     </a>
                   </li>

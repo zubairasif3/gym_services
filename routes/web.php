@@ -12,6 +12,17 @@ use App\Http\Controllers\HomeController;
 use Filament\Facades\Filament;
 use App\Filament\Pages\ChatPage;
 
+Route::post('/locale', function (Request $request) {
+    $locale = $request->input('locale', 'en');
+    if (! in_array($locale, ['en', 'it'], true)) {
+        $locale = 'en';
+    }
+
+    session(['locale' => $locale]);
+
+    return back();
+})->name('locale.switch');
+
 
 Route::get('/', [HomeController::class, 'index'])->name('web.index');
 Route::get('/contact', [HomeController::class, 'contact'])->name('web.contact');

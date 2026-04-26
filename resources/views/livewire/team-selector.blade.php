@@ -1,11 +1,20 @@
 <div>
-
-    <div class="switch-toggle">
-        <input id="language-toggle" class="check-toggle check-toggle-round-flat" type="checkbox">
-        <label for="language-toggle"></label>
-        <span class="on">English</span>
-        <span class="off">Italian</span>
-    </div>
+    <form method="POST" action="{{ route('locale.switch') }}" id="locale-switch-form-team-selector">
+        @csrf
+        <input type="hidden" name="locale" id="locale-input-team-selector" value="{{ app()->getLocale() }}">
+        <div class="switch-toggle">
+            <input
+                id="language-toggle"
+                class="check-toggle check-toggle-round-flat"
+                type="checkbox"
+                {{ app()->getLocale() === 'it' ? 'checked' : '' }}
+                onchange="document.getElementById('locale-input-team-selector').value = this.checked ? 'it' : 'en'; document.getElementById('locale-switch-form-team-selector').submit();"
+            >
+            <label for="language-toggle"></label>
+            <span class="on">{{ __('language.english') }}</span>
+            <span class="off">{{ __('language.italian') }}</span>
+        </div>
+    </form>
     {{-- google translator --}}
     <style>
         .skiptranslate {
@@ -130,65 +139,4 @@
         }
     </style>
 
-    <!-- Hidden Google Translate Element -->
-    <div id="google_translate_element" style="display: none;"></div>
-
-    <script type="text/javascript">
-        // Use same storage key as app layout for consistent preference
-        window.FITSCOUT_LANG_KEY = window.FITSCOUT_LANG_KEY || 'fitScoutPreferredLanguage';
-
-        function googleTranslateElementInit() {
-          new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,it',
-            autoDisplay: false
-          }, 'google_translate_element');
-        }
-
-        // 🧠 Get current language: localStorage first, then cookie, then default 'en'
-        function getCurrentGoogleLanguage() {
-          try {
-            const stored = localStorage.getItem(window.FITSCOUT_LANG_KEY);
-            if (stored === 'it' || stored === 'en') return stored;
-          } catch (e) {}
-          const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
-          return match ? match[1] : 'en';
-        }
-
-        // Wait for DOM to load
-        document.addEventListener('DOMContentLoaded', function () {
-          const toggle = document.getElementById('language-toggle');
-          if (!toggle) return;
-
-          // 🔁 Restore language from localStorage and apply to Translate widget
-          function restoreAndApplyLanguage() {
-            const preferredLang = getCurrentGoogleLanguage();
-            const select = document.querySelector("select.goog-te-combo");
-            if (select) {
-              select.value = preferredLang;
-              select.dispatchEvent(new Event("change"));
-            }
-            toggle.checked = (preferredLang === 'it');
-          }
-
-          // 📌 Change language when toggle is flipped + persist to localStorage
-          toggle.addEventListener('change', function () {
-            const selectedLang = this.checked ? 'it' : 'en';
-            try {
-              localStorage.setItem(window.FITSCOUT_LANG_KEY, selectedLang);
-            } catch (e) {}
-            const select = document.querySelector("select.goog-te-combo");
-            if (select) {
-              select.value = selectedLang;
-              select.dispatchEvent(new Event("change"));
-            }
-          });
-
-          // 🔄 Restore from localStorage when Translate widget is ready
-          setTimeout(restoreAndApplyLanguage, 500);
-        });
-    </script>
-
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
-    </script>
 </div>

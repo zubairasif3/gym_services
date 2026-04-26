@@ -1,5 +1,5 @@
 @extends('web.layouts.app')
-@section('title', 'Register - FitScout')
+@section('title', __('web.register.title'))
 
 @push('styles')
 <style>
@@ -329,8 +329,8 @@
 
         <!-- Tabs -->
         <div class="register-tabs">
-            <button type="button" class="register-tab active" data-tab="customer">Customer</button>
-            <button type="button" class="register-tab" data-tab="professional">Professionals</button>
+            <button type="button" class="register-tab active" data-tab="customer">{{ __('web.register.customer') }}</button>
+            <button type="button" class="register-tab" data-tab="professional">{{ __('web.register.professionals') }}</button>
         </div>
 
         <!-- Customer Form -->
@@ -340,7 +340,7 @@
             <div class="register-form-container">
                 @if($errors->any() && old('user_type') == '2')
                     <div class="alert-error">
-                        <strong>Please correct the following errors:</strong>
+                        <strong>{{ __('web.register.errors') }}</strong>
                         <ul>
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -358,25 +358,25 @@
                 <div class="register-form-grid">
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Name<span class="required">*</span>
+                            {{ __('web.register.name') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('name') error @enderror" name="name" placeholder="Name" value="{{ old('name') }}" required>
+                        <input type="text" class="form-input-register @error('name') error @enderror" name="name" placeholder="{{ __('web.register.name') }}" value="{{ old('name') }}" required>
                         @error('name')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Surname<span class="required">*</span>
+                            {{ __('web.register.surname') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('surname') error @enderror" name="surname" placeholder="Surname" value="{{ old('surname') }}" required>
+                        <input type="text" class="form-input-register @error('surname') error @enderror" name="surname" placeholder="{{ __('web.register.surname') }}" value="{{ old('surname') }}" required>
                         @error('surname')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Date of Birth<span class="required">*</span>
+                            {{ __('web.register.date_of_birth') }}<span class="required">*</span>
                         </label>
                         <input type="date" class="form-input-register @error('date_of_birth') error @enderror" name="date_of_birth" value="{{ old('date_of_birth') }}" required>
                         @error('date_of_birth')
@@ -385,16 +385,16 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Username<span class="required">*</span>
+                            {{ __('web.register.username') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('username') error @enderror" name="username" placeholder="Username" value="{{ old('username') }}" required>
+                        <input type="text" class="form-input-register @error('username') error @enderror" name="username" placeholder="{{ __('web.register.username') }}" value="{{ old('username') }}" required>
                         @error('username')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            E-mail<span class="required">*</span>
+                            {{ __('web.register.email') }}<span class="required">*</span>
                         </label>
                         <input type="email" class="form-input-register @error('email') error @enderror" name="email" placeholder="email@example.com" value="{{ old('email') }}" required>
                         @error('email')
@@ -403,37 +403,37 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Country<span class="required">*</span>
+                            {{ __('web.register.country') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('country') error @enderror" name="country" placeholder="Country" value="{{ old('country') }}" required>
+                        <input type="text" class="form-input-register @error('country') error @enderror" name="country" placeholder="{{ __('web.register.country') }}" value="{{ old('country') }}" required>
                         @error('country')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            City<span class="required">*</span>
+                            {{ __('web.register.city') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('city') error @enderror" name="city" placeholder="City" value="{{ old('city') }}" required>
+                        <input type="text" class="form-input-register @error('city') error @enderror" name="city" placeholder="{{ __('web.register.city') }}" value="{{ old('city') }}" required>
                         @error('city')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Zip code<span class="required">*</span>
+                            {{ __('web.register.zip_code') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('cap') error @enderror" name="cap" placeholder="Zip c" value="{{ old('cap') }}" required>
+                        <input type="text" class="form-input-register @error('cap') error @enderror" name="cap" placeholder="{{ __('web.register.zip_code') }}" value="{{ old('cap') }}" required>
                         @error('cap')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register notranslate" translate="no">
-                            Password<span class="required">*</span>
+                            {{ __('web.register.password') }}<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input-register @error('password') error @enderror" name="password" id="customer_password" placeholder="Password" required>
+                            <input type="password" class="form-input-register @error('password') error @enderror" name="password" id="customer_password" placeholder="{{ __('web.register.password') }}" required>
                             <button type="button" class="password-toggle" onclick="togglePassword('customer_password', this)">
                                 <i class="far fa-eye"></i>
                             </button>
@@ -444,10 +444,10 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Confirm Password<span class="required">*</span>
+                            {{ __('web.register.confirm_password') }}<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input-register" name="password_confirmation" id="customer_password_confirmation" placeholder="Confirm Password" required>
+                            <input type="password" class="form-input-register" name="password_confirmation" id="customer_password_confirmation" placeholder="{{ __('web.register.confirm_password') }}" required>
                             <button type="button" class="password-toggle" onclick="togglePassword('customer_password_confirmation', this)">
                                 <i class="far fa-eye"></i>
                             </button>
@@ -455,19 +455,19 @@
                     </div>
                 </div>
 
-                <p class="required-fields-note">* Required fields</p>
+                <p class="required-fields-note">{{ __('web.register.required_fields') }}</p>
 
                 <div class="privacy-checkbox-wrapper">
                     <input type="checkbox" class="privacy-checkbox @error('privacy_consent') error @enderror" id="customer_privacy" name="privacy_consent" {{ old('privacy_consent') ? 'checked' : '' }} required>
                     <label for="customer_privacy" class="privacy-text">
-                        I declare that I have read and understood the <a href="{{ route('web.privacy_policy') }}" target="_blank">Privacy Policy</a> and authorize the processing of my personal data in accordance with the EU General Data Protection Regulation (GDPR).
+                        {!! __('web.register.privacy_text', ['privacy' => '<a href="' . route('web.privacy_policy') . '" target="_blank">' . __('web.register.privacy_policy') . '</a>']) !!}
                     </label>
                 </div>
                 @error('privacy_consent')
                     <div class="error-message" style="margin-top: -20px; margin-bottom: 15px;">{{ $message }}</div>
                 @enderror
 
-                <button type="submit" class="register-submit-btn">Create Account</button>
+                <button type="submit" class="register-submit-btn">{{ __('web.register.create_account') }}</button>
             </div>
         </form>
 
@@ -478,7 +478,7 @@
             <div class="register-form-container">
                 @if($errors->any() && old('user_type') == '3')
                     <div class="alert-error">
-                        <strong>Please correct the following errors:</strong>
+                        <strong>{{ __('web.register.errors') }}</strong>
                         <ul>
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -496,18 +496,18 @@
                 <div class="register-form-grid">
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Name<span class="required">*</span>
+                            {{ __('web.register.name') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('name') error @enderror" name="name" placeholder="Name" value="{{ old('name') }}" required>
+                        <input type="text" class="form-input-register @error('name') error @enderror" name="name" placeholder="{{ __('web.register.name') }}" value="{{ old('name') }}" required>
                         @error('name')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Surname<span class="required">*</span>
+                            {{ __('web.register.surname') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('surname') error @enderror" name="surname" placeholder="Surname" value="{{ old('surname') }}" required>
+                        <input type="text" class="form-input-register @error('surname') error @enderror" name="surname" placeholder="{{ __('web.register.surname') }}" value="{{ old('surname') }}" required>
                         @error('surname')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -523,16 +523,16 @@
                     </div> --}}
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Username<span class="required">*</span>
+                            {{ __('web.register.username') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('username') error @enderror" name="username" placeholder="Username" value="{{ old('username') }}" required>
+                        <input type="text" class="form-input-register @error('username') error @enderror" name="username" placeholder="{{ __('web.register.username') }}" value="{{ old('username') }}" required>
                         @error('username')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            E-mail<span class="required">*</span>
+                            {{ __('web.register.email') }}<span class="required">*</span>
                         </label>
                         <input type="email" class="form-input-register @error('email') error @enderror" name="email" placeholder="email@example.com" value="{{ old('email') }}" required>
                         @error('email')
@@ -541,46 +541,46 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Country<span class="required">*</span>
+                            {{ __('web.register.country') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('country') error @enderror" name="country" placeholder="Country" value="{{ old('country') }}" required>
+                        <input type="text" class="form-input-register @error('country') error @enderror" name="country" placeholder="{{ __('web.register.country') }}" value="{{ old('country') }}" required>
                         @error('country')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            City<span class="required">*</span>
+                            {{ __('web.register.city') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('city') error @enderror" name="city" placeholder="City" value="{{ old('city') }}" required>
+                        <input type="text" class="form-input-register @error('city') error @enderror" name="city" placeholder="{{ __('web.register.city') }}" value="{{ old('city') }}" required>
                         @error('city')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Address
+                            {{ __('web.register.address') }}
                         </label>
-                        <input type="text" class="form-input-register @error('address') error @enderror" name="address" placeholder="Address" value="{{ old('address') }}">
+                        <input type="text" class="form-input-register @error('address') error @enderror" name="address" placeholder="{{ __('web.register.address') }}" value="{{ old('address') }}">
                         @error('address')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Zip code<span class="required">*</span>
+                            {{ __('web.register.zip_code') }}<span class="required">*</span>
                         </label>
-                        <input type="text" class="form-input-register @error('cap') error @enderror" name="cap" placeholder="Zip code" value="{{ old('cap') }}" required>
+                        <input type="text" class="form-input-register @error('cap') error @enderror" name="cap" placeholder="{{ __('web.register.zip_code') }}" value="{{ old('cap') }}" required>
                         @error('cap')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Choose Category<span class="required">*</span>
+                            {{ __('web.register.choose_category') }}<span class="required">*</span>
                         </label>
                         <select class="form-select-register @error('category_id') error @enderror" name="category_id" id="professional_category" required onchange="loadSubcategories(this.value, 'professional')">
-                            <option value="">Choose Category</option>
+                            <option value="">{{ __('web.register.choose_category') }}</option>
                             @foreach($active_categories as $category)
                                 <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
@@ -591,10 +591,10 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Subcategory 1<span class="required">*</span>
+                            {{ __('web.register.subcategory_1') }}<span class="required">*</span>
                         </label>
                         <select class="form-select-register @error('subcategory_1') error @enderror" name="subcategory_1" id="professional_subcategory_1" required>
-                            <option value="">Select Category First</option>
+                            <option value="">{{ __('web.register.select_category_first') }}</option>
                         </select>
                         @error('subcategory_1')
                             <div class="error-message">{{ $message }}</div>
@@ -602,10 +602,10 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Subcategory 2
+                            {{ __('web.register.subcategory_2') }}
                         </label>
                         <select class="form-select-register @error('subcategory_2') error @enderror" name="subcategory_2" id="professional_subcategory_2">
-                            <option value="">Optional</option>
+                            <option value="">{{ __('web.register.optional') }}</option>
                         </select>
                         @error('subcategory_2')
                             <div class="error-message">{{ $message }}</div>
@@ -613,10 +613,10 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Subcategory 3
+                            {{ __('web.register.subcategory_3') }}
                         </label>
                         <select class="form-select-register @error('subcategory_3') error @enderror" name="subcategory_3" id="professional_subcategory_3">
-                            <option value="">Optional</option>
+                            <option value="">{{ __('web.register.optional') }}</option>
                         </select>
                         @error('subcategory_3')
                             <div class="error-message">{{ $message }}</div>
@@ -624,10 +624,10 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register notranslate" translate="no">
-                            Password<span class="required">*</span>
+                            {{ __('web.register.password') }}<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input-register @error('password') error @enderror" name="password" id="professional_password" placeholder="Password" required>
+                            <input type="password" class="form-input-register @error('password') error @enderror" name="password" id="professional_password" placeholder="{{ __('web.register.password') }}" required>
                             <button type="button" class="password-toggle" onclick="togglePassword('professional_password', this)">
                                 <i class="far fa-eye"></i>
                             </button>
@@ -638,10 +638,10 @@
                     </div>
                     <div class="form-group-register">
                         <label class="form-label-register">
-                            Confirm Password<span class="required">*</span>
+                            {{ __('web.register.confirm_password') }}<span class="required">*</span>
                         </label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input-register" name="password_confirmation" id="professional_password_confirmation" placeholder="Confirm Password" required>
+                            <input type="password" class="form-input-register" name="password_confirmation" id="professional_password_confirmation" placeholder="{{ __('web.register.confirm_password') }}" required>
                             <button type="button" class="password-toggle" onclick="togglePassword('professional_password_confirmation', this)">
                                 <i class="far fa-eye"></i>
                             </button>
@@ -652,10 +652,10 @@
                 <!-- Credit Card Section for Professionals -->
                 <div class="credit-card-section" style="margin: 30px 0; padding: 25px; background: rgba(0, 179, 241, 0.05); border: 1px solid #00b3f1; border-radius: 12px;">
                     <h3 style="color: white; font-size: 18px; margin-bottom: 15px; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
-                        Payment Information <span class="required">*</span>
+                        {{ __('web.register.payment_information') }} <span class="required">*</span>
                     </h3>
                     <p style="color: #00b3f1; font-size: 13px; margin-bottom: 20px; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
-                        30-day free trial, renewal 29 €/month or 290 €/year (payable in 3 installments)
+                        {{ __('web.register.payment_note') }}
                     </p>
                     @if(config('app.env') === 'local')
                     <div id="stripe-config-warning" style="display: none; background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
@@ -679,25 +679,25 @@
                         <!-- Stripe Elements will create form elements here -->
                     </div>
                     <p style="color: #00b3f1; font-size: 12px; margin: 4px 2px 0; font-family: var(--body-font-family, 'DM Sans', sans-serif);">
-                        For the first 200 professionals the free trial is 90 days; once this limit is reached, new registrations will have a 30-day free trial.
+                        {{ __('web.register.trial_note') }}
                     </p>
                     <div id="professional-card-errors" role="alert" style="color: #ff4444; font-size: 13px; margin-top: 10px; min-height: 20px;"></div>
                     <input type="hidden" name="payment_method_id" id="professional_payment_method_id">
                 </div>
 
-                <p class="required-fields-note">* Required fields</p>
+                <p class="required-fields-note">{{ __('web.register.required_fields') }}</p>
 
                 <div class="privacy-checkbox-wrapper">
                     <input type="checkbox" class="privacy-checkbox @error('privacy_consent') error @enderror" id="professional_privacy" name="privacy_consent" {{ old('privacy_consent') ? 'checked' : '' }} required>
                     <label for="professional_privacy" class="privacy-text">
-                        I declare that I have read and understood the <a href="{{ route('web.privacy_policy') }}" target="_blank">Privacy Policy</a> and authorize the processing of my personal data in accordance with the EU General Data Protection Regulation (GDPR).
+                        {!! __('web.register.privacy_text', ['privacy' => '<a href="' . route('web.privacy_policy') . '" target="_blank">' . __('web.register.privacy_policy') . '</a>']) !!}
                     </label>
                 </div>
                 @error('privacy_consent')
                     <div class="error-message" style="margin-top: -20px; margin-bottom: 15px;">{{ $message }}</div>
                 @enderror
 
-                <button type="submit" class="register-submit-btn" id="professional-submit-btn">Create Account</button>
+                <button type="submit" class="register-submit-btn" id="professional-submit-btn">{{ __('web.register.create_account') }}</button>
             </div>
         </form>
     </div>
@@ -713,6 +713,12 @@
     let professionalCardErrors;
     
     document.addEventListener('DOMContentLoaded', function() {
+    const webRegisterTranslations = {
+        selectCategoryFirst: @json(__('web.register.select_category_first')),
+        optional: @json(__('web.register.optional')),
+        selectSubcategory: @json(__('web.register.select_subcategory')),
+    };
+
         // Only initialize Stripe if we're on the professional tab
         const professionalForm = document.getElementById('professionalForm');
         if (professionalForm) {
@@ -915,7 +921,9 @@
             ['1', '2', '3'].forEach(num => {
                 const select = document.getElementById(`${prefix}_subcategory_${num}`);
                 if (select) {
-                    select.innerHTML = num === '1' ? '<option value="">Select Category First</option>' : '<option value="">Optional</option>';
+                    select.innerHTML = num === '1'
+                        ? '<option value="">' + webRegisterTranslations.selectCategoryFirst + '</option>'
+                        : '<option value="">' + webRegisterTranslations.optional + '</option>';
                 }
             });
             return;
@@ -929,8 +937,8 @@
                     if (select) {
                         const isRequired = num === '1';
                         select.innerHTML = isRequired 
-                            ? '<option value="">Select Subcategory</option>'
-                            : '<option value="">Optional</option>';
+                            ? '<option value="">' + webRegisterTranslations.selectSubcategory + '</option>'
+                            : '<option value="">' + webRegisterTranslations.optional + '</option>';
                         
                         data.forEach(subcategory => {
                             const option = document.createElement('option');

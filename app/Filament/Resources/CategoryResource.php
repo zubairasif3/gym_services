@@ -29,9 +29,22 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
-    protected static ?string $navigationGroup = 'Categories';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.categories');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.category.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.category.plural');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -42,7 +55,7 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Basic Information')
+                Section::make(__('admin.sections.basic_information'))
                     ->schema([
                         Grid::make(['default' => 2])
                             ->schema([
@@ -60,7 +73,7 @@ class CategoryResource extends Resource
                                     ->maxLength(1000),
 
                                 IconPicker::make('icon')
-                                    ->label('Icon')
+                                    ->label(__('admin.fields.icon'))
                                     ->sets(['heroicons', 'fontawesome-solid'])
                                     ->columns([
                                         'default' => 5,
@@ -74,7 +87,7 @@ class CategoryResource extends Resource
                                 //     ->required(),
 
                                 Toggle::make('is_active')
-                                    ->label('Active')
+                                    ->label(__('admin.fields.active'))
                                     ->default(true),
                             ])
                     ])
@@ -97,7 +110,7 @@ class CategoryResource extends Resource
                 //     ->sortable(),
 
                 BooleanColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.fields.active'))
                     ->sortable(),
 
             ])
