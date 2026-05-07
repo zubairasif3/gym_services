@@ -68,8 +68,7 @@ class AppointmentCalendar extends Page
 
         // Load appointments
         $appointmentsQuery = Appointment::where('professional_id', Filament::auth()->id())
-            ->whereBetween('appointment_date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->where('is_external', false);
+            ->whereBetween('appointment_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         if ($this->selectedServiceId) {
             $appointmentsQuery->where('service_id', $this->selectedServiceId);
@@ -82,7 +81,7 @@ class AppointmentCalendar extends Page
                     'pending' => '#dc3545', // Red
                     'confirmed' => '#28a745', // Green
                     'cancelled' => '#6c757d', // Gray
-                    default => '#00b3f1', // Primary
+                    default => $appointment->is_external ? ($appointment->external_color ?? '#00b3f1') : '#00b3f1',
                 };
 
                 return [

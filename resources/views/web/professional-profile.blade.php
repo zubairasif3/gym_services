@@ -879,7 +879,7 @@
                     </h5>
                     <div class="text-center py-5 bg-light rounded">
                         <i class="far fa-image text-muted" style="font-size: 3rem;"></i>
-                        <p class="text-muted mt-3 mb-0">No media available</p>
+                        <p class="text-muted mt-3 mb-0">{{ __('web.professional_profile.no_media') }}</p>
                     </div>
                 </div>
                 @endif
@@ -888,7 +888,7 @@
                 @if($user->profile && $user->profile->about)
                 <div class="mb-4">
                     <h5 class="mb-3">
-                        <i class="far fa-align-left text-primary me-2"></i> About
+                        <i class="far fa-align-left text-primary me-2"></i> {{ __('web.professional_profile.about') }}
                     </h5>
                     <div class="card shadow-sm border-0">
                         <div class="card-body">
@@ -903,7 +903,7 @@
                 <!-- Reviews Section -->
                 <div class="reviews-section mb-5">
                     <h4 class="mb-4">
-                        <i class="far fa-thumbs-up text-primary me-2"></i> Reviews
+                        <i class="far fa-thumbs-up text-primary me-2"></i> {{ __('web.professional_profile.reviews') }}
                         <span class="badge bg-primary ms-2">{{ $reviewStats['total'] }}</span>
                     </h4>
                     
@@ -946,13 +946,13 @@
                             <button class="btn btn-outline-primary" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#reviewsModal">
-                                <i class="far fa-eye me-2"></i> See all Reviews ({{ $reviewStats['total'] }})
+                                <i class="far fa-eye me-2"></i> {{ __('web.professional_profile.see_all_reviews', ['count' => $reviewStats['total']]) }}
                             </button>
                         @endif
                     @else
                         <div class="text-center py-4 bg-light rounded">
                             <i class="far fa-comment-slash text-muted" style="font-size: 3rem;"></i>
-                            <p class="text-muted mt-3 mb-0">No reviews yet. Be the first to review!</p>
+                            <p class="text-muted mt-3 mb-0">{{ __('web.professional_profile.no_reviews') }}</p>
                         </div>
                     @endif
                     
@@ -966,7 +966,7 @@
                     @else
                         <div class="alert alert-info mt-4">
                             <i class="fas fa-info-circle me-2"></i>
-                            <a href="{{ route('web.login') }}">Log in</a> to leave a review
+                            <a href="{{ route('web.login') }}">{{ __('web.login.button') }}</a> {{ __('web.professional_profile.to_leave_review') }}
                         </div>
                     @endauth
                 </div>
@@ -1011,23 +1011,23 @@
                             @auth
                                 @if(auth()->id() !== $user->id)
                                     <a href="{{ route('appointments.book', $user->username) }}" target="_blank" class="btn btn-primary btn-lg">
-                                        <i class="far fa-calendar-check me-2"></i> Book now
+                                        <i class="far fa-calendar-check me-2"></i> {{ __('web.professional_profile.book_now') }}
                                     </a>
                                     <button class="btn btn-outline-primary" 
                                             onclick="Livewire.dispatch('open-chat-sidebar', { userId: {{ $user->id }} })">
-                                        <i class="far fa-paper-plane me-2"></i> Contact me
+                                        <i class="far fa-paper-plane me-2"></i> {{ __('web.professional_profile.contact_me') }}
                                     </button>
                                 @else
                                     <a href="{{ url('/admin') }}" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-edit me-2"></i> Manage Services
+                                        <i class="fas fa-edit me-2"></i> {{ __('web.professional_profile.manage_services') }}
                                     </a>
                                 @endif
                             @else
                                 <a href="{{ route('web.login') }}" class="btn btn-primary btn-lg">
-                                    <i class="far fa-calendar-check me-2"></i> Book now
+                                    <i class="far fa-calendar-check me-2"></i> {{ __('web.professional_profile.book_now') }}
                                 </a>
                                 <a href="{{ route('web.login') }}" class="btn btn-outline-primary">
-                                    <i class="far fa-paper-plane me-2"></i> Contact me
+                                    <i class="far fa-paper-plane me-2"></i> {{ __('web.professional_profile.contact_me') }}
                                 </a>
                             @endauth
                         </div>
@@ -1037,7 +1037,7 @@
                 <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
                     <div class="card-body text-center py-5">
                         <i class="far fa-briefcase text-muted" style="font-size: 2.5rem;"></i>
-                        <p class="text-muted mt-3 mb-0">No services available</p>
+                        <p class="text-muted mt-3 mb-0">{{ __('web.professional_profile.no_services') }}</p>
                     </div>
                 </div>
                 @endif
@@ -1055,7 +1055,7 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <h5 class="mb-3">
-                                <i class="far fa-star text-primary me-2"></i> Skills
+                                <i class="far fa-star text-primary me-2"></i> {{ __('web.professional_profile.skills') }}
                             </h5>
                             <div class="d-flex flex-wrap gap-2">
                                 @foreach($skills as $skill)
@@ -1074,7 +1074,7 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="mb-3">
-                            <i class="far fa-quote-left text-primary me-2"></i> Bio
+                            <i class="far fa-quote-left text-primary me-2"></i> {{ __('web.professional_profile.bio') }}
                         </h5>
                         <p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">
                             {{ $user->profile->bio }}
@@ -1110,7 +1110,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="reviewsModalLabel">
-                    <i class="far fa-thumbs-up text-primary me-2"></i> All Reviews ({{ $reviewStats['total'] }})
+                    <i class="far fa-thumbs-up text-primary me-2"></i> {{ __('web.professional_profile.all_reviews', ['count' => $reviewStats['total']]) }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>

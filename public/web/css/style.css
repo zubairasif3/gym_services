@@ -6747,6 +6747,12 @@ section {
     top: 35px;
 }
 
+.feature-style1 .bottom-area {
+    padding-left: 30px;
+    position: absolute;
+    bottom: 45px;
+}
+
 .feature-style1:hover .feature-content {
     background-color: rgba(34, 34, 34, 0.6);
 }

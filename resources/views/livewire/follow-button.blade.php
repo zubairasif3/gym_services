@@ -8,7 +8,7 @@
             @if($isLoading)
                 <span class="d-inline-flex align-items-center justify-content-center">
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <span>Loading...</span>
+                    <span>{{ __('web.professional_profile.loading') }}</span>
                 </span>
             @else
                 <div class="d-flex align-items-center justify-content-center gap-2">
@@ -16,9 +16,9 @@
                     <div class="text-center">
                         <strong class="{{ $isFollowing ? 'text-white' : 'text-dark' }}">{{ $followersCount }}</strong>
                         @if($isFollowing)
-                            <small class="text-white fw-medium ms-1" style="font-size: 0.85rem;">Following</small>
+                            <small class="text-white fw-medium ms-1" style="font-size: 0.85rem;">{{ __('web.professional_profile.following') }}</small>
                         @else
-                            <small class="text-muted fw-medium ms-1" style="font-size: 0.85rem;">Followers</small>
+                            <small class="text-muted fw-medium ms-1" style="font-size: 0.85rem;">{{ __('web.professional_profile.followers') }}</small>
                         @endif
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                 <i class="fas fa-heart text-danger"></i>
                 <div class="text-center">
                     <strong class="text-dark">{{ $followersCount }}</strong>
-                    <small class="text-muted fw-medium ms-1" style="font-size: 0.85rem;">Followers</small>
+                    <small class="text-muted fw-medium ms-1" style="font-size: 0.85rem;">{{ __('web.professional_profile.followers') }}</small>
                 </div>
             </div>
         </a>

@@ -52,15 +52,6 @@
                     <p>{{ __('web.booking.no_service') }}</p>
                 </div>
                 <div id="calendar-error" class="booking-calendar-error" style="display: none;"></div>
-                @if(!$isServiceOwner)
-                <div id="selected-datetime-bar" class="booking-selected-bar" style="display: none;">
-                    <span class="booking-selected-label">{{ __('web.booking.selected') }}</span>
-                    <span id="selected-date-display"></span> {{ __('web.booking.at') }} <span id="selected-time-display"></span>
-                    <button type="button" class="booking-btn booking-btn-primary" id="btn-next-datetime">
-                        {{ __('web.booking.confirm_booking') }} <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-                @endif
             </div>
 
             @if(!$isServiceOwner)
@@ -700,6 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const externalStoreUrl = '{{ route("appointments.store.external") }}';
     const availabilityStoreUrl = '{{ route("service-availabilities.store") }}';
     const availabilityStoreWithRepeatUrl = '{{ route("service-availabilities.store-with-repeat") }}';
+    const availabilityDestroyUrlTemplate = '{{ route("service-availabilities.destroy", ["serviceAvailability" => "__ID__"]) }}';
     const loginUrl = '{{ route("web.login") }}';
     const returnUrl = '{{ url()->current() }}';
     @php
@@ -745,6 +737,17 @@ document.addEventListener('DOMContentLoaded', function() {
         save: @json(__('web.booking.save')),
         noAvailableOption: @json(__('web.booking.no_available_option')),
         selectedSlotNotAvailable: @json(__('web.booking.selected_slot_not_available')),
+        availableSlot: @json(__('web.booking.available_slot')),
+        slotActionUnavailable: @json(__('web.booking.slot_action_unavailable')),
+        slotActionUnavailableText: @json(__('web.booking.slot_action_unavailable_text')),
+        deleteSlot: @json(__('web.booking.delete_slot')),
+        slotDeleted: @json(__('web.booking.slot_deleted')),
+        availabilityDeleted: @json(__('web.booking.availability_deleted')),
+        couldNotDeleteSlot: @json(__('web.booking.could_not_delete_slot')),
+        error: @json(__('web.booking.error')),
+        close: @json(__('web.booking.cancel')),
+        date: @json(__('web.booking.date')),
+        time: @json(__('web.booking.time')),
     };
 
     console.log('[Booking] Debug:', bookingDebug);
@@ -786,8 +789,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const serviceSelect = document.getElementById('service-select');
     const calendarContainer = document.getElementById('calendar-container');
     const calendarNoService = document.getElementById('calendar-no-service');
-    const selectedDatetimeBar = document.getElementById('selected-datetime-bar');
-    const btnNextDateTime = document.getElementById('btn-next-datetime');
 
     function getCalendarDataUrl() {
         return calendarDataUrl;
@@ -816,7 +817,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 calendar.removeAllEvents();
             }
         }
-        if (selectedDatetimeBar) selectedDatetimeBar.style.display = 'none';
         selectedDate = null;
         selectedTime = null;
     });
@@ -1191,19 +1191,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     return (selectedDurationMinutes === 60) ? (t + ' (1 hour)') : t;
                 })();
-                if (selectedDatetimeBar) {
-                    var dateDisp = document.getElementById('selected-date-display');
-                    var timeDisp = document.getElementById('selected-time-display');
-                    if (dateDisp) dateDisp.textContent = info.event.start.toLocaleDateString('it-IT', {
-                        weekday: 'short',
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    });
-                    if (timeDisp) timeDisp.textContent = selectedTimeDisplay;
-                    selectedDatetimeBar.style.display = 'flex';
+                if (isServiceOwner) {
+                    showAvailabilitySlotActions(props);
+                } else {
+                    showBookingConfirmModal();
                 }
-                if (btnNextDateTime) btnNextDateTime.disabled = false;
             }
         });
         calendar.render();
@@ -1464,8 +1456,79 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingConfirmModalEl = document.getElementById('bookingConfirmModal');
     const bookingConfirmModal = bookingConfirmModalEl ? new bootstrap.Modal(bookingConfirmModalEl) : null;
 
-    if (btnNextDateTime) {
-    btnNextDateTime.addEventListener('click', function() {
+    function getAvailabilityDestroyUrl(availabilityId) {
+        return availabilityDestroyUrlTemplate.replace('__ID__', encodeURIComponent(availabilityId));
+    }
+
+    function showAvailabilitySlotActions(props) {
+        var availabilityId = props.availability_id;
+        if (!availabilityId) {
+            bookingSwal.fire({
+                icon: 'error',
+                title: webTranslations.slotActionUnavailable,
+                text: webTranslations.slotActionUnavailableText,
+                confirmButtonColor: '#00b3f1'
+            });
+            return;
+        }
+
+        var dateLabel = selectedDate
+            ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('it-IT', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            })
+            : '';
+        var timeLabel = selectedTimeDisplay || selectedTime || '';
+
+        bookingSwal.fire({
+            icon: 'question',
+            title: webTranslations.availableSlot,
+            html: '<p><strong>' + webTranslations.date + '</strong> ' + dateLabel + '</p><p><strong>' + webTranslations.time + '</strong> ' + timeLabel + '</p>',
+            showCancelButton: true,
+            confirmButtonText: webTranslations.deleteSlot,
+            cancelButtonText: webTranslations.close,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6b7280'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+
+            fetch(getAvailabilityDestroyUrl(availabilityId), {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(function(response) {
+                    return response.json().then(function(data) {
+                        if (!response.ok) throw data;
+                        return data;
+                    });
+                })
+                .then(function(data) {
+                    bookingSwal.fire({
+                        icon: 'success',
+                        title: webTranslations.slotDeleted,
+                        text: data.message || webTranslations.availabilityDeleted,
+                        confirmButtonColor: '#00b3f1'
+                    });
+                    if (calendar) calendar.refetchEvents();
+                })
+                .catch(function(error) {
+                    bookingSwal.fire({
+                        icon: 'error',
+                        title: webTranslations.error,
+                        text: (error && (error.error || error.message)) || webTranslations.couldNotDeleteSlot,
+                        confirmButtonColor: '#00b3f1'
+                    });
+                });
+        });
+    }
+
+    function showBookingConfirmModal() {
         if (!selectedDate || !selectedTime) return;
         const serviceOption = serviceSelect.options[serviceSelect.selectedIndex];
         document.getElementById('modal-service').textContent = serviceOption ? serviceOption.text : '';
@@ -1481,7 +1544,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hour12: false
         });
         if (bookingConfirmModal) bookingConfirmModal.show();
-    });
     }
 
     var btnConfirmBooking = document.getElementById('btn-confirm-booking');

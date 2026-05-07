@@ -639,6 +639,39 @@ class AppointmentController extends Controller
                 $slotDurationPref = (int) ($availability->slot_duration_minutes ?? 60);
                 $fullHourFree = $slotDurationPref === 60 && $availabilityDurationM >= 60 && $segmentEnd60->lte($slotEnd) && ! $appointment && ! $overlapsSegment($segmentEnd30->copy(), $segmentEnd60->copy());
 
+                if ($appointment) {
+                    $appointmentDuration = (int) ($appointment->duration_minutes ?? 30);
+                    $appointmentStart = Carbon::parse($appointment->appointment_date->format('Y-m-d') . ' ' . $appointment->appointment_time->format('H:i:s'));
+                    $appointmentEnd = $appointmentStart->copy()->addMinutes($appointmentDuration);
+                    $title = $appointment->status === 'pending' ? 'Waiting' : 'Booked';
+                    $color = $appointment->status === 'pending' ? '#dc3545' : '#28a745';
+                    $extendedProps = [
+                        'time' => $appointment->appointment_time->format('H:i'),
+                        'date' => $appointment->appointment_date->format('Y-m-d'),
+                        'bookable' => false,
+                        'duration_minutes' => $appointmentDuration,
+                        'status' => $appointment->status,
+                    ];
+
+                    if ($request->boolean('as_owner') && Auth::check() && (int) Auth::id() === (int) $professional->id) {
+                        $extendedProps['service_title'] = $appointment->service->title ?? '';
+                        $extendedProps['client_name'] = trim(($appointment->client_name ?? '') . ' ' . ($appointment->client_surname ?? ''));
+                        $extendedProps['client_email'] = $appointment->client_email ?? '';
+                        $extendedProps['client_phone'] = $appointment->client_phone ?? '';
+                    }
+
+                    $events[] = [
+                        'title' => $title,
+                        'start' => $dateStr . 'T' . $appointmentStart->format('H:i:s'),
+                        'end' => $dateStr . 'T' . $appointmentEnd->format('H:i:s'),
+                        'color' => $color,
+                        'extendedProps' => $extendedProps,
+                    ];
+
+                    $current = $appointmentEnd->greaterThan($current) ? $appointmentEnd : $current->copy()->addMinutes(30);
+                    continue;
+                }
+
                 /* Respect slot_duration_minutes: 30 = always 30-min events; 60 = 1h when full hour free */
                 if ($fullHourFree) {
                     $events[] = [
@@ -647,6 +680,7 @@ class AppointmentController extends Controller
                         'end' => $dateStr . 'T' . $segmentEnd60->format('H:i:s'),
                         'color' => '#00b3f1',
                         'extendedProps' => [
+                            'availability_id' => $availability->id,
                             'time' => $slotTime,
                             'date' => $dateStr,
                             'bookable' => true,
@@ -662,30 +696,12 @@ class AppointmentController extends Controller
                 $color = '#00b3f1';
                 $bookable = true;
                 $extendedProps = [
+                    'availability_id' => $availability->id,
                     'time' => $slotTime,
                     'date' => $dateStr,
                     'bookable' => $bookable,
                     'duration_minutes' => 30,
                 ];
-
-                if ($appointment) {
-                    if ($appointment->status === 'pending') {
-                        $title = 'Waiting';
-                        $color = '#dc3545';
-                        $bookable = false;
-                    } else {
-                        $title = 'Booked';
-                        $color = '#28a745';
-                        $bookable = false;
-                    }
-                    if ($request->boolean('as_owner') && Auth::check() && (int) Auth::id() === (int) $professional->id) {
-                        $extendedProps['service_title'] = $appointment->service->title ?? '';
-                        $extendedProps['client_name'] = trim(($appointment->client_name ?? '') . ' ' . ($appointment->client_surname ?? ''));
-                        $extendedProps['client_email'] = $appointment->client_email ?? '';
-                        $extendedProps['client_phone'] = $appointment->client_phone ?? '';
-                        $extendedProps['status'] = $appointment->status;
-                    }
-                }
 
                 $events[] = [
                     'title' => $title,

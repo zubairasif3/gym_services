@@ -33,8 +33,8 @@
                             <img class="w-100" src="{{ asset($staticImages[$index % count($staticImages)]) }}" alt="{{ $subcategory->name }}">
                           @endif
                         </div>
-                        <div class="feature-content">
-                          <div class="top-area">
+                        <div class="feature-content d-flex align-items-end h-100">
+                          <div class="bottom-area w-100">
                             <h6 class="title mb-1">{{ $subcategory->gigs_count }}</h6>
                             <h5 class="text">{{ $subcategory->name }}</h5>
                           </div>

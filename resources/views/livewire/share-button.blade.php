@@ -5,7 +5,7 @@
         style="border: 1px solid #dee2e6; padding: 0.5rem 1rem;"
         title="Share this service">
         <i class="fas fa-share-alt text-primary"></i>
-        <span class="text-dark fw-medium">Condividere</span>
+        <span class="text-dark fw-medium">{{ __('web.share') }}</span>
     </button>
     
     @if($showDropdown)
@@ -26,7 +26,7 @@
                 </button>
                 <hr class="my-2">
                 <button wire:click="copyLink" class="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 hover-dark">
-                    <i class="far fa-copy text-dark"></i> <span>Copy Link</span>
+                    <i class="far fa-copy text-dark"></i> <span>{{ __('web.copy_link') }}</span>
                 </button>
             </div>
         </div>

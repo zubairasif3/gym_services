@@ -49,8 +49,7 @@ class AppointmentResource extends Resource
     {
         // Only show appointments for the logged-in professional
         return parent::getEloquentQuery()
-            ->where('professional_id', Filament::auth()->id())
-            ->where('is_external', false); // Exclude external appointments from list
+            ->where('professional_id', Filament::auth()->id());
     }
 
     public static function form(Form $form): Form
@@ -90,34 +89,36 @@ class AppointmentResource extends Resource
                     ->columns(3),
                     
                 Forms\Components\Section::make(__('admin.sections.client_information'))
-                    ->description(fn ($record) => $record ? __('admin.messages.client_read_only') : __('admin.messages.enter_client_details'))
+                    ->description(fn ($record) => $record?->is_external
+                        ? __('admin.messages.external_client_editable')
+                        : ($record ? __('admin.messages.client_read_only') : __('admin.messages.enter_client_details')))
                     ->schema([
                         Forms\Components\TextInput::make('client_name')
                             ->label(__('admin.fields.first_name'))
                             ->required()
                             ->maxLength(255)
-                            ->disabled(fn ($record) => $record !== null),
+                            ->disabled(fn ($record) => $record !== null && ! $record->is_external),
                         Forms\Components\TextInput::make('client_surname')
                             ->label(__('admin.fields.last_name'))
                             ->required()
                             ->maxLength(255)
-                            ->disabled(fn ($record) => $record !== null),
+                            ->disabled(fn ($record) => $record !== null && ! $record->is_external),
                         Forms\Components\TextInput::make('client_email')
                             ->label(__('admin.fields.email'))
                             ->email()
                             ->required()
                             ->maxLength(255)
-                            ->disabled(fn ($record) => $record !== null),
+                            ->disabled(fn ($record) => $record !== null && ! $record->is_external),
                         Forms\Components\TextInput::make('client_phone')
                             ->label(__('admin.fields.phone'))
                             ->tel()
                             ->maxLength(255)
-                            ->disabled(fn ($record) => $record !== null),
+                            ->disabled(fn ($record) => $record !== null && ! $record->is_external),
                         Forms\Components\DatePicker::make('client_date_of_birth')
                             ->label(__('admin.fields.date_of_birth'))
                             ->required()
                             ->maxDate(now()->subDay())
-                            ->disabled(fn ($record) => $record !== null),
+                            ->disabled(fn ($record) => $record !== null && ! $record->is_external),
                     ])
                     ->columns(2),
                     
@@ -125,11 +126,8 @@ class AppointmentResource extends Resource
                     ->schema([
                         Forms\Components\Toggle::make('is_external')
                             ->label(__('admin.fields.external_appointment'))
-                            ->default(false),
-                        Forms\Components\ColorPicker::make('external_color')
-                            ->label(__('admin.fields.calendar_color'))
-                            ->default('#00b3f1')
-                            ->visible(fn ($get) => $get('is_external')),
+                            ->default(false)
+                            ->disabled(fn ($record) => $record !== null),
                     ])
                     ->columns(2),
                     
@@ -163,6 +161,9 @@ class AppointmentResource extends Resource
                     ->label(__('admin.fields.email'))
                     ->size(TextColumnSize::ExtraSmall)
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_external')
+                    ->label(__('admin.fields.external_appointment'))
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('appointment_date')
                     ->label(__('admin.fields.date'))
                     ->size(TextColumnSize::ExtraSmall)
@@ -196,6 +197,8 @@ class AppointmentResource extends Resource
                         'cancelled' => __('admin.status.cancelled'),
                         'completed' => __('admin.status.completed'),
                     ]),
+                Tables\Filters\TernaryFilter::make('is_external')
+                    ->label(__('admin.fields.external_appointment')),
                 Tables\Filters\Filter::make('appointment_date')
                     ->form([
                         Forms\Components\DatePicker::make('date_from')

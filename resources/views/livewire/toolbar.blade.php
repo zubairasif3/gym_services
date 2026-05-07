@@ -48,7 +48,7 @@
             
             <!-- Following/Followers -->
             <div class="col-auto">
-                <a href="{{ route('following') }}" class="toolbar-icon btn btn-link text-white text-decoration-none p-2" title="Following">
+                <a href="{{ route('following') }}" class="toolbar-icon btn btn-link text-white text-decoration-none p-2" title="Followed">
                     <i class="far fa-heart fs-5"></i>
                     <span class="ms-1">{{ $followingCount }}</span>
                 </a>

@@ -6,7 +6,7 @@ return [
     'choose_category' => 'Scegli categoria',
     'contact_us' => 'Contattaci',
     'professionals' => 'Professionisti',
-    'home' => 'Casa',
+    'home' => 'Home',
     'about_us' => 'Chi siamo',
     'quick_link' => 'Link rapidi',
     'follow_us' => 'Seguici',

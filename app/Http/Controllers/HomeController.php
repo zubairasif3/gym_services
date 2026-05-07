@@ -162,16 +162,19 @@ class HomeController extends Controller
         ])
         ->where('is_active', true)
         ->having('services_count', '>', 0) // Ensure at least 1 active service
-        ->take(10) // Limit to 10 subcategories for the carousel
         ->get();
 
         // Static fallback images array
         $staticImages = [
-            'web/images/listings/category-1.jpg',
-            'web/images/listings/category-2.jpg',
-            'web/images/listings/category-3.jpg',
-            'web/images/listings/category-4.jpg',
-            'web/images/listings/category-5.jpg'
+            'web/images/listings/professional-images/1.png',
+            'web/images/listings/professional-images/2.png',
+            'web/images/listings/professional-images/3.png',
+            'web/images/listings/professional-images/4.png',
+            'web/images/listings/professional-images/5.png',
+            'web/images/listings/professional-images/6.png',
+            'web/images/listings/professional-images/7.png',
+            'web/images/listings/professional-images/8.png',
+            'web/images/listings/professional-images/9.png'
         ];
 
         $testimonials = $this->getDummyTestimonials(4);
@@ -630,11 +633,11 @@ class HomeController extends Controller
 
         // Check if user_type is 2
         if ($user->user_type != 2) {
-            return redirect('/admin');
+            return redirect()->intended('/admin');
         }
 
         // Redirect to dashboard or home
-        return redirect()->route('web.index')->with('success', 'Login successful!');
+        return redirect()->intended(route('web.index'))->with('success', 'Login successful!');
     }
 
     public function logout(Request $request)

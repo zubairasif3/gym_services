@@ -135,11 +135,14 @@ class ServiceAvailabilityController extends Controller
                 return response()->json(['error' => 'Maximum two 30-minute slots per hour for this service and date.'], 422);
             }
 
+            $slotDurationMinutes = Carbon::parse('1970-01-01 ' . $request->start_time)->diffInMinutes(Carbon::parse('1970-01-01 ' . $request->end_time));
+
             $availability = ServiceAvailability::create([
                 'service_id' => $service->id,
                 'availability_date' => $request->availability_date,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
+                'slot_duration_minutes' => $slotDurationMinutes,
                 'is_active' => $request->is_active ?? true,
             ]);
 
@@ -292,6 +295,7 @@ class ServiceAvailabilityController extends Controller
         try {
             $created = 0;
             $targetDates = array_unique($request->target_dates);
+            $slotDurationMinutes = Carbon::parse('1970-01-01 ' . $request->source_start_time)->diffInMinutes(Carbon::parse('1970-01-01 ' . $request->source_end_time));
 
             foreach ($targetDates as $targetDate) {
                 $dateStr = Carbon::parse($targetDate)->toDateString();
@@ -303,6 +307,7 @@ class ServiceAvailabilityController extends Controller
                     'availability_date' => $dateStr,
                     'start_time' => $request->source_start_time,
                     'end_time' => $request->source_end_time,
+                    'slot_duration_minutes' => $slotDurationMinutes,
                     'is_active' => true,
                 ]);
                 $created++;
@@ -344,6 +349,7 @@ class ServiceAvailabilityController extends Controller
         try {
             $created = 0;
             $dates = array_unique($request->dates);
+            $slotDurationMinutes = Carbon::parse('1970-01-01 ' . $request->start_time)->diffInMinutes(Carbon::parse('1970-01-01 ' . $request->end_time));
 
             foreach ($dates as $date) {
                 $dateStr = Carbon::parse($date)->toDateString();
@@ -355,6 +361,7 @@ class ServiceAvailabilityController extends Controller
                     'availability_date' => $dateStr,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
+                    'slot_duration_minutes' => $slotDurationMinutes,
                     'is_active' => true,
                 ]);
                 $created++;

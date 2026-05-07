@@ -2,16 +2,16 @@
     @if($hasReviewed)
         <div class="alert alert-info">
             <i class="fas fa-check-circle me-2"></i>
-            You have already reviewed this professional. Thank you for your feedback!
+            {{ __('web.professional_profile.already_reviewed') }}
         </div>
     @else
         <div class="review-form-card border rounded p-4 bg-light">
-            <h5 class="mb-4">Leave a Review</h5>
+            <h5 class="mb-4">{{ __('web.professional_profile.leave_review') }}</h5>
             
             <form wire:submit.prevent="submitReview">
                 <!-- Rating Selection -->
                 <div class="mb-4">
-                    <label class="form-label fw-bold">Your Rating *</label>
+                    <label class="form-label fw-bold">{{ __('web.professional_profile.your_rating') }}</label>
                     <div class="rating-input">
                         @for($i = 1; $i <= 5; $i++)
                             <button 
@@ -30,19 +30,19 @@
                 
                 <!-- Comment Textarea -->
                 <div class="mb-4">
-                    <label for="comment" class="form-label fw-bold">Your Review *</label>
+                    <label for="comment" class="form-label fw-bold">{{ __('web.professional_profile.your_review') }}</label>
                     <textarea 
                         wire:model="comment"
                         id="comment"
                         class="form-control @error('comment') is-invalid @enderror"
                         rows="5"
-                        placeholder="Share your experience with this professional... (minimum 10 characters)"
+                        placeholder="{{ __('web.professional_profile.review_placeholder') }}"
                         maxlength="1000"></textarea>
                     <div class="d-flex justify-content-between mt-1">
                         @error('comment')
                             <div class="text-danger small">{{ $message }}</div>
                         @else
-                            <div class="text-muted small">Minimum 10 characters</div>
+                            <div class="text-muted small">{{ __('web.professional_profile.minimum_10') }}</div>
                         @enderror
                         <div class="text-muted small">{{ strlen($comment) }}/1000</div>
                     </div>
@@ -56,11 +56,11 @@
                         wire:loading.attr="disabled"
                         wire:target="submitReview">
                         <span wire:loading.remove wire:target="submitReview">
-                            <i class="far fa-paper-plane me-1"></i> Submit Review
+                            <i class="far fa-paper-plane me-1"></i> {{ __('web.professional_profile.submit_review') }}
                         </span>
                         <span wire:loading wire:target="submitReview">
                             <span class="spinner-border spinner-border-sm me-1"></span>
-                            Submitting...
+                            {{ __('web.professional_profile.submitting') }}
                         </span>
                     </button>
                     
@@ -69,7 +69,7 @@
                             type="button"
                             wire:click="$refresh"
                             class="btn btn-outline-secondary">
-                            <i class="fas fa-redo me-1"></i> Reset
+                            <i class="fas fa-redo me-1"></i> {{ __('web.professional_profile.reset') }}
                         </button>
                     @endif
                 </div>

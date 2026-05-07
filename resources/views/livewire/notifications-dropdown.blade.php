@@ -43,28 +43,37 @@
                     <div class="flex-grow-1">
                         <div class="notification-content">
                             @if($notification['type'] === 'new_follower')
-                                <strong>{{ $notification['related_user']['name'] ?? 'Someone' }}</strong>
-                                <span class="text-muted">{{ $notification['data']['message'] ?? 'started following you' }}</span>
+                                <strong>{{ $notification['related_user']['name'] ?? __('notifications.someone') }}</strong>
+                                <span class="text-muted">{{ __('notifications.started_following_you') }}</span>
                             @elseif(($notification['type'] ?? '') === 'new_booking_request' || ($notification['data']['type'] ?? '') === 'new_booking_request')
                                 @php
                                     $appointmentId = $notification['data']['appointment_id'] ?? null;
                                     $bookingRequestUrl = $appointmentId ? url('/admin/appointments/' . $appointmentId . '/edit') : route('notifications');
+                                    $serviceTitle = $notification['data']['service_title'] ?? '';
+                                    $clientName = $notification['data']['client_name'] ?? __('notifications.someone');
+                                    $bookingRequestMessage = __('notifications.new_booking_request', [
+                                        'service' => $serviceTitle,
+                                        'client' => $clientName,
+                                    ]);
                                 @endphp
                                 <a href="{{ $bookingRequestUrl }}" class="text-decoration-none text-dark">
-                                    <span>{{ $notification['data']['message'] ?? 'New booking request' }}</span>
+                                    <span>{{ $bookingRequestMessage }}</span>
                                     <span class="d-block small text-primary mt-1">{{ __('notifications.view_appointment') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_gig_reaction')
                                 @php
-                                    $reactorName = $notification['related_user']['name'] ?? 'Someone';
+                                    $reactorName = $notification['related_user']['name'] ?? __('notifications.someone');
                                 @endphp
                                 <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
-                                    <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your service</span>
+                                    <span>{{ __('notifications.reacted_to_service', [
+                                        'name' => $reactorName,
+                                        'emoji' => $notification['data']['emoji'] ?? '',
+                                    ]) }}</span>
                                     <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_media_reaction')
                                 @php
-                                    $reactorName = $notification['related_user']['name'] ?? 'Someone';
+                                    $reactorName = $notification['related_user']['name'] ?? __('notifications.someone');
                                     $mediaId = $notification['related_model_id'] ?? null;
                                     $profileBaseUrl = auth()->user() && auth()->user()->username
                                         ? route('professional.profile', auth()->user()->username)
@@ -72,30 +81,49 @@
                                     $profileUrl = $mediaId ? ($profileBaseUrl . '?media_id=' . $mediaId) : $profileBaseUrl;
                                 @endphp
                                 <a href="{{ $profileUrl }}" class="text-decoration-none text-dark">
-                                    <span><strong>{{ $reactorName }}</strong> reacted {{ $notification['data']['emoji'] ?? '' }} to your photo/video</span>
+                                    <span>{{ __('notifications.reacted_to_media', [
+                                        'name' => $reactorName,
+                                        'emoji' => $notification['data']['emoji'] ?? '',
+                                    ]) }}</span>
                                     <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_profile_media' || ($notification['type'] ?? '') === 'new_service')
                                 @php
-                                    $actorName = $notification['related_user']['name'] ?? 'Someone';
+                                    $actorName = $notification['related_user']['name'] ?? __('notifications.someone');
                                     $activityUrl = $notification['data']['url'] ?? route('notifications');
-                                    $message = $notification['data']['message'] ?? 'posted new content';
+                                    $message = __('notifications.posted_new_content');
                                 @endphp
                                 <a href="{{ $activityUrl }}" class="text-decoration-none text-dark">
                                     <span><strong>{{ $actorName }}</strong> {{ $message }}</span>
-                                    <span class="d-block small text-primary mt-1">View →</span>
+                                    <span class="d-block small text-primary mt-1">{{ __('notifications.view') }}</span>
                                 </a>
                             @elseif(($notification['type'] ?? '') === 'new_gig_review')
                                 @php
-                                    $reviewerName = $notification['related_user']['name'] ?? 'Someone';
+                                    $reviewerName = $notification['related_user']['name'] ?? __('notifications.someone');
                                     $rating = $notification['data']['rating'] ?? null;
                                 @endphp
                                 <a href="{{ route('professional.preview') }}" class="text-decoration-none text-dark">
-                                    <span><strong>{{ $reviewerName }}</strong> left a {{ $rating ? $rating . '-star ' : '' }}review on your service</span>
+                                    <span>
+                                        @if($rating)
+                                            {{ __('notifications.left_review', ['name' => $reviewerName, 'rating' => $rating]) }}
+                                        @else
+                                            {{ __('notifications.left_review_no_rating', ['name' => $reviewerName]) }}
+                                        @endif
+                                    </span>
                                     <span class="d-block small text-primary mt-1">{{ __('notifications.view_profile') }}</span>
                                 </a>
+                            @elseif(($notification['data']['type'] ?? '') === 'appointment_request_received')
+                                <span>{{ __('notifications.appointment_request_received', ['service' => $notification['data']['service_title'] ?? '']) }}</span>
+                            @elseif(($notification['data']['type'] ?? '') === 'appointment_confirmed')
+                                <span>{{ __('notifications.appointment_confirmed', ['service' => $notification['data']['service_title'] ?? '']) }}</span>
+                            @elseif(($notification['data']['type'] ?? '') === 'appointment_reminder')
+                                <span>{{ __('notifications.appointment_reminder', ['service' => $notification['data']['service_title'] ?? '']) }}</span>
+                            @elseif(($notification['data']['type'] ?? '') === 'appointment_cancelled_by_client')
+                                <span>{{ __('notifications.appointment_cancelled_by_client', ['service' => $notification['data']['service_title'] ?? '']) }}</span>
+                            @elseif(($notification['data']['type'] ?? '') === 'appointment_cancelled_by_professional')
+                                <span>{{ __('notifications.appointment_cancelled_by_professional', ['service' => $notification['data']['service_title'] ?? '']) }}</span>
                             @else
-                                <span>{{ $notification['data']['message'] ?? 'New notification' }}</span>
+                                <span>{{ $notification['data']['message'] ?? __('notifications.new_notification') }}</span>
                             @endif
                         </div>
                         <div class="notification-time text-muted small mt-1">
