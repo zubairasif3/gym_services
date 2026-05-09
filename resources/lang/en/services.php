@@ -5,6 +5,8 @@ return [
     'filters' => 'Filters:',
     'location_italy' => 'Location (Italy)',
     'all_available_cities' => 'All Available Cities',
+    'city_search_placeholder' => 'Search cities...',
+    'city_no_results' => 'No cities found.',
     'price_range' => 'Price Range',
     'range' => 'Range',
     'search' => 'Search',

@@ -241,7 +241,20 @@
                  <div class="menu_and_widgets">
                     <div class="mobile_menu_bar d-flex justify-content-between align-items-center">
                        <a class="mobile_logo" href="#"><img src="{{ asset('web/images/logo.png') }}" alt="" width="120px"></a>
-                       <div class="right-side text-end">
+                       <div class="right-side text-end d-flex align-items-center justify-content-end flex-wrap gap-1">
+                          <div class="locale-switch-mobile d-inline-flex align-items-center me-1" role="group" aria-label="{{ __('profile.language') }}">
+                              <form method="POST" action="{{ route('locale.switch') }}" class="d-inline m-0">
+                                  @csrf
+                                  <input type="hidden" name="locale" value="en">
+                                  <button type="submit" class="btn btn-link text-white text-decoration-none p-1 px-2 fz14 m-0 border-0 {{ app()->getLocale() === 'en' ? 'locale-active-mobile' : 'opacity-75' }}">EN</button>
+                              </form>
+                              <span class="text-white-50 fz12 user-select-none">|</span>
+                              <form method="POST" action="{{ route('locale.switch') }}" class="d-inline m-0">
+                                  @csrf
+                                  <input type="hidden" name="locale" value="it">
+                                  <button type="submit" class="btn btn-link text-white text-decoration-none p-1 px-2 fz14 m-0 border-0 {{ app()->getLocale() === 'it' ? 'locale-active-mobile' : 'opacity-75' }}">IT</button>
+                              </form>
+                          </div>
                           @guest
                             <a class="text-white" href="{{ route('web.login') }}">{{ __('auth.log_in') }}</a>
                           @else
@@ -250,7 +263,7 @@
                                 <button type="submit" class="text-white" style="background:none;border:none;padding:0;">{{ __('auth.logout') }}</button>
                             </form>
                           @endguest
-                          <a class="menubar ml30" href="#menu"><img src="{{ asset('web/images/white-nav-icon.svg') }}" alt=""></a>
+                          <a class="menubar ms-2 ms-sm-3" href="#menu"><img src="{{ asset('web/images/white-nav-icon.svg') }}" alt=""></a>
                        </div>
                     </div>
                  </div>
@@ -276,6 +289,23 @@
                     </li>
                     <li>
                         <a href="{{ route('web.register') }}">{{ __('auth.subscribe') }}</a>
+                    </li>
+                    <li>
+                        <span>
+                            <span class="d-block fz14 fw600 mb10">{{ __('profile.language') }}</span>
+                            <span class="d-flex align-items-center gap-2 flex-wrap">
+                                <form method="POST" action="{{ route('locale.switch') }}" class="d-inline m-0">
+                                    @csrf
+                                    <input type="hidden" name="locale" value="en">
+                                    <button type="submit" class="ud-btn btn-thm py-2 px-3 fz14 {{ app()->getLocale() === 'en' ? '' : 'btn-white' }}">{{ __('language.english') }}</button>
+                                </form>
+                                <form method="POST" action="{{ route('locale.switch') }}" class="d-inline m-0">
+                                    @csrf
+                                    <input type="hidden" name="locale" value="it">
+                                    <button type="submit" class="ud-btn btn-thm py-2 px-3 fz14 {{ app()->getLocale() === 'it' ? '' : 'btn-white' }}">{{ __('language.italian') }}</button>
+                                </form>
+                            </span>
+                        </span>
                     </li>
                 </ul>
             </nav>
@@ -545,6 +575,18 @@
         .our-register,
         .our-login {
             background: #ffece773;
+        }
+
+        .locale-switch-mobile .btn-link {
+            line-height: 1.2;
+        }
+        .locale-switch-mobile .btn-link:focus {
+            box-shadow: none;
+        }
+        .locale-active-mobile {
+            color: #00b3f1 !important;
+            font-weight: 700;
+            opacity: 1 !important;
         }
     </style>
 

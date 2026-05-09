@@ -45,7 +45,7 @@ class AppointmentController extends Controller
 
         // Allow clients to book, or the professional owner to manage their calendar
         if (Auth::check() && Auth::user()->user_type !== 2 && Auth::id() != $professional->id) {
-            return redirect()->back()->with('error', 'Only clients can book appointments.');
+            return redirect()->back()->with('error', __('web.booking.only_clients_book'));
         }
 
         // Show + add-slot button when the logged-in user is this professional (by id or username)
@@ -73,7 +73,7 @@ class AppointmentController extends Controller
     public function index()
     {
         if (! Auth::check() || Auth::user()->user_type !== 2) {
-            return redirect()->route('web.index')->with('error', 'Only clients can view this page.');
+            return redirect()->route('web.index')->with('error', __('web.booking.only_clients_view_appointments'));
         }
 
         $appointments = Appointment::where('client_id', Auth::id())
@@ -95,7 +95,7 @@ class AppointmentController extends Controller
     {
         // Check if user is authenticated and is a client
         if (!Auth::check() || Auth::user()->user_type !== 2) {
-            return response()->json(['error' => 'Only clients can book appointments.'], 403);
+            return response()->json(['error' => __('web.booking.only_clients_book')], 403);
         }
 
         $request->validate([
@@ -117,20 +117,22 @@ class AppointmentController extends Controller
         $clientDateOfBirth = $user->profile?->date_of_birth?->format('Y-m-d');
 
         if (!$clientDateOfBirth) {
-            return response()->json(['error' => 'Please complete your profile with date of birth before booking.'], 422);
+            return response()->json(['error' => __('web.booking.dob_required_booking')], 422);
         }
 
         // Reject past appointments
         $appointmentDateTime = Carbon::parse($request->appointment_date . ' ' . $request->appointment_time);
         if ($appointmentDateTime->lte(now())) {
-            return response()->json(['error' => 'Please select future appointments.'], 422);
+            return response()->json(['error' => __('web.booking.invalid_selection_text')], 422);
         }
 
         // Check if client is blocked from booking
         if (!ClientCancellationTracking::canClientBook(Auth::id())) {
             $tracking = ClientCancellationTracking::getOrCreateForCurrentMonth(Auth::id());
+            $blockedLabel = $tracking->blocked_until->locale(app()->getLocale())->isoFormat('LL');
+
             return response()->json([
-                'error' => 'You have exceeded the monthly cancellation limit. You cannot book new appointments until ' . $tracking->blocked_until->format('F d, Y') . '.'
+                'error' => __('web.booking.cancellation_blocked_until', ['date' => $blockedLabel]),
             ], 403);
         }
 
@@ -148,7 +150,7 @@ class AppointmentController extends Controller
             ->exists();
 
         if (!$isAvailable) {
-            return response()->json(['error' => 'The selected time slot is not available.'], 422);
+            return response()->json(['error' => __('web.booking.slot_not_available')], 422);
         }
 
         // Check if slot overlaps any existing appointment (consider duration)
@@ -168,7 +170,7 @@ class AppointmentController extends Controller
             });
 
         if ($overlaps) {
-            return response()->json(['error' => 'This time slot is already booked.'], 422);
+            return response()->json(['error' => __('web.booking.slot_already_booked')], 422);
         }
 
         DB::beginTransaction();
@@ -192,7 +194,7 @@ class AppointmentController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Appointment store: create failed', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Failed to create appointment. Please try again.'], 500);
+            return response()->json(['error' => __('web.booking.store_appointment_failed')], 500);
         }
 
         // Send notifications and chat message after commit.
@@ -208,7 +210,7 @@ class AppointmentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Appointment request submitted successfully.',
+            'message' => __('web.booking.booking_success_default'),
             'appointment_id' => $appointment->id,
         ]);
     }
@@ -220,11 +222,11 @@ class AppointmentController extends Controller
     {
         // Check if user is the professional
         if (Auth::id() !== $appointment->professional_id || Auth::user()->user_type !== 3) {
-            return response()->json(['error' => 'Unauthorized.'], 403);
+            return response()->json(['error' => __('web.booking.unauthorized')], 403);
         }
 
         if ($appointment->status !== 'pending') {
-            return response()->json(['error' => 'Only pending appointments can be confirmed.'], 422);
+            return response()->json(['error' => __('web.booking.only_pending_can_confirm')], 422);
         }
 
         DB::beginTransaction();
@@ -242,11 +244,11 @@ class AppointmentController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment confirmed successfully.',
+                'message' => __('web.booking.confirm_appointment_success'),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to confirm appointment.'], 500);
+            return response()->json(['error' => __('web.booking.confirm_appointment_failed')], 500);
         }
     }
 
@@ -257,17 +259,17 @@ class AppointmentController extends Controller
     {
         // Check if user is the client
         if (Auth::id() !== $appointment->client_id) {
-            return response()->json(['error' => 'Unauthorized.'], 403);
+            return response()->json(['error' => __('web.booking.unauthorized')], 403);
         }
 
         if ($appointment->status === 'cancelled') {
-            return response()->json(['error' => 'Appointment is already cancelled.'], 422);
+            return response()->json(['error' => __('web.booking.appointment_already_cancelled')], 422);
         }
 
         // Check 24-hour window
         if (!$appointment->canBeCancelled()) {
             return response()->json([
-                'error' => 'Appointments can only be cancelled at least 24 hours in advance.'
+                'error' => __('web.booking.cancel_must_be_24h'),
             ], 422);
         }
 
@@ -295,11 +297,11 @@ class AppointmentController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment cancelled successfully.',
+                'message' => __('web.booking.appointment_cancelled_success'),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to cancel appointment.'], 500);
+            return response()->json(['error' => __('web.booking.cancel_appointment_failed')], 500);
         }
     }
 
@@ -310,11 +312,11 @@ class AppointmentController extends Controller
     {
         // Check if user is the professional
         if (Auth::id() !== $appointment->professional_id || Auth::user()->user_type !== 3) {
-            return response()->json(['error' => 'Unauthorized.'], 403);
+            return response()->json(['error' => __('web.booking.unauthorized')], 403);
         }
 
         if ($appointment->status === 'cancelled') {
-            return response()->json(['error' => 'Appointment is already cancelled.'], 422);
+            return response()->json(['error' => __('web.booking.appointment_already_cancelled')], 422);
         }
 
         $request->validate([
@@ -341,11 +343,11 @@ class AppointmentController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment cancelled successfully.',
+                'message' => __('web.booking.appointment_cancelled_success'),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to cancel appointment.'], 500);
+            return response()->json(['error' => __('web.booking.cancel_appointment_failed')], 500);
         }
     }
 
@@ -355,7 +357,7 @@ class AppointmentController extends Controller
     public function storeExternal(Request $request)
     {
         if (Auth::user()->user_type !== 3) {
-            return response()->json(['error' => 'Only professionals can create external appointments.'], 403);
+            return response()->json(['error' => __('web.booking.only_professionals_external')], 403);
         }
 
         $request->validate([
@@ -370,7 +372,7 @@ class AppointmentController extends Controller
 
         // Check if professional owns the service
         if ($service->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized.'], 403);
+            return response()->json(['error' => __('web.booking.unauthorized')], 403);
         }
 
         DB::beginTransaction();
@@ -394,7 +396,7 @@ class AppointmentController extends Controller
                 });
 
             if ($overlaps) {
-                return response()->json(['error' => 'This time slot is already booked.'], 422);
+                return response()->json(['error' => __('web.booking.slot_already_booked')], 422);
             }
 
             $appointment = Appointment::create([
@@ -417,12 +419,12 @@ class AppointmentController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'External appointment created successfully.',
+                'message' => __('web.booking.external_appointment_created_success'),
                 'appointment' => $appointment,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create external appointment.'], 500);
+            return response()->json(['error' => __('web.booking.external_appointment_failed')], 500);
         }
     }
 
@@ -432,7 +434,7 @@ class AppointmentController extends Controller
     public function calendarData(Request $request)
     {
         if (Auth::user()->user_type !== 3) {
-            return response()->json(['error' => 'Unauthorized.'], 403);
+            return response()->json(['error' => __('web.booking.unauthorized')], 403);
         }
 
         $request->validate([
@@ -503,7 +505,7 @@ class AppointmentController extends Controller
             ->map(function ($availability) {
                 $dateStr = $availability->availability_date->format('Y-m-d');
                 return [
-                    'title' => 'Available',
+                    'title' => __('web.booking.event_available'),
                     'start' => $dateStr . 'T' . $availability->start_time->format('H:i:s'),
                     'end' => $dateStr . 'T' . $availability->end_time->format('H:i:s'),
                     'color' => '#00b3f1',
@@ -574,7 +576,7 @@ class AppointmentController extends Controller
             ->first();
 
         if (!$professional) {
-            return response()->json(['error' => 'Professional not found.'], 404);
+            return response()->json(['error' => __('web.booking.professional_not_found')], 404);
         }
 
         $request->validate([
@@ -590,7 +592,7 @@ class AppointmentController extends Controller
             ->first();
 
         if (!$service) {
-            return response()->json(['error' => 'Service not found or not available.'], 404);
+            return response()->json(['error' => __('web.booking.service_not_found_unavailable')], 404);
         }
 
         $start = Carbon::parse($request->start)->startOfDay();

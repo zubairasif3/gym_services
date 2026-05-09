@@ -745,9 +745,42 @@ document.addEventListener('DOMContentLoaded', function() {
         availabilityDeleted: @json(__('web.booking.availability_deleted')),
         couldNotDeleteSlot: @json(__('web.booking.could_not_delete_slot')),
         error: @json(__('web.booking.error')),
-        close: @json(__('web.booking.cancel')),
+        close: @json(__('web.booking.close')),
+        cancelButton: @json(__('web.booking.cancel')),
+        ok: @json(__('web.booking.ok')),
+        confirmLabel: @json(__('web.booking.confirm')),
         date: @json(__('web.booking.date')),
         time: @json(__('web.booking.time')),
+        booked: @json(__('web.booking.booked')),
+        waiting: @json(__('web.booking.waiting')),
+        selectServiceSwalTitle: @json(__('web.booking.select_service_swal_title')),
+        selectServiceSwalText: @json(__('web.booking.select_service_swal_text')),
+        slotUnavailableTitle: @json(__('web.booking.slot_unavailable_title')),
+        slotUnavailableText: @json(__('web.booking.slot_unavailable_text')),
+        slotStatusBooked: @json(__('web.booking.slot_status_booked')),
+        slotStatusWaiting: @json(__('web.booking.slot_status_waiting')),
+        slotStatusUnknown: @json(__('web.booking.slot_status_unknown')),
+        invalidSelectionTitle: @json(__('web.booking.invalid_selection_title')),
+        invalidSelectionText: @json(__('web.booking.invalid_selection_text')),
+        unableLoadSlots: @json(__('web.booking.unable_load_slots')),
+        unableLoadSlotsRetry: @json(__('web.booking.unable_load_slots_retry')),
+        noSlotsThisWeek: @json(__('web.booking.no_slots_this_week')),
+        eventAvailable: @json(__('web.booking.event_available')),
+        externalAppointmentCreated: @json(__('web.booking.external_appointment_created')),
+        slotsAdded: @json(__('web.booking.slots_added')),
+        slotAdded: @json(__('web.booking.slot_added')),
+        externalSlotBooked: @json(__('web.booking.external_slot_booked')),
+        calendarUpdatedSuccess: @json(__('web.booking.calendar_updated_success')),
+        couldNotSaveSlot: @json(__('web.booking.could_not_save_slot')),
+        bookingSubmittedTitle: @json(__('web.booking.booking_submitted_title')),
+        bookingSuccessDefault: @json(__('web.booking.booking_success_default')),
+        bookingSuccessFollowup: @json(__('web.booking.booking_success_followup')),
+        failedSubmitBooking: @json(__('web.booking.failed_submit_booking')),
+        errorTryAgain: @json(__('web.booking.error_try_again')),
+        oneHourSuffix: @json(__('web.booking.one_hour_suffix')),
+        addSlotTitle: @json(__('web.booking.add_slot_title')),
+        statusConfirmed: @json(__('web.booking.status_confirmed')),
+        statusPending: @json(__('web.booking.status_pending')),
     };
 
     console.log('[Booking] Debug:', bookingDebug);
@@ -766,6 +799,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function setBookingCalendarLocale(locale) {
         window._bookingCalendarLocale = locale;
+    }
+    function bookingDateLocaleTag() {
+        return getCalendarLocale() === 'it' ? 'it-IT' : 'en-GB';
+    }
+    function escapeBookingHtml(str) {
+        if (str == null || str === '') return '';
+        var d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+    function slotStatusPhraseForSwal(eventTitle) {
+        var t = (eventTitle || '').trim();
+        var tl = t.toLowerCase();
+        if (tl === 'booked' || t === 'Prenotato') return webTranslations.slotStatusBooked;
+        if (tl === 'waiting' || t === 'In attesa') return webTranslations.slotStatusWaiting;
+        return webTranslations.slotStatusUnknown;
+    }
+    function formatSlotStatusLabel(status, eventTitle) {
+        var s = (status || '').toLowerCase();
+        if (s === 'confirmed') return webTranslations.statusConfirmed;
+        if (s === 'pending') return webTranslations.statusPending;
+        var t = (eventTitle || '').trim();
+        var tl = t.toLowerCase();
+        if (tl === 'booked' || t === 'Prenotato') return webTranslations.booked;
+        if (tl === 'waiting' || t === 'In attesa') return webTranslations.waiting;
+        return status || eventTitle || '—';
+    }
+    function isWaitingSlotTitle(title) {
+        var t = (title || '').trim();
+        return t === 'Waiting' || t === 'In attesa';
     }
 
     @php
@@ -891,7 +954,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             'data-column="' + c + '" ' +
                             'data-allow-first="' + (!firstCovered ? '1' : '0') + '" ' +
                             'data-allow-second="' + (!secondCovered ? '1' : '0') + '" ' +
-                            'role="button" tabindex="0" title="Add slot">+</span>';
+                            'role="button" tabindex="0" title="' + webTranslations.addSlotTitle + '">+</span>';
                     }
                     cells[c].innerHTML = html;
                 }
@@ -956,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             'data-slot-end-1h="' + endTime1h + '" ' +
                             'data-column="' + c + '" ' +
                             'data-allow-first="1" data-allow-second="1" ' +
-                            'role="button" tabindex="0" title="Add slot">+</span>';
+                            'role="button" tabindex="0" title="' + webTranslations.addSlotTitle + '">+</span>';
                     }
                     html += '</div>';
                 }
@@ -1085,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(function(response) {
                         return response.json().then(function(data) {
                             if (!response.ok) {
-                                var msg = (data && (data.error || data.message)) || 'Unable to load time slots.';
+                                var msg = (data && (data.error || data.message)) || webTranslations.unableLoadSlots;
                                 if (errEl) {
                                     errEl.textContent = msg;
                                     errEl.style.display = 'block';
@@ -1095,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                             if (data.error || (data.message && !data.events)) {
                                 if (errEl) {
-                                    errEl.textContent = data.error || data.message || 'Unable to load time slots.';
+                                    errEl.textContent = data.error || data.message || webTranslations.unableLoadSlots;
                                     errEl.style.display = 'block';
                                 }
                                 successCallback([]);
@@ -1105,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 var props = ev.extendedProps || {};
                                 var dur = props.duration_minutes || 30;
                                 return {
-                                    title: ev.title || 'Available',
+                                    title: ev.title || webTranslations.eventAvailable,
                                     start: ev.start,
                                     end: ev.end,
                                     backgroundColor: ev.color || '#00b3f1',
@@ -1115,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 };
                             });
                             if (events.length === 0 && errEl) {
-                                errEl.textContent = 'No available time slots for this week. Try another week or ensure the professional has set availability for this service.';
+                                errEl.textContent = webTranslations.noSlotsThisWeek;
                                 errEl.style.display = 'block';
                                 errEl.style.color = '#9ca3af';
                                 errEl.style.background = 'rgba(156, 163, 175, 0.15)';
@@ -1130,7 +1193,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .catch(function(err) {
                         console.error('Error loading calendar:', err);
                         if (errEl) {
-                            errEl.textContent = 'Unable to load time slots. Please try again.';
+                            errEl.textContent = webTranslations.unableLoadSlotsRetry;
                             errEl.style.display = 'block';
                         }
                         successCallback([]);
@@ -1139,28 +1202,33 @@ document.addEventListener('DOMContentLoaded', function() {
             eventClick: function(info) {
                 info.jsEvent.preventDefault();
                 const props = info.event.extendedProps || {};
-                var isBookedOrWaiting = (props.bookable === false) || (info.event.title === 'Booked' || info.event.title === 'Waiting') || (props.status === 'confirmed' || props.status === 'pending');
+                var evTitleTrim = (info.event.title || '').trim();
+                var isBookedOrWaiting = (props.bookable === false)
+                    || (props.status === 'confirmed' || props.status === 'pending')
+                    || ['Booked', 'Waiting', 'Prenotato', 'In attesa'].indexOf(evTitleTrim) !== -1;
                 if (isBookedOrWaiting) {
                     if (isServiceOwner) {
                         var modalEl = document.getElementById('appointment-details-modal');
                         if (modalEl) {
+                            var dateLoc = bookingDateLocaleTag();
                             document.getElementById('slot-modal-service').textContent = props.service_title || '—';
                             document.getElementById('slot-modal-client').textContent = props.client_name || '—';
                             document.getElementById('slot-modal-email').textContent = props.client_email || '—';
                             document.getElementById('slot-modal-phone').textContent = props.client_phone || '—';
-                            document.getElementById('slot-modal-date').textContent = props.date ? new Date(props.date + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : (info.event.start ? info.event.start.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '—');
-                            document.getElementById('slot-modal-time').textContent = props.time || (info.event.start ? info.event.start.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false }) : '—');
+                            document.getElementById('slot-modal-date').textContent = props.date ? new Date(props.date + 'T12:00:00').toLocaleDateString(dateLoc, { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : (info.event.start ? info.event.start.toLocaleDateString(dateLoc, { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '—');
+                            document.getElementById('slot-modal-time').textContent = props.time || (info.event.start ? info.event.start.toLocaleTimeString(dateLoc, { hour: '2-digit', minute: '2-digit', hour12: false }) : '—');
                             var statusEl = document.getElementById('slot-modal-status');
-                            statusEl.textContent = props.status || info.event.title || '—';
-                            statusEl.className = 'badge ' + (props.status === 'confirmed' ? 'bg-success' : (props.status === 'pending' || info.event.title === 'Waiting') ? 'bg-warning text-dark' : 'bg-secondary');
+                            statusEl.textContent = formatSlotStatusLabel(props.status, info.event.title);
+                            statusEl.className = 'badge ' + (props.status === 'confirmed' ? 'bg-success' : ((props.status === 'pending' || isWaitingSlotTitle(info.event.title)) ? 'bg-warning text-dark' : 'bg-secondary'));
                             var modal = new bootstrap.Modal(modalEl);
                             modal.show();
                         }
                     } else {
                         bookingSwal.fire({
                             icon: 'info',
-                            title: 'Slot Unavailable',
-                            text: 'This slot is ' + (info.event.title || 'booked').toLowerCase() + '. Please select an available slot.',
+                            title: webTranslations.slotUnavailableTitle,
+                            text: webTranslations.slotUnavailableText.replace(':status', slotStatusPhraseForSwal(info.event.title)),
+                            confirmButtonText: webTranslations.ok,
                             confirmButtonColor: '#00b3f1'
                         });
                     }
@@ -1173,8 +1241,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     bookingSwal.fire({
                         icon: 'error',
-                        title: 'Invalid Selection',
-                        text: 'Please select future appointments.',
+                        title: webTranslations.invalidSelectionTitle,
+                        text: webTranslations.invalidSelectionText,
+                        confirmButtonText: webTranslations.ok,
                         confirmButtonColor: '#00b3f1'
                     });
                     return;
@@ -1184,12 +1253,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedDurationMinutes = props.duration_minutes || 30;
                 selectedTimeDisplay = (function() {
                     const d = info.event.start;
-                    var t = d.toLocaleTimeString('it-IT', {
+                    var t = d.toLocaleTimeString(bookingDateLocaleTag(), {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false
                     });
-                    return (selectedDurationMinutes === 60) ? (t + ' (1 hour)') : t;
+                    return (selectedDurationMinutes === 60) ? (t + webTranslations.oneHourSuffix) : t;
                 })();
                 if (isServiceOwner) {
                     showAvailabilitySlotActions(props);
@@ -1283,7 +1352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!slotTime || isNaN(col)) return;
         if (!calendar) return;
         if (!selectedServiceId) {
-            bookingSwal.fire({ icon: 'info', title: 'Select a service', text: 'Please select a service from the sidebar first.', confirmButtonColor: '#00b3f1' });
+            bookingSwal.fire({ icon: 'info', title: webTranslations.selectServiceSwalTitle, text: webTranslations.selectServiceSwalText, confirmButtonText: webTranslations.ok, confirmButtonColor: '#00b3f1' });
             return;
         }
 
@@ -1335,6 +1404,7 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmButtonColor: '#00b3f1',
             cancelButtonColor: '#6b7280',
             confirmButtonText: webTranslations.save,
+            cancelButtonText: webTranslations.cancelButton,
             didOpen: function() {
                 var durationSel = document.getElementById('swal-slot-duration');
                 var halfWrap = document.getElementById('swal-half-wrap');
@@ -1385,7 +1455,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!intervals.length) {
-                bookingSwal.fire({ icon: 'error', title: webTranslations.noAvailableOption, text: webTranslations.selectedSlotNotAvailable, confirmButtonColor: '#00b3f1' });
+                bookingSwal.fire({ icon: 'error', title: webTranslations.noAvailableOption, text: webTranslations.selectedSlotNotAvailable, confirmButtonText: webTranslations.ok, confirmButtonColor: '#00b3f1' });
                 return;
             }
 
@@ -1428,15 +1498,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(function() {
                     bookingSwal.fire({
                         icon: 'success',
-                        title: isExternal ? 'External appointment created' : (useRepeat ? 'Slots added' : 'Slot added'),
-                        text: isExternal ? 'Selected slot has been booked in your calendar.' : 'Calendar updated successfully.',
+                        title: isExternal ? webTranslations.externalAppointmentCreated : (useRepeat ? webTranslations.slotsAdded : webTranslations.slotAdded),
+                        text: isExternal ? webTranslations.externalSlotBooked : webTranslations.calendarUpdatedSuccess,
+                        confirmButtonText: webTranslations.ok,
                         confirmButtonColor: '#00b3f1'
                     });
                     if (calendar) calendar.refetchEvents();
                 })
                 .catch(function(err) {
-                    var msg = err && err.data && err.data.error ? err.data.error : (err && err.error) || 'Could not save slot.';
-                    bookingSwal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#00b3f1' });
+                    var msg = err && err.data && err.data.error ? err.data.error : (err && err.error) || webTranslations.couldNotSaveSlot;
+                    bookingSwal.fire({ icon: 'error', title: webTranslations.error, text: msg, confirmButtonText: webTranslations.ok, confirmButtonColor: '#00b3f1' });
                 });
         });
     });
@@ -1467,13 +1538,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'error',
                 title: webTranslations.slotActionUnavailable,
                 text: webTranslations.slotActionUnavailableText,
+                confirmButtonText: webTranslations.ok,
                 confirmButtonColor: '#00b3f1'
             });
             return;
         }
 
         var dateLabel = selectedDate
-            ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('it-IT', {
+            ? new Date(selectedDate + 'T12:00:00').toLocaleDateString(bookingDateLocaleTag(), {
                 weekday: 'short',
                 day: '2-digit',
                 month: 'short',
@@ -1513,6 +1585,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'success',
                         title: webTranslations.slotDeleted,
                         text: data.message || webTranslations.availabilityDeleted,
+                        confirmButtonText: webTranslations.ok,
                         confirmButtonColor: '#00b3f1'
                     });
                     if (calendar) calendar.refetchEvents();
@@ -1522,6 +1595,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'error',
                         title: webTranslations.error,
                         text: (error && (error.error || error.message)) || webTranslations.couldNotDeleteSlot,
+                        confirmButtonText: webTranslations.ok,
                         confirmButtonColor: '#00b3f1'
                     });
                 });
@@ -1532,13 +1606,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!selectedDate || !selectedTime) return;
         const serviceOption = serviceSelect.options[serviceSelect.selectedIndex];
         document.getElementById('modal-service').textContent = serviceOption ? serviceOption.text : '';
-        document.getElementById('modal-date').textContent = new Date(selectedDate + 'T12:00:00').toLocaleDateString('it-IT', {
+        document.getElementById('modal-date').textContent = new Date(selectedDate + 'T12:00:00').toLocaleDateString(bookingDateLocaleTag(), {
             weekday: 'short',
             day: '2-digit',
             month: 'short',
             year: 'numeric'
         });
-        document.getElementById('modal-time').textContent = selectedTimeDisplay || new Date(selectedDate + 'T' + selectedTime + ':00').toLocaleTimeString('it-IT', {
+        document.getElementById('modal-time').textContent = selectedTimeDisplay || new Date(selectedDate + 'T' + selectedTime + ':00').toLocaleTimeString(bookingDateLocaleTag(), {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false
@@ -1553,6 +1627,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'warning',
                 title: webTranslations.loginRequired,
                 text: webTranslations.loginRequiredText,
+                confirmButtonText: webTranslations.ok,
                 confirmButtonColor: '#00b3f1'
             }).then(function() {
                 window.location.href = loginUrl + '?intended=' + encodeURIComponent(returnUrl);
@@ -1585,10 +1660,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(function(response) {
             if (response.status === 401 || response.status === 403) {
                 return response.json().then(function(body) {
-                    throw { authRequired: true, message: body.error || 'Please log in to book an appointment.' };
+                    throw { authRequired: true, message: body.error || webTranslations.loginRequiredText };
                 }).catch(function(err) {
                     if (err.authRequired) throw err;
-                    throw { authRequired: true, message: 'Please log in to book an appointment.' };
+                    throw { authRequired: true, message: webTranslations.loginRequiredText };
                 });
             }
             return response.json();
@@ -1598,24 +1673,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (bookingConfirmModal) bookingConfirmModal.hide();
                 bookingSwal.fire({
                     icon: 'success',
-                    title: 'Booking Submitted!',
-                    html: '<p>' + (data.message || '') + '</p><p>You will receive a confirmation email once the professional confirms your appointment.</p>',
+                    title: webTranslations.bookingSubmittedTitle,
+                    html: '<p>' + escapeBookingHtml(data.message || webTranslations.bookingSuccessDefault) + '</p><p>' + webTranslations.bookingSuccessFollowup + '</p>',
+                    confirmButtonText: webTranslations.ok,
                     confirmButtonColor: '#00b3f1'
                 }).then(function() {
                     window.location.href = '{{ route("web.index") }}';
                 });
             } else {
-                throw new Error(data.error || data.message || 'Failed to submit booking');
+                throw new Error(data.error || data.message || webTranslations.failedSubmitBooking);
             }
         })
         .catch(function(error) {
-            var msg = error.message || 'An error occurred. Please try again.';
+            var msg = error.message || webTranslations.errorTryAgain;
             if (error.authRequired) {
-                msg = error.message || 'Please log in to book an appointment.';
+                msg = error.message || webTranslations.loginRequiredText;
                 bookingSwal.fire({
                     icon: 'warning',
-                    title: 'Login Required',
+                    title: webTranslations.loginRequired,
                     text: msg,
+                    confirmButtonText: webTranslations.ok,
                     confirmButtonColor: '#00b3f1'
                 }).then(function() {
                     window.location.href = loginUrl + '?intended=' + encodeURIComponent(returnUrl);
@@ -1623,13 +1700,14 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 bookingSwal.fire({
                     icon: 'error',
-                    title: 'Error',
+                    title: webTranslations.error,
                     text: msg,
+                    confirmButtonText: webTranslations.ok,
                     confirmButtonColor: '#00b3f1'
                 });
             }
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="far fa-calendar-check"></i> Confirm';
+            submitBtn.innerHTML = '<i class="far fa-calendar-check"></i> ' + webTranslations.confirmLabel;
         });
     });
 

@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\Filament\AdminLogoutResponse;
 use App\Models\Category;
 use App\Models\ProfileMedia;
 use App\Models\Service;
 use App\Observers\ProfileMediaObserver;
 use App\Observers\ServiceObserver;
+use Filament\Http\Responses\Auth\Contracts\LogoutResponse as FilamentLogoutResponseContract;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(FilamentLogoutResponseContract::class, AdminLogoutResponse::class);
     }
 
     /**

@@ -6,7 +6,7 @@
             <div class="col-auto position-relative">
                 <button class="toolbar-icon btn btn-link text-white position-relative p-2" 
                         wire:click="toggleNotifications"
-                        title="Notifications">
+                        title="{{ __('web.dashboard.notifications') }}">
                     <i class="far fa-bell fs-5"></i>
                     @if($notificationsCount > 0)
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -28,7 +28,7 @@
             <div class="col-auto position-relative">
                 <button class="toolbar-icon btn btn-link text-white position-relative p-2" 
                         wire:click="toggleMessages"
-                        title="Messages">
+                        title="{{ __('web.dashboard.messages') }}">
                     <i class="far fa-envelope fs-5"></i>
                     @if($messagesCount > 0)
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -48,7 +48,7 @@
             
             <!-- Following/Followers -->
             <div class="col-auto">
-                <a href="{{ route('following') }}" class="toolbar-icon btn btn-link text-white text-decoration-none p-2" title="Followed">
+                <a href="{{ route('following') }}" class="toolbar-icon btn btn-link text-white text-decoration-none p-2" title="{{ __('web.dashboard.following') }}">
                     <i class="far fa-heart fs-5"></i>
                     <span class="ms-1">{{ $followingCount }}</span>
                 </a>
@@ -58,7 +58,7 @@
             <div class="col-auto position-relative">
                 <button class="toolbar-icon btn btn-link p-1" 
                         wire:click="toggleProfile"
-                        title="Profile">
+                        title="{{ __('web.dashboard.profile') }}">
                     @if(auth()->user()->avatar_url)
                         <img src="{{ asset('storage/' . auth()->user()->avatar_url) }}" 
                              class="rounded-circle" 

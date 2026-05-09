@@ -3,7 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Http\Middleware\SetLocale;
-use Filament\Http\Middleware\Authenticate;
+use App\Filament\Pages\Auth\RedirectWebLogin;
+use App\Http\Middleware\RedirectAdminGuestsToWebLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -54,7 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(RedirectWebLogin::class)
             ->brandLogo(asset('web/images/logo-dark.png'))
             ->favicon(asset('favicon1.ico'))
             ->brandLogoHeight('3.5rem')
@@ -92,7 +93,7 @@ class AdminPanelProvider extends PanelProvider
                 //     ,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                RedirectAdminGuestsToWebLogin::class,
             ])
             ->colors([
                 'primary' => '#00b3f1',

@@ -325,7 +325,23 @@ class HomeController extends Controller
         return view('web.privacy_policy');
     }
 
-    public function login(){
+    public function login(Request $request)
+    {
+        $intended = $request->query('intended');
+        if (is_string($intended) && $intended !== '') {
+            if (str_starts_with($intended, '/') && ! str_starts_with($intended, '//') && ! str_contains($intended, '..')) {
+                $request->session()->put('url.intended', url($intended));
+            } else {
+                $appUrl = rtrim((string) config('app.url'), '/');
+                if ($appUrl !== '' && (str_starts_with($intended, $appUrl.'/') || $intended === $appUrl)) {
+                    $path = parse_url($intended, PHP_URL_PATH) ?? '';
+                    if ($path === '' || ! str_contains($path, '..')) {
+                        $request->session()->put('url.intended', $intended);
+                    }
+                }
+            }
+        }
+
         return view('web.login');
     }
 

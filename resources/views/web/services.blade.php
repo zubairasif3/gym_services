@@ -40,18 +40,24 @@
                                 <label class="form-label fw-semibold text-dark mb-1 small">
                                     <i class="fas fa-map-marker-alt text-primary me-1"></i>{{ __('services.location_italy') }}
                                 </label>
-                                <select id="city-select" 
-                                        name="city" 
-                                        class="form-select rounded-pill border-2 shadow-sm" 
-                                        style="height: 38px;"
-                                        onchange="this.form.submit()">
-                                    <option value="">🇮🇹 {{ __('services.all_available_cities') }}</option>
-                                    @foreach ($finalCities as $cityOption)
-                                        <option value="{{ $cityOption }}" {{ request('city') == $cityOption ? 'selected' : '' }}>
-                                            {{ $cityOption }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div class="services-city-autocomplete"
+                                     data-cities='@json(array_values($finalCities))'
+                                     data-all-label="🇮🇹 {{ __('services.all_available_cities') }}"
+                                     data-no-results="{{ e(__('services.city_no_results')) }}">
+                                    <input type="hidden" name="city" id="city-hidden" value="{{ request('city') }}">
+                                    <input type="text"
+                                           id="city-search-input"
+                                           class="form-control rounded-pill border-2 shadow-sm"
+                                           style="height: 38px;"
+                                           placeholder="{{ __('services.city_search_placeholder') }}"
+                                           value="{{ request('city') }}"
+                                           autocomplete="off"
+                                           aria-autocomplete="list"
+                                           aria-controls="city-suggestions-list"
+                                           aria-expanded="false"
+                                           role="combobox">
+                                    <ul id="city-suggestions-list" class="services-city-suggestions" role="listbox" hidden></ul>
+                                </div>
                             </div>
                             
                             <!-- Price Range Filter -->
@@ -144,7 +150,7 @@
         <div class="container">
           <div class="row align-items-center wow fadeInUp">
             <div class="col-xl-5">
-              <div class="main-title mb30-lg">
+              <div class="main-title mb30-lg" style="position: relative; z-index: -6;">
                 <h2 class="title">{{ __('services.featured_professionals') }}</h2>
                 <p class="paragraph">{{ __('services.top_rated_professionals') }}</p>
               </div>
@@ -285,6 +291,7 @@
     transition: all 0.3s ease;
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border: 1px solid #e3e6f0 !important;
+    overflow: visible;
 }
 
 .filter-panel:hover {
@@ -324,8 +331,8 @@
 }
 
 .form-control:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    border-color: #00b3f1;
+    box-shadow: 0 0 0 0.2rem rgba(0, 179, 241, 0.25);
     transform: scale(1.02);
 }
 
@@ -391,6 +398,53 @@
     }
 }
 
+/* City autocomplete (custom list — solid panel, above page content) */
+.services-city-autocomplete {
+    position: relative;
+    z-index: 50;
+}
+.services-city-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 5000;
+    margin: 0;
+    padding: 0.35rem 0;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid rgba(0, 179, 241, 0.45);
+    border-radius: 0.5rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+    max-height: 280px;
+    overflow-y: auto;
+}
+.services-city-suggestion-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    line-height: 1.35;
+}
+.services-city-suggestion-item:hover,
+.services-city-suggestion-item.is-active {
+    background: rgba(0, 179, 241, 0.12);
+    color: #006a94;
+}
+.services-city-suggestion-item[data-value=""] {
+    font-weight: 600;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.55rem;
+}
+.services-city-suggestion-empty {
+    padding: 0.55rem 1rem 0.65rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    cursor: default;
+    font-style: italic;
+}
+
 /* Loading animation for form submission */
 .btn-primary.loading {
     position: relative;
@@ -450,8 +504,11 @@
       });
     });
 
-    // Add loading state to filter button
+    // Add loading state to filter button (city hidden synced before submit)
     filterForm.addEventListener('submit', function() {
+      if (typeof window.servicesCitySyncFromInput === 'function') {
+        window.servicesCitySyncFromInput();
+      }
       submitBtn.classList.add('loading');
       submitBtn.disabled = true;
     });
@@ -489,14 +546,133 @@
       });
     });
 
-    // Auto-submit city filter with loading state
-    const citySelect = document.getElementById('city-select');
-    if (citySelect) {
-      citySelect.addEventListener('change', function() {
+    // City filter: typeahead + suggestion panel (no bootstrap-select — avoids overlap / z-index issues)
+    (function initCityAutocomplete() {
+      const root = document.querySelector('.services-city-autocomplete');
+      if (!root || !filterForm) return;
+
+      let cities = [];
+      try {
+        cities = JSON.parse(root.getAttribute('data-cities') || '[]');
+      } catch (e) {
+        cities = [];
+      }
+      const allLabel = root.getAttribute('data-all-label') || '';
+      const noResultsText = root.getAttribute('data-no-results') || '';
+      const hidden = document.getElementById('city-hidden');
+      const input = document.getElementById('city-search-input');
+      const list = document.getElementById('city-suggestions-list');
+      if (!hidden || !input || !list) return;
+
+      var blurTimer;
+
+      function normalize(s) {
+        var t = (s || '').toString();
+        try {
+          return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        } catch (e) {
+          return t.toLowerCase();
+        }
+      }
+
+      function syncCityFromInput() {
+        const v = input.value.trim();
+        if (v === '') {
+          hidden.value = '';
+          return;
+        }
+        const vn = normalize(v);
+        const match = cities.find(function (c) {
+          return normalize(c) === vn;
+        });
+        hidden.value = match || '';
+      }
+      window.servicesCitySyncFromInput = syncCityFromInput;
+
+      function hideSuggestions() {
+        list.innerHTML = '';
+        list.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+      }
+
+      function renderSuggestions(query) {
+        const qn = normalize(query.trim());
+        list.innerHTML = '';
+        const frag = document.createDocumentFragment();
+
+        const allLi = document.createElement('li');
+        allLi.className = 'services-city-suggestion-item';
+        allLi.setAttribute('role', 'option');
+        allLi.dataset.value = '';
+        allLi.textContent = allLabel;
+        frag.appendChild(allLi);
+
+        var shown = 0;
+        var max = 80;
+        cities.forEach(function (city) {
+          if (shown >= max) return;
+          if (!qn || normalize(city).indexOf(qn) !== -1) {
+            var li = document.createElement('li');
+            li.className = 'services-city-suggestion-item';
+            li.setAttribute('role', 'option');
+            li.dataset.value = city;
+            li.textContent = city;
+            frag.appendChild(li);
+            shown++;
+          }
+        });
+        if (qn && shown === 0 && noResultsText) {
+          var emptyLi = document.createElement('li');
+          emptyLi.className = 'services-city-suggestion-empty';
+          emptyLi.setAttribute('role', 'presentation');
+          emptyLi.textContent = noResultsText;
+          frag.appendChild(emptyLi);
+        }
+        list.appendChild(frag);
+        list.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+      }
+
+      function pickCity(value) {
+        if (value === '') {
+          hidden.value = '';
+          input.value = '';
+        } else {
+          hidden.value = value;
+          input.value = value;
+        }
+        hideSuggestions();
         submitBtn.classList.add('loading');
         submitBtn.disabled = true;
+        filterForm.submit();
+      }
+
+      input.addEventListener('focus', function () {
+        window.clearTimeout(blurTimer);
+        renderSuggestions(input.value);
       });
-    }
+
+      input.addEventListener('input', function () {
+        renderSuggestions(input.value);
+      });
+
+      list.addEventListener('mousedown', function (e) {
+        var li = e.target.closest('.services-city-suggestion-item');
+        if (!li || !list.contains(li)) return;
+        e.preventDefault();
+        pickCity(li.dataset.value === undefined ? '' : li.dataset.value);
+      });
+
+      input.addEventListener('blur', function () {
+        blurTimer = window.setTimeout(function () {
+          hideSuggestions();
+        }, 180);
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!root.contains(e.target)) hideSuggestions();
+      });
+    })();
   });
 </script>
 @endpush

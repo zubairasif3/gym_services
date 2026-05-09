@@ -5,6 +5,8 @@ return [
     'filters' => 'Filtri:',
     'location_italy' => 'Posizione (Italia)',
     'all_available_cities' => 'Tutte le citta disponibili',
+    'city_search_placeholder' => 'Cerca citta...',
+    'city_no_results' => 'Nessuna citta trovata.',
     'price_range' => 'Fascia di prezzo',
     'range' => 'Intervallo',
     'search' => 'Cerca',
